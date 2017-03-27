@@ -1,0 +1,12 @@
+build/
+dist/
+.DS_Store
+.npm
+node_modules
+logs
+*.log
+npm-debug.log*
+
+pids
+*.pid
+*.seed
