@@ -1,21 +1,20 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-import routes from './config/routes'
+
+// 引入element-ui
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
-Vue.use(VueRouter)
 Vue.use(ElementUI)
 
-var App = require('./App')
-
+// 配置vue-router
+import VueRouter from 'vue-router'
+Vue.use(VueRouter)
+import routes from './config/routes'
 const router = new VueRouter({
     routes
 })
 
-//setting Vuex
-var app = new Vue({
-    el: '#app',
-    router,
-    name,
-    render: h => h(App)
-})
+var App = require('./App')
+
+new Vue({
+    router
+}).$mount('#app')

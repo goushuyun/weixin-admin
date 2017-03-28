@@ -1,93 +1,96 @@
 <style lang="scss" scoped>
-@import "../common/_color";
 
-.container{
-    background-color: $bg_grey;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-div#loginBox{
-    margin-top: -56px;
-    padding: 6px 24px 24px;
-    border-radius: 6px;
+#login_box {
     background-color: white;
-    width: 300px;
-    .el-input{
-        padding-bottom: 12px;
+    text-align: center;
+    width: 400px;
+    margin: 0 auto;
+    padding: 22px 24px 32px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+
+    // logo
+    img.logo {
+        margin-bottom: 12px;
     }
 
-    .login_btn{
-        width: 100%;
+    div.tabs{
+        display: flex;
+        justify-content: center;
+        margin-bottom: 8px;
     }
 }
+
+.bottom_bar{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    height: 128px;
+    color: #888;
+    font-size: 13px;
+    line-height: 128px;
+}
+
 </style>
 
 <template lang="html">
-    <div class="container">
-        <div id="loginBox">
-            <el-input class="loginTel" v-model="tel" placeholder="手机号码" autofocus></el-input>
-            <el-input @keyup.enter.native="login" v-model="password" type="password" placeholder="密码"></el-input>
-            <el-button class="login_btn" :loading="btn_loading" type="primary" @click="login">登录</el-button>
+
+<div class="container">
+    <div style="height:180px;"></div>
+
+    <div id="login_box">
+        <img class="logo" src="../images/logo.png" alt="logo">
+
+        <div class="tabs">
+            <el-tabs v-model="activeName" @tab-click="handleClick"  style="width:120px;">
+                <el-tab-pane label="登录" name="sign_in">
+                    <!-- 登录框 -->
+
+                </el-tab-pane>
+                <el-tab-pane label="注册" name="sign_up">
+                    <!-- 注册框 -->
+                </el-tab-pane>
+            </el-tabs>
         </div>
+
+        <el-row type="flex" justify="center">
+            <el-col :span="18">
+                <el-form :label-position="top">
+                    <el-form-item>
+                        <el-input placeholder="手机号码"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-input placeholder="密码"></el-input>
+                    </el-form-item>
+                    <el-button style="width: 100%;" type="primary">立即登录</el-button>
+                </el-form>
+            </el-col>
+        </el-row>
+
     </div>
+
+    <!-- 底部信息条 -->
+    <el-row class="bottom_bar">
+        <el-col :span="24">© 2017 购书云 版权所有 沪ICP备15022838号-2 </el-col>
+    </el-row>
+</div>
+
 </template>
 
 <script>
-import {testMobile, testPassword} from '../scripts/utils'
-import axios from "../scripts/http"
 
 export default {
-    data(){
+    data() {
         return {
-            tel: '',
-            password: '',
-            btn_loading: false
+            activeName: 'sign_in'
         }
     },
-    mounted(){
-        //remove adminInfo
-        localStorage.removeItem('adminInfo')
-        localStorage.removeItem('token')
-    },
     methods: {
-        login(){
-            //校验手机号码格式
-            if(!testMobile(this.tel)){
-                this.$message.error('手机号码格式不正确！')
-                return
-            }
-            //check password
-            if(!testPassword(this.password)){
-                this.$message.error('密码格式不正确！');
-                return
-            }
-            this.btn_loading = true
-            axios.post('/v1/admin/login', {
-                tel: this.tel,
-                password: this.password
-            }).then(resp=>{
-                if(resp.data.code == '00000'){
-                    //login success
-
-                    //put token into localStorage
-                    localStorage.setItem("token", resp.data.data.token)
-                    //put adminInfo into admin
-                    localStorage.setItem('adminInfo', JSON.stringify(resp.data.data))
-
-                    this.$router.push({name: 'admin'})
-                }else if (resp.data.code == '11001'){
-                    //user not found
-                    this.$message.error("用户名或密码错误")
-                    this.tel = ''
-                    this.password = ''
-                    $('.loginTel input').focus()
-                }
-                this.btn_loading = false
-            })
-
+        handleClick(tab, e) {
+            console.log(tab, e);
         }
     }
 }
+
 </script>
