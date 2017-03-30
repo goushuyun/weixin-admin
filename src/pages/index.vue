@@ -50,6 +50,8 @@
     #top_bar {
         background-color: white;
         padding: 0 26px;
+        font-size: 20px;
+        font-weight: bold;
         .title {
             height: 48px;
             line-height: 48px;
@@ -57,10 +59,9 @@
         }
     }
     .content_inner {
-        background-color: white;
-        overflow: auto;
+        // background-color: white;
+        // overflow: auto;
         margin: 8px;
-        padding: 16px 10px;
     }
     box-sizing: border-box;
 }
