@@ -1,0 +1,50 @@
+@import "../../common/_color.scss";
+
+section.main{
+    width: 750px;
+    font-size: 13px;
+    margin: 16px auto;
+    ul.shops{
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        li{
+            margin-top: 12px;
+            background-color: white;
+            display: inline-block;
+            margin-left: 12px;
+            border-radius: 4px;
+            &:hover{
+                cursor: pointer;
+                box-shadow: 0 0 10px rgba(0, 0, 0,.1);
+            }
+        }
+
+        li.shop{
+            padding: 12px;
+            // width: 200px;
+            min-width: 180px;
+            h3.shop_name{
+                font-size: 16px;
+                line-height: 48px;
+                color: $font_normal;
+            }
+            p.create_at{
+                font-size: 12px;
+                color: $font_light;
+                line-height: 22px;
+            }
+        }
+
+        li.add_btn{
+            width: 126px;
+            height: 126px;
+            line-height: 126px;
+            text-align: center;
+            font-size: 22px;
+            color: #efefef;
+        }
+
+    }
+
+}
