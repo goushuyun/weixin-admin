@@ -92,34 +92,6 @@
         </el-form-item>
 
     </el-form>
-
-    <el-form style="margin-top:8px;" ref="form" :model="form" label-width="110px">
-        <el-form-item label="客服电话：">
-          <label style="margin-right:10px;">总客服</label>
-          <label v-if="!update_main_service">
-            <label style="margin-right:10px;">18818000305</label>
-            <el-button type="text" @click="update_main_service = true">修改</el-button>
-          </label>
-          <label v-else>
-            <el-input size="small" value="18818000305"></el-input>
-            <el-button type="text" @click="update_main_service = false">保存</el-button>
-            <el-button type="text" @click="update_main_service = false">取消</el-button>
-          </label>
-        </el-form-item>
-        <el-form-item v-for="(service, index) in services">
-          <label style="margin-right:10px;">{{service.service_school}}</label>
-          <label v-if="!service.service_update">
-            <label style="margin-right:10px;">{{service.service_tel}}</label>
-            <el-button type="text" @click="service.service_update = true">修改</el-button>
-          </label>
-          <label v-else>
-            <el-input size="small" v-model="service.service_tel"></el-input>
-            <el-button type="text" @click="service.service_update = false">保存</el-button>
-            <el-button type="text" @click="service.service_update = false">取消</el-button>
-          </label>
-        </el-form-item>
-    </el-form>
-
 </div>
 
 </template>
@@ -140,15 +112,6 @@ export default {
               token: ''
             },
             shop_id: '',
-            services: [{
-              service_school: '上海应用技术大学',
-              service_tel: '18818000305',
-              service_update: false,
-            },{
-              service_school: '上海应用技术大学',
-              service_tel: '18818000305',
-              service_update: false,
-            }],
             form: {
                 logo: "",
                 shop_name: "购书云",
