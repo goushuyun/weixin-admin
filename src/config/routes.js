@@ -1,7 +1,8 @@
 // 将组件抽离成不同的代码块，当路由访问到的时候再去加载，实现路由懒加载
 const example = r => require(['../pages/example/example'], r)
 const shops = r => require(['../pages/shops/shops'], r)
-const shopInfo = r => require(['../pages/manage/shop_info'], r)
+const shop_info = r => require(['../pages/manage/index'], r)
+const cloud_shop = r => require(['../pages/manage/shop_info'], r)
 
 export default [{
     path: '/',
@@ -19,9 +20,15 @@ export default [{
         name: 'example',
         path: 'example',
         component: example
-    },{
-        path: 'shopInfo',
-        name: 'shopInfo',
-        component: shopInfo
+    }, {
+        path: 'shop_info',
+        name: 'shop_info',
+        component: shop_info,
+        children: [{
+            name: 'cloud_shop',
+            path: 'cloud_shop',
+            component: cloud_shop
+        }]
+
     }]
 }]
