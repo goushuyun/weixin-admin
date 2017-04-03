@@ -19,13 +19,6 @@ cp -r ./src/images  ./index.html ./build
 # copy 打包后的js
 cp ./dist/* ./build/dist
 
-<<<<<<< Updated upstream
-=======
-# copy 打印相关js到 dist
-cp ./src/scripts/print.js ./src/scripts/LodopFuncs.js ./build/dist
-
-
->>>>>>> Stashed changes
 # rm -rf ./dist
 
 rsync -e ssh -r ./build/* --progress -cv 'root@121.42.184.175:/home/admin-pages'

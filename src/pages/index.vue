@@ -95,10 +95,10 @@
                 </el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="店铺管理">
-                <el-menu-item index="/admin/example">
+                <el-menu-item index="/admin/shop_info/">
                     <i class="fa fa-info-circle" aria-hidden="true"></i></i>店铺信息
                 </el-menu-item>
-                <el-menu-item index="/admin/example">
+                <el-menu-item index="/admin/shop_setting/school/">
                     <i class="fa fa-cog" aria-hidden="true"></i></i>店铺设置
                 </el-menu-item>
             </el-menu-item-group>
