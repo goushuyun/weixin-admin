@@ -1,9 +1,8 @@
 <style lang="scss" scoped>
-
 #login_box {
     background-color: white;
     text-align: center;
-    width: 400px;
+    width: 300px;
     margin: 0 auto;
     padding: 22px 24px 32px;
     border-radius: 4px;
@@ -14,14 +13,14 @@
         margin-bottom: 12px;
     }
 
-    div.tabs{
+    div.tabs {
         display: flex;
         justify-content: center;
         margin-bottom: 8px;
     }
 }
 
-.bottom_bar{
+.bottom_bar {
     position: fixed;
     bottom: 0;
     width: 100%;
@@ -31,7 +30,6 @@
     font-size: 13px;
     line-height: 128px;
 }
-
 </style>
 
 <template lang="html">
@@ -46,7 +44,6 @@
             <el-tabs v-model="activeName" @tab-click="handleClick"  style="width:120px;">
                 <el-tab-pane label="登录" name="sign_in">
                     <!-- 登录框 -->
-
                 </el-tab-pane>
                 <el-tab-pane label="注册" name="sign_up">
                     <!-- 注册框 -->
@@ -54,16 +51,46 @@
             </el-tabs>
         </div>
 
-        <el-row type="flex" justify="center">
-            <el-col :span="18">
+        <el-row v-if="activeName=='sign_up'" type="flex" justify="center">
+            <el-col :span="24">
                 <el-form :label-position="top">
                     <el-form-item>
                         <el-input placeholder="手机号码"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-input placeholder="密码"></el-input>
+                        <el-input placeholder="短信验证码"><template slot="append">获取验证码</template></el-input>
                     </el-form-item>
-                    <el-button style="width: 100%;" type="primary">立即登录</el-button>
+                    <el-form-item>
+                        <el-input placeholder="个人昵称"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-input placeholder="设置密码"></el-input>
+                    </el-form-item>
+                    <el-button style="width: 100%;" type="primary">立即注册</el-button>
+                </el-form>
+            </el-col>
+        </el-row>
+
+        <el-row v-if="activeName=='sign_in'" type="flex" justify="center">
+            <el-col :span="24">
+                <el-form :label-position="top">
+                    <el-form-item>
+                        <el-input placeholder="手机号码"></el-input>
+                    </el-form-item>
+                    <el-form-item v-show="!forgetPwd">
+                        <el-input placeholder="登录密码"></el-input>
+                    </el-form-item>
+                    <el-form-item v-show="forgetPwd">
+                        <el-input placeholder="短信验证码"><template slot="append">获取验证码</template></el-input>
+                    </el-form-item>
+                    <el-form-item v-show="forgetPwd">
+                        <el-input placeholder="新密码"></el-input>
+                    </el-form-item>
+                    <el-form-item style="text-align:left">
+                        <el-button style="width: 100%;" type="primary">立即登录</el-button>
+                        <el-button v-show="!forgetPwd" type="text" @click="forgetPwd=true">忘记密码？</el-button>
+                        <el-button v-show="forgetPwd" type="text" @click="forgetPwd=false">密码登录</el-button>
+                    </el-form-item>
                 </el-form>
             </el-col>
         </el-row>
@@ -79,18 +106,17 @@
 </template>
 
 <script>
-
 export default {
     data() {
         return {
-            activeName: 'sign_in'
+            activeName: 'sign_in',
+            forgetPwd: false
         }
     },
     methods: {
         handleClick(tab, e) {
-            console.log(tab, e);
+            this.activeName = tab.name
         }
     }
 }
-
 </script>
