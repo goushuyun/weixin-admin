@@ -26,15 +26,15 @@ axios.interceptors.response.use(function(response) {
     if(jwt_token != undefined){
         localStorage.setItem('token', jwt_token)
     }
+
+    // if(response.data.code == '11001'){
+    //     app.$message.error('用户名或密码错误!')
+    //     // return new Error(response.data.message)
+    // }
     //relogin
-    if(response.data.code == '11001'){
-        app.$message.error('用户名或密码错误!')
-        // return new Error(response.data.message)
-    }
-    //relogin
-    if(response.data.code == '11014'){
-        window.location.href = "http://www.goushuyun.com/#"
-    }
+    // if(response.data.code == '11014'){
+    //     window.location.href = "http://localhost:8090/#"
+    // }
     //handler error
     if(response.data.code != '00000'){
         app.$message.error(response.data.message)
