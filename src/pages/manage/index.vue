@@ -15,15 +15,12 @@
 
     <div class="content_inner">
         <el-tabs class="tabs" v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="云店信息" name="first"></el-tab-pane>
-            <el-tab-pane label="实体店信息" name="second"></el-tab-pane>
+            <el-tab-pane label="云店信息" name="cloud"></el-tab-pane>
+            <el-tab-pane label="实体店信息" name="substance"></el-tab-pane>
         </el-tabs>
-
         <section>
             <router-view></router-view>
         </section>
-
-
     </div>
 </div>
 
@@ -34,12 +31,18 @@
 export default {
     data() {
         return {
-            activeName: 'second'
+            activeName: 'cloud'
         };
     },
     methods: {
         handleClick(tab, event) {
-            console.log(tab, event);
+            this.activeName = tab.name
+            if (tab.name == 'cloud') {
+                this.$router.push('cloud_shop')
+            }
+            if (tab.name == 'substance') {
+                console.log('没有实现');
+            }
         }
     }
 }
