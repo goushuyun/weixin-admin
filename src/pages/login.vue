@@ -51,52 +51,50 @@
             </el-tabs>
         </div>
 
-        <el-row v-if="activeName=='sign_up'" type="flex" justify="center">
+        <el-row type="flex" justify="center">
             <el-col :span="24">
-                <el-form :label-position="top">
-                    <el-form-item>
-                        <el-input placeholder="手机号码" v-model="mobile"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-input placeholder="短信验证码" v-model="message_code"><template slot="append">获取验证码</template></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-input placeholder="个人昵称" v-model="username"></el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-input placeholder="设置密码" v-model="password" @keyup.enter.native="signUp"></el-input>
-                    </el-form-item>
-                    <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signUp">立即注册</el-button>
+                <el-form :model="sign" :rules="rules" ref="sign">
+                    <div v-if="activeName=='sign_up'">
+                      <el-form-item prop="mobile">
+                          <el-input class="mobile" placeholder="手机号码" v-model="sign.mobile"></el-input>
+                      </el-form-item>
+                      <el-form-item prop="message_code">
+                          <el-input placeholder="短信验证码" v-model="sign.message_code"><el-button slot="append" @click="getMessageCode">获取验证码</el-button></el-input>
+                      </el-form-item>
+                      <el-form-item prop="username">
+                          <el-input placeholder="个人昵称" v-model="sign.username"></el-input>
+                      </el-form-item>
+                      <el-form-item prop="password">
+                          <el-input placeholder="设置密码" type="password" v-model="sign.password" @keyup.enter.native="signUp"></el-input>
+                      </el-form-item>
+                      <el-form-item>
+                          <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signUp('sign')">立即注册</el-button>
+                      </el-form-item>
+                    </div>
+
+                    <div v-if="activeName=='sign_in'">
+                      <el-form-item prop="mobile">
+                          <el-input class="mobile" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
+                      </el-form-item>
+                      <el-form-item prop="password" v-show="!forgetPwd">
+                          <el-input placeholder="登录密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
+                      </el-form-item>
+                      <el-form-item prop="message_code" v-show="forgetPwd">
+                          <el-input placeholder="短信验证码" v-model="sign.message_code"><el-button slot="append" @click="getMessageCode">获取验证码</el-button></el-input>
+                      </el-form-item>
+                      <el-form-item prop="password" v-show="forgetPwd">
+                          <el-input placeholder="新密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
+                      </el-form-item>
+                      <el-form-item style="text-align:left">
+                          <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signIn">立即登录</el-button>
+                          <el-button v-show="!forgetPwd" type="text" @click="forgetPwd=true">忘记密码？</el-button>
+                          <el-button v-show="forgetPwd" type="text" @click="forgetPwd=false">密码登录</el-button>
+                      </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>
-
-        <el-row v-if="activeName=='sign_in'" type="flex" justify="center">
-            <el-col :span="24">
-                <el-form :label-position="top">
-                    <el-form-item>
-                        <el-input placeholder="手机号码" v-model="mobile"></el-input>
-                    </el-form-item>
-                    <el-form-item v-show="!forgetPwd">
-                        <el-input placeholder="登录密码" v-model="password" @keyup.enter.native="signIn"></el-input>
-                    </el-form-item>
-                    <el-form-item v-show="forgetPwd">
-                        <el-input placeholder="短信验证码" v-model="message_code"><template slot="append">获取验证码</template></el-input>
-                    </el-form-item>
-                    <el-form-item v-show="forgetPwd">
-                        <el-input placeholder="新密码" v-model="password" @keyup.enter.native="signIn"></el-input>
-                    </el-form-item>
-                    <el-form-item style="text-align:left">
-                        <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signIn">立即登录</el-button>
-                        <el-button v-show="!forgetPwd" type="text" @click="forgetPwd=true">忘记密码？</el-button>
-                        <el-button v-show="forgetPwd" type="text" @click="forgetPwd=false">密码登录</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
-
     </div>
-
     <!-- 底部信息条 -->
     <el-row class="bottom_bar">
         <el-col :span="24">© 2017 购书云 版权所有 沪ICP备15022838号-2 </el-col>
@@ -106,67 +104,195 @@
 </template>
 
 <script>
-import {testMobile, testPassword} from '../scripts/utils'
+import {
+    testMobile,
+    testPassword
+} from '../scripts/utils'
 import axios from "../scripts/http"
 export default {
     data() {
+        var checkMobile = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('手机号码不能为空'));
+            }
+            setTimeout(() => {
+                let telReg = /^1\d{10}$/
+                if (!telReg.test(value)) {
+                    callback(new Error('请输正确的手机号码'));
+                } else {
+                    callback();
+                }
+            }, 1000);
+        };
+
+        var checkPassword = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('密码不能为空'));
+            }
+            setTimeout(() => {
+                let pwdReg = /^[A-Za-z0-9]{6,20}$/
+                if (!pwdReg.test(value)) {
+                    callback(new Error('密码格式不正确'));
+                } else {
+                    callback();
+                }
+            }, 1000);
+        };
+
+        var checkMessageCode = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('验证码不能为空'));
+            }
+            setTimeout(() => {
+                let msgCodeReg = /\d{4}/
+                if (!msgCodeReg.test(value)) {
+                    callback(new Error('验证码格式不正确'));
+                } else {
+                    callback();
+                }
+            }, 1000);
+        };
         return {
             activeName: 'sign_in',
             forgetPwd: false,
             btn_loading: false,
 
-            mobile:'',
-            password:'',
-            message_code:'',
-            username:''
+            sign: {
+                mobile: '',
+                password: '',
+                message_code: '',
+                username: ''
+            },
+
+            rules: {
+                mobile: [{
+                    validator: checkMobile,
+                    trigger: 'blur'
+                }],
+                password: [{
+                    validator: checkPassword,
+                    trigger: 'blur'
+                }],
+                message_code: [{
+                    validator: checkMessageCode,
+                    trigger: 'blur'
+                }],
+                username: [{
+                        required: true,
+                        message: '请输入用户名',
+                        trigger: 'blur'
+                    },
+                    {
+                        min: 3,
+                        max: 20,
+                        message: '长度在 3 到 20 个字符',
+                        trigger: 'blur'
+                    }
+                ]
+            }
         }
     },
-    mounted(){
-        //remove adminInfo
+    mounted() {
+        $('.mobile input').focus()
         localStorage.removeItem('adminInfo')
         localStorage.removeItem('token')
     },
     methods: {
         handleClick(tab, e) {
             this.activeName = tab.name
+            this.password = '',
+                this.message_code = ''
         },
-        signIn(){
+        signIn() {
             //校验手机号码格式
-            if(!testMobile(this.mobile)){
-                this.$message.error('手机号码格式不正确！')
+            if (!testMobile(this.sign.mobile)) {
                 return
             }
             //check password
-            if(!testPassword(this.password)){
-                this.$message.error('密码格式不正确！');
+            if (!testPassword(this.sign.password)) {
                 return
             }
             this.btn_loading = true
             axios.post('/v1/seller/login', {
-                mobile: this.mobile,
-                password: this.password
-            }).then(resp=>{
-                if(resp.data.code == '00000'){
+                mobile: this.sign.mobile,
+                password: this.sign.password
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
                     //login success
                     //put token into localStorage
                     localStorage.setItem("token", resp.data.data.token)
                     //put adminInfo into admin
                     localStorage.setItem('adminInfo', JSON.stringify(resp.data.data))
 
-                    this.$router.push({name: 'sales_statistics'})
-                }else if (resp.data.code == '11001'){
+                    this.$router.push({
+                        name: 'admin'
+                    })
+                } else if (resp.data.message == 'notFound') {
                     //user not found
                     this.$message.error("用户名或密码错误")
-                    this.mobile = ''
-                    this.password = ''
-                    $('.loginTel input').focus()
+                    this.sign.mobile = ''
+                    this.sign.password = ''
+                    $('.mobile input').focus()
                 }
                 this.btn_loading = false
             })
-
         },
-        signUp() {
-
+        checkSignUp() {
+            if (testMobile(this.sign.mobile)) {
+                axios.post('/v1/seller/check_mobile', {
+                    "mobile": this.sign.mobile
+                }).then(resp => {
+                    if (resp.data.message == 'ok') {
+                        this.$message.info("用户名不存在，请注册！")
+                        this.activeName = 'sign_up'
+                    }
+                })
+            }
+        },
+        signUp(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                  this.btn_loading = true
+                  axios.post('/v1/seller/register', {
+                      mobile: this.sign.mobile,
+                      password: this.sign.password,
+                      message_code: this.sign.message_code,
+                      username: this.sign.username
+                  }).then(resp => {
+                      if (resp.data.message == 'ok') {
+                          this.signIn()
+                      } else if (resp.data.message == 'exist') {
+                          this.$message.info("用户名已存在！")
+                      } else if (resp.data.message == 'codeErr') {
+                          this.$message.warn("验证码错误！")
+                      }
+                      this.btn_loading = false
+                  })
+                } else {
+                    console.log('error submit!!');
+                    return false;
+                }
+            });
+        },
+        getMessageCode() {
+            if (!testMobile(this.sign.mobile)) {
+                console.log(this.sign.mobile);
+                this.$message.error('手机号码格式不正确！')
+                return
+            }
+            axios.post('/v1/seller/get_sms', {
+                "mobile": this.sign.mobile
+            }).then(resp => {
+                if (resp.data.code != '00000') {
+                    this.$message.error("获取验证码失败，请重试！")
+                }
+                if (resp.data.message == 'exist') {
+                    this.$message.info("该用户已被注册！")
+                }
+                if (resp.data.message == 'ok') {
+                    this.$message.info("已发送，请查收短信！")
+                }
+            })
         }
     }
 }
