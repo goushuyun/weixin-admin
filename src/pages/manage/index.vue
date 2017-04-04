@@ -1,9 +1,7 @@
 <style lang="scss" scoped>
-
-.tabs{
+.tabs {
     background-color: white;
 }
-
 </style>
 
 <template lang="html">
@@ -27,12 +25,14 @@
 </template>
 
 <script>
-
 export default {
     data() {
         return {
             activeName: 'cloud'
         };
+    },
+    mounted() {
+        this.$router.push('cloud_shop')
     },
     methods: {
         handleClick(tab, event) {
@@ -41,10 +41,9 @@ export default {
                 this.$router.push('cloud_shop')
             }
             if (tab.name == 'substance') {
-                console.log('没有实现');
+                this.$router.push('substance_shop')
             }
         }
     }
 }
-
 </script>

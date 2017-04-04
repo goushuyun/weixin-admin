@@ -78,23 +78,7 @@
         </div>
 
         <el-menu theme="dark" mode="vertical" :router="true">
-            <el-menu-item-group title="订单">
-                <el-menu-item index="/admin/example">
-                    <i class="fa fa-arrow-left" aria-hidden="true"></i>导航一
-                </el-menu-item>
-                <el-menu-item index="/admin/example">
-                    <i class="fa fa-arrow-left" aria-hidden="true"></i>导航一
-                </el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="分组一">
-                <el-menu-item index="/admin/example">
-                    <i class="fa fa-bath nav_menu_icon" aria-hidden="true"></i>导航一
-                </el-menu-item>
-                <el-menu-item index="/admin/example">
-                    <i class="fa fa-arrow-left" aria-hidden="true"></i>导航一
-                </el-menu-item>
-            </el-menu-item-group>
-            <el-menu-item-group title="店铺管理">
+            <el-menu-item-group title="设置">
                 <el-menu-item index="/admin/shop_info/">
                     <i class="fa fa-info-circle" aria-hidden="true"></i></i>店铺信息
                 </el-menu-item>
