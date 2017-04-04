@@ -40,23 +40,16 @@ div.top_bar {
 
     <section class="main">
         <ul class="shops">
-            <li class="shop">
-                <h3 class="shop_name">购书宝（应技大）</h3>
-                <p class="create_at">创建于：2017-5-31</p>
+            <li v-for="store in stores" class="shop" @click="into_store(store)">
+                <h3 class="shop_name">{{store.name}}</h3>
+                <p class="create_at">到期于：{{store.expire_at}}</p>
                 <p style="text-align: right; ">
                     <el-button style="font-size: 12px;" type="text">删除</el-button>
                 </p>
             </li>
-            <li class="shop">
-                <h3 class="shop_name">购书宝（应技大）</h3>
-                <p class="create_at">创建于：2017-5-31</p>
-                <p style="text-align: right; ">
-                    <el-button style="font-size: 12px;" type="text">删除</el-button>
-                </p>
-            </li>
-
             <li class="add_btn" @click="add_shop">
                 <i class="fa fa-plus" aria-hidden="true"></i>
+                <p class="remark">添加云店铺</p>
             </li>
         </ul>
     </section>
@@ -69,7 +62,36 @@ div.top_bar {
 <script>
 import axios from '../../scripts/http.js'
 export default {
+    data(){
+        return {
+            stores: []
+        }
+    },
+
+    mounted(){
+        // get seller's stores
+        axios.post('/v1/seller/self_stores', {}).then(resp=>{
+            this.stores = resp.data.data.map(val=>{
+                val.create_at = moment.unix(val.create_at).format('YYYY-MM-DD')
+                val.expire_at = moment.unix(val.expire_at).format('YYYY-MM-DD')
+                return val
+            })
+        })
+    },
+
     methods: {
+        // go into shop
+        into_store(store){
+            // put store info into localstorage
+            localStorage.setItem('store', JSON.stringify(store))
+            this.$router.push("admin")
+
+            console.log('>>>>>>>>>>>>>>>>>>>>>>.');
+            console.log(store);
+            console.log('>>>>>>>>>>>>>>>>>>>>>>.');
+        },
+
+
         add_shop() {
             this.$prompt('请输入店铺名称', '店铺名称', {
                 confirmButtonText: '确定',
