@@ -124,35 +124,12 @@ export default {
         border: 1px solid lighten($blue, 16%);
     }
 }
-.avatar-uploader {
-    border: 1px dashed #bfcbd9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    width: 160px;
-    height: 160px;
-}
-.avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 160px;
-    height: 160px;
-    line-height: 160px;
-    text-align: center;
-}
-.avatar {
-    width: 160px;
-    height: 160px;
-    display: block;
-}
 
 .el-form {
-    background-color: white;
     padding: 16px 10px;
-    .el-input,
-    .el-textarea {
-        width: 300px;
+    .el-input {
+        width: 20%;
+        min-width: 200px;
         margin-right: 10px;
     }
 }
@@ -163,4 +140,5 @@ export default {
     padding: 3px 10px;
     border-radius: 4px;
     border: 1px solid #BFCBD9;
-}</style>
+}
+</style>

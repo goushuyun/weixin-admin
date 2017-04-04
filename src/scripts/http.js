@@ -31,10 +31,10 @@ axios.interceptors.response.use(function(response) {
     //     app.$message.error('用户名或密码错误!')
     //     // return new Error(response.data.message)
     // }
-    //relogin
-    // if(response.data.code == '11014'){
-    //     window.location.href = "http://localhost:8090/#"
-    // }
+    // relogin
+    if(response.data.code == '11014'){
+        window.location.href = "http://localhost:8090/#"
+    }
     //handler error
     if(response.data.code != '00000'){
         app.$message.error(response.data.message)

@@ -56,13 +56,13 @@
                 <el-form :model="sign" :rules="rules" ref="sign">
                     <div v-if="activeName=='sign_up'">
                       <el-form-item prop="mobile">
-                          <el-input class="mobile" placeholder="手机号码" v-model="sign.mobile"></el-input>
+                          <el-input class="mobile" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
                       </el-form-item>
                       <el-form-item prop="message_code">
-                          <el-input placeholder="短信验证码" v-model="sign.message_code"><el-button slot="append" @click="getMessageCode">获取验证码</el-button></el-input>
+                          <el-input placeholder="短信验证码" v-model="sign.message_code"><el-button slot="append" @click="getMessageCode('register')" :disabled="registe_timer_disabled">获取验证码<span v-show="registe_timer_disabled">（{{register_timer_second}}）</span></el-button></el-input>
                       </el-form-item>
                       <el-form-item prop="username">
-                          <el-input placeholder="个人昵称" v-model="sign.username"></el-input>
+                          <el-input placeholder="姓名" v-model="sign.username"></el-input>
                       </el-form-item>
                       <el-form-item prop="password">
                           <el-input placeholder="设置密码" type="password" v-model="sign.password" @keyup.enter.native="signUp"></el-input>
@@ -80,7 +80,7 @@
                           <el-input placeholder="登录密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
                       </el-form-item>
                       <el-form-item prop="message_code" v-show="forgetPwd">
-                          <el-input placeholder="短信验证码" v-model="sign.message_code"><el-button slot="append" @click="getMessageCode">获取验证码</el-button></el-input>
+                          <el-input placeholder="短信验证码" v-model="sign.message_code"><el-button slot="append" @click="getMessageCode('update_pwd')" :disabled="update_pwd_timer_disabled">获取验证码<span v-show="update_pwd_timer_disabled">（{{update_pwd_timer_second}}）</span></el-button></el-input>
                       </el-form-item>
                       <el-form-item prop="password" v-show="forgetPwd">
                           <el-input placeholder="新密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
@@ -153,9 +153,16 @@ export default {
             }, 1000);
         };
         return {
+            year: '',
             activeName: 'sign_in',
             forgetPwd: false,
             btn_loading: false,
+
+            /* 倒计时 */
+            register_timer_second: 60,
+            registe_timer_disabled: false,
+            update_pwd_timer_second: 60,
+            update_pwd_timer_disabled: false,
 
             sign: {
                 mobile: '',
@@ -200,22 +207,41 @@ export default {
     methods: {
         handleClick(tab, e) {
             this.activeName = tab.name
-            this.password = '',
-                this.message_code = ''
+            this.sign.password = ''
+            this.sign.message_code = ''
         },
         signIn() {
+            var self = this
             //校验手机号码格式
-            if (!testMobile(this.sign.mobile)) {
+            if (!testMobile(self.sign.mobile)) {
                 return
             }
             //check password
-            if (!testPassword(this.sign.password)) {
+            if (!testPassword(self.sign.password)) {
                 return
             }
-            this.btn_loading = true
+            self.btn_loading = true
+
+            if (self.forgetPwd) {
+                axios.post('/v1/seller/update_password', {
+                    mobile: self.sign.mobile,
+                    password: self.sign.password,
+                    message_code: self.sign.message_code
+                }).then(resp => {
+                    if (resp.data.message == 'ok') {
+                        self.$message.success("密码已更改")
+                        self.forgetPwd = false
+                        self.login()
+                    } else {
+                        self.$message.error("密码更改失败")
+                        return
+                    }
+                })
+            }
+
             axios.post('/v1/seller/login', {
-                mobile: this.sign.mobile,
-                password: this.sign.password
+                mobile: self.sign.mobile,
+                password: self.sign.password
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     //login success
@@ -223,18 +249,14 @@ export default {
                     localStorage.setItem("token", resp.data.data.token)
                     //put adminInfo into admin
                     localStorage.setItem('adminInfo', JSON.stringify(resp.data.data))
-
-                    this.$router.push({
-                        name: 'admin'
+                    self.$router.push({
+                        name: 'shops'
                     })
                 } else if (resp.data.message == 'notFound') {
-                    //user not found
-                    this.$message.error("用户名或密码错误")
-                    this.sign.mobile = ''
-                    this.sign.password = ''
+                    self.$message.error("用户名或密码错误")
                     $('.mobile input').focus()
                 }
-                this.btn_loading = false
+                self.btn_loading = false
             })
         },
         checkSignUp() {
@@ -242,9 +264,14 @@ export default {
                 axios.post('/v1/seller/check_mobile', {
                     "mobile": this.sign.mobile
                 }).then(resp => {
-                    if (resp.data.message == 'ok') {
+                    if (resp.data.message == 'ok' && this.activeName == 'sign_in') {
                         this.$message.info("用户名不存在，请注册！")
                         this.activeName = 'sign_up'
+                    }
+                    if (resp.data.message == 'exist' && this.activeName == 'sign_up') {
+                        this.$message.info("用户名已存在，请登录！")
+                        this.activeName = 'sign_in'
+                        this.forgetPwd = false
                     }
                 })
             }
@@ -252,47 +279,93 @@ export default {
         signUp(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                  this.btn_loading = true
-                  axios.post('/v1/seller/register', {
-                      mobile: this.sign.mobile,
-                      password: this.sign.password,
-                      message_code: this.sign.message_code,
-                      username: this.sign.username
-                  }).then(resp => {
-                      if (resp.data.message == 'ok') {
-                          this.signIn()
-                      } else if (resp.data.message == 'exist') {
-                          this.$message.info("用户名已存在！")
-                      } else if (resp.data.message == 'codeErr') {
-                          this.$message.warn("验证码错误！")
-                      }
-                      this.btn_loading = false
-                  })
+                    this.btn_loading = true
+                    axios.post('/v1/seller/register', {
+                        mobile: this.sign.mobile,
+                        password: this.sign.password,
+                        message_code: this.sign.message_code,
+                        username: this.sign.username
+                    }).then(resp => {
+                        if (resp.data.message == 'ok') {
+                            this.signIn()
+                        } else if (resp.data.message == 'exist') {
+                            this.$message.info("用户名已存在！")
+                        } else if (resp.data.message == 'codeErr') {
+                            this.$message.warn("验证码错误！")
+                        }
+                        this.btn_loading = false
+                    })
                 } else {
                     console.log('error submit!!');
                     return false;
                 }
             });
         },
-        getMessageCode() {
+        getMessageCode(type) {
             if (!testMobile(this.sign.mobile)) {
                 console.log(this.sign.mobile);
                 this.$message.error('手机号码格式不正确！')
                 return
             }
-            axios.post('/v1/seller/get_sms', {
-                "mobile": this.sign.mobile
-            }).then(resp => {
-                if (resp.data.code != '00000') {
-                    this.$message.error("获取验证码失败，请重试！")
+            console.log(type);
+            if (type == 'register') {
+                axios.post('/v1/seller/get_sms', {
+                    mobile: this.sign.mobile
+                }).then(resp => {
+                    if (resp.data.code != '00000') {
+                        this.$message.error("获取验证码失败，请重试！")
+                    }
+                    if (resp.data.message == 'exist') {
+                        this.$message.info("该用户已被注册！")
+                    }
+                    if (resp.data.message == 'ok') {
+                        this.$message.info("已发送，请查收短信！")
+                        this.registe_timer_disabled = true
+                        this.timer(type)
+                    }
+                })
+            }
+
+            if (type == 'update_pwd') {
+                axios.post('/v1/seller/get_update_sms', {
+                    mobile: this.sign.mobile
+                }).then(resp => {
+                    if (resp.data.code != '00000') {
+                        this.$message.error("获取验证码失败，请重试！")
+                    }
+                    if (resp.data.message == 'needRegister') {
+                        // this.$message.info("该用户已被注册！")
+                    }
+                    if (resp.data.message == 'ok') {
+                        this.$message.info("已发送，请查收短信！")
+                        this.update_pwd_timer_disabled = true
+                        this.timer(type)
+                    }
+                })
+            }
+        },
+        timer(type) {
+            var self = this
+            if (type == 'register') {
+                if (self.register_timer_second > 0) {
+                    self.register_timer_second--;
+                    setTimeout(function(){
+                      self.timer(type)
+                    }, 1000);
+                } else {
+                    self.registe_timer_disabled = false
                 }
-                if (resp.data.message == 'exist') {
-                    this.$message.info("该用户已被注册！")
-                }
-                if (resp.data.message == 'ok') {
-                    this.$message.info("已发送，请查收短信！")
-                }
-            })
+            }
+            if (type == 'update_pwd') {
+              if (self.update_pwd_timer_second > 0) {
+                  self.update_pwd_timer_second--;
+                  setTimeout(function(){
+                    self.timer(type)
+                  }, 1000);
+              } else {
+                  self.update_pwd_timer_disabled = false
+              }
+            }
         }
     }
 }

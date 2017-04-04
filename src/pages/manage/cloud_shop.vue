@@ -1,33 +1,34 @@
 <style lang="scss" scoped>
-.avatar-uploader{
-   border: 1px dashed #bfcbd9;
-   border-radius: 6px;
-   cursor: pointer;
-   position: relative;
-   overflow: hidden;
-   width: 160px;
-   height: 160px;
+.avatar-uploader {
+    border: 1px dashed #bfcbd9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    width: 160px;
+    height: 160px;
 }
 .avatar-uploader-icon {
-   font-size: 28px;
-   color: #8c939d;
-   width: 160px;
-   height: 160px;
-   line-height: 160px;
-   text-align: center;
+    font-size: 28px;
+    color: #8c939d;
+    width: 160px;
+    height: 160px;
+    line-height: 160px;
+    text-align: center;
 }
 .avatar {
-   width: 160px;
-   height: 160px;
-   display: block;
+    width: 160px;
+    height: 160px;
+    display: block;
 }
 
 .el-form {
     background-color: white;
     padding: 16px 10px;
-    .el-input,.el-textarea {
-       width: 300px;
-       margin-right: 10px;
+    .el-input,
+    .el-textarea {
+        width: 300px;
+        margin-right: 10px;
     }
 }
 </style>
@@ -77,18 +78,18 @@
 
         <el-form-item label="店铺名称：">
           <label v-if="!update_flag" style="margin-right:10px;">{{form.shop_name}}</label>
-          <el-input v-else size="small" v-model="form.shop_name"></el-input>
+          <el-input v-else size="small" v-model="form_submit.shop_name"></el-input>
         </el-form-item>
 
         <el-form-item label="店铺介绍：">
-          <div v-if="!update_flag" style="line-height:20px;width: 300px;">{{form.introduction}}</div>
-          <el-input v-else type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :maxlength="300" v-model="form.introduction"></el-input>
+          <div v-if="!update_flag" style="line-height:20px;width: 300px;">{{form.profile}}</div>
+          <el-input v-else type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :maxlength="300" v-model="form_submit.profile"></el-input>
         </el-form-item>
 
         <el-form-item>
-          <el-button v-if="!update_flag" type="primary" size="small" @click="update_flag = true">修改信息</el-button>
-          <el-button v-if="update_flag" type="primary" size="small" @click="update_flag = false">取消</el-button>
-          <el-button v-if="update_flag" type="primary" size="small" @click="update_flag = false">确认修改</el-button>
+          <el-button v-if="!update_flag" type="primary" size="small" @click="proUpdate">修改信息</el-button>
+          <el-button v-if="update_flag" type="primary" size="small" @click="cancelUpdate">取消</el-button>
+          <el-button v-if="update_flag" type="primary" size="small" @click="confirmUpdate">确认修改</el-button>
         </el-form-item>
 
     </el-form>
@@ -99,7 +100,9 @@
 <script>
 import axios from "../../scripts/http"
 import uploadImage from "../../scripts/uploadImage"
-import {getTimeVal} from "../../scripts/utils"
+import {
+    getTimeVal
+} from "../../scripts/utils"
 
 export default {
     data() {
@@ -108,21 +111,40 @@ export default {
             update_tel: false,
             update_main_service: false,
             requestData: {
-              key:'',
-              token: ''
+                key: '',
+                token: ''
             },
             shop_id: '',
+
+            form_submit: {
+                shop_name: '',
+                profile: '',
+                tel: ''
+            },
+
             form: {
-                logo: "",
-                shop_name: "购书云",
-                creat_date: "2017/03/21",
-                introduction: "习近平，男，汉族，1953年6月生，陕西富平人，1969年1月参加工作，1974年1月加入中国共产党，清华大学人文社会学院马克思主义理论与思想政治教育专业毕业，在职研究生学历，法学博士学位。",
+                logo: '',
+                shop_name: '',
+                creat_date: '',
+                profile: '',
                 tel: '18818000305'
             }
         }
     },
-    mixins: [uploadImage],
+    mounted() {
+        // axios.post('/v1/seller/login', {
+        //     mobile: this.sign.mobile,
+        //     password: this.sign.password
+        // }).then(resp => {
+        //     if (resp.data.message == 'ok') {}
+        // })
+    },
     methods: {
+        proUpdate() {
+            this.update_flag = true
+            this.form_submit.shop_name = this.form.shop_name
+            this.form_submit.profile = this.form.profile
+        },
         addService() {
             if (this.services.length < 3) {
                 let service = {
@@ -133,8 +155,22 @@ export default {
                 this.services.push(service)
             }
         },
-        cancelAddService(index) {
-
+        cancelUpdate() {
+            this.update_flag = false
+            this.form_submit.shop_name = this.form.shop_name
+            this.form_submit.profile = this.form.profile
+        },
+        confirmUpdate() {
+          axios.post('/v1/store/update', {
+            id: localStorage.shop_id,
+            name: this.form_submit.shop_name,
+            profile: this.form_submit.profile
+          }).then(resp => {
+              if (resp.data.message == 'ok') {
+                this.$message.success('修改成功')
+                this.update_flag = false
+              }
+          })
         },
         handleAvatarScucess(res, file) {
             this.form.logo = file.url
@@ -151,5 +187,4 @@ export default {
         }
     }
 }
-
 </script>
