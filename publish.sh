@@ -19,6 +19,6 @@ cp -r ./src/images  ./index.html ./build
 # copy 打包后的js
 cp ./dist/* ./build/dist
 
-# rm -rf ./dist
+rm -rf ./dist
 
-rsync -e ssh -r ./build/* --progress -cv 'root@121.42.184.175:/home/admin-pages'
+rsync -e ssh -r ./build/* --progress -cv 'root@115.28.109.6:/home/weixin-admin'

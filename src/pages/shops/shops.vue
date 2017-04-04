@@ -54,13 +54,6 @@ div.top_bar {
                     <el-button style="font-size: 12px;" type="text">删除</el-button>
                 </p>
             </li>
-            <!-- <li class="shop">
-                <h3 class="shop_name">购书宝（应技大）</h3>
-                <p class="create_at">创建于：2017-5-31</p>
-                <p style="text-align: right; ">
-                    <el-button style="font-size: 12px;" type="text">删除</el-button>
-                </p>
-            </li> -->
 
             <li class="add_btn" @click="add_shop">
                 <i class="fa fa-plus" aria-hidden="true"></i>
@@ -74,7 +67,7 @@ div.top_bar {
 </template>
 
 <script>
-
+import axios from '../../scripts/http.js'
 export default {
     methods: {
         add_shop() {
@@ -84,10 +77,19 @@ export default {
             }).then(({
                 value
             }) => {
-                this.$message({
-                    type: 'success',
-                    message: '你的邮箱是: ' + value
-                });
+                // add store
+                let name = value.trim()
+                axios.post('/v1/store/add', {name}).then(resp=>{
+                    console.log(resp.data);
+                })
+
+                console.log(value);
+
+
+                // this.$message({
+                //     type: 'success',
+                //     message: '你的邮箱是: ' + value
+                // });
             }).catch(() => {
                 this.$message({
                     type: 'info',
