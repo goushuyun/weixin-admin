@@ -209,6 +209,7 @@ export default {
             this.activeName = tab.name
             this.sign.password = ''
             this.sign.message_code = ''
+            this.forgetPwd = false
         },
         signIn() {
             var self = this
