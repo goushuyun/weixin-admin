@@ -6,12 +6,11 @@ ul#schools {
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
-    li{
+    li {
         box-sizing: border-box;
         display: inline-block;
         border-radius: 4px;
     }
-
     li.school {
         width: 245px;
         // height: 141px;
@@ -23,9 +22,6 @@ ul#schools {
         &:hover {
             cursor: pointer;
             box-shadow: 0 0 10px rgba(0, 0, 0, .2);
-            // button{
-            //     display: none;
-            // }
         }
         p.name {
             line-height: 48px;
@@ -36,15 +32,14 @@ ul#schools {
             font-size: 13px;
             line-height: 24px;
             color: $font_light;
-            .price{
+            .price {
                 color: $weixin_green;
                 padding-right: 82px;
             }
         }
-        p.operate{
+        p.operate {
             text-align: right;
-
-            button{
+            button {
                 line-height: 16px;
                 padding: 0;
                 font-size: 12px;
@@ -59,11 +54,24 @@ ul#schools {
         line-height: 124px;
         text-align: center;
         color: $bg_grey;
-        &:hover{
+        &:hover {
             color: lighten($blue, 12%);
             cursor: pointer;
             border: 1px solid lighten($blue, 16%);
         }
+    }
+}
+
+.el-dialog--large{
+    top: 5% !important;
+}
+
+#amap {
+    height: 400px;
+    .search-box {
+        position: relative;
+        top: 2px;
+        left: 2px;
     }
 }
 
@@ -97,21 +105,139 @@ ul#schools {
         <li class="add" @click="add_school">
             <i class="fa fa-plus" aria-hidden="true"></i>
         </li>
-
     </ul>
+
+    <!-- 学校信息弹出框 -->
+    <el-dialog title="学校信息" v-model="visible" size="large" style="top:-14%;" :close-on-click-modal="false" @close="dialog_close_handle">
+        <div id="amap">
+            <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult" :events="events"></el-amap-search-box>
+            <el-amap :vid="'amap'" :center="center" :zoom="zoom" :plugin="plugin">
+                <el-amap-marker :events="marker_events" :clickable="true" :title="marker.name" v-for="marker in markers" :position="marker.loc"></el-amap-marker>
+            </el-amap>
+        </div>
+
+        <el-form :inline="true" style="margin-top: 16px;">
+            <el-form-item label="客服电话">
+                <el-input></el-input>
+            </el-form-item>
+            <el-form-item label="配送费用">
+                <el-input placeholder="单位: 元">
+                    <!-- <template slot="append">元</template> -->
+                </el-input>
+            </el-form-item>
+        </el-form>
+
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="visible = false">取 消</el-button>
+            <el-button type="primary" @click="visible = false">确 定</el-button>
+        </div>
+
+
+    </el-dialog>
+
 </div>
 
 </template>
 
 <script>
 
-export default {
-    methods:{
-        add_school(){
-            // add school
+import {
+    AMapManager
+}
+from 'vue-amap';
 
+export default {
+    created() {
+            this.$on('test', () => {
+                console.log('adsfasdfasdf');
+            })
+        },
+
+        data() {
+            return {
+                visible: false,
+
+                // map paramter
+                zoom: 12,
+                center: [121.59996, 31.197646],
+                markers: [],
+                searchOption: {
+                    city: '上海',
+                    citylimit: true
+                },
+                events: {
+                    init(o) {
+                        console.log(o);
+                    }
+                },
+                plugin: [{
+                    pName: 'Geolocation',
+                    events: {
+                        init(o) {
+                            // o 是高德地图定位插件实例
+                            o.getCurrentPosition((status, result) => {
+                                self.center = [result.position.lng, result.position.lat];
+                            });
+                        }
+                    }
+                }],
+
+                // markers
+                marker_events: {
+                    click(e) {
+                        console.log(e);
+                    }
+                }
+
+
+            }
+        },
+        methods: {
+            chooMarker(e) {
+                    console.log('kaiakiakai');
+
+                    console.log(e);
+                },
+                dialog_close_handle() {
+                    // handle model close
+                    this.zoom = 12
+                    this.markers = []
+                },
+                add_school() {
+                    // add school
+                    this.visible = true
+                },
+                onSearchResult(pois) {
+                    this.markers = []
+                    console.log(pois);
+
+                    let latSum = 0;
+                    let lngSum = 0;
+                    if (pois.length > 0) {
+                        pois.forEach(poi => {
+                            let marker = {
+                                name: poi.name,
+                                loc: [poi.lng, poi.lat]
+                            }
+                            let {
+                                lng, lat
+                            } = poi;
+                            lngSum += lng;
+                            latSum += lat;
+                            this.markers.push(marker);
+                        });
+                        let center = {
+                            lng: lngSum / pois.length,
+                            lat: latSum / pois.length
+                        };
+                        this.center = [center.lng, center.lat];
+                    }
+
+                    // 修改zoom值，放大搜索结果
+                    this.zoom = 15
+
+                }
         }
-    }
 }
 
 </script>
