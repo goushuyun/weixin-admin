@@ -3,7 +3,7 @@ const example = r => require(['../pages/example/example'], r)
 const shops = r => require(['../pages/shops/shops'], r)
 const shop_info = r => require(['../pages/manage/index'], r)
 const cloud_shop = r => require(['../pages/manage/cloud_shop'], r)
-const substance_shop = r => require(['../pages/manage/substance_shop'], r)
+const real_shop = r => require(['../pages/manage/real_shop'], r)
 const shop_setting = r => require(['../pages/shop_setting/index'], r)
 const school = r => require(['../pages/shop_setting/school'], r)
 
@@ -32,9 +32,9 @@ export default [{
             path: 'cloud_shop',
             component: cloud_shop
         },{
-            name: 'substance_shop',
-            path: 'substance_shop',
-            component: substance_shop
+            name: 'real_shop',
+            path: 'real_shop',
+            component: real_shop
         }]
     }, {
         name: 'shop_setting',

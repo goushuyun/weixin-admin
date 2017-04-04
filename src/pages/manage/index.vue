@@ -14,7 +14,7 @@
     <div class="content_inner">
         <el-tabs class="tabs" v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="云店信息" name="cloud"></el-tab-pane>
-            <el-tab-pane label="实体店信息" name="substance"></el-tab-pane>
+            <el-tab-pane label="实体店信息" name="real"></el-tab-pane>
         </el-tabs>
         <section>
             <router-view></router-view>
@@ -40,8 +40,8 @@ export default {
             if (tab.name == 'cloud') {
                 this.$router.push('cloud_shop')
             }
-            if (tab.name == 'substance') {
-                this.$router.push('substance_shop')
+            if (tab.name == 'real') {
+                this.$router.push('real_shop')
             }
         }
     }

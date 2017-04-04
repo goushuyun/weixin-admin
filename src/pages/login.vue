@@ -35,7 +35,7 @@
 <template lang="html">
 
 <div class="container">
-    <div style="height:180px;"></div>
+    <div style="height:20%;"></div>
 
     <div id="login_box">
         <img class="logo" src="../images/logo.png" alt="logo">
@@ -190,9 +190,9 @@ export default {
                         trigger: 'blur'
                     },
                     {
-                        min: 3,
+                        min: 1,
                         max: 20,
-                        message: '长度在 3 到 20 个字符',
+                        message: '长度在 1 到 20 个字符',
                         trigger: 'blur'
                     }
                 ]

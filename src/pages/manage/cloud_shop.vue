@@ -100,9 +100,7 @@
 <script>
 import axios from "../../scripts/http"
 import uploadImage from "../../scripts/uploadImage"
-import {
-    getTimeVal
-} from "../../scripts/utils"
+import getTimeVal from "../../scripts/utils"
 
 export default {
     data() {
@@ -132,12 +130,19 @@ export default {
         }
     },
     mounted() {
-        // axios.post('/v1/seller/login', {
-        //     mobile: this.sign.mobile,
-        //     password: this.sign.password
-        // }).then(resp => {
-        //     if (resp.data.message == 'ok') {}
-        // })
+        var self = this
+        self.shop_id = localStorage.shop_id
+        axios.post('/v1/store/store_info', {
+            id: '170403000003'
+        }).then(resp => {
+            if (resp.data.message == 'ok') {
+                self.form.logo = resp.data.data.logo,
+                self.form.shop_name = resp.data.data.name,
+                self.form.creat_date = stamp2date(resp.data.data.create_at, 'YYYY-MM-DD HH:mm'),
+                self.form.profile = resp.data.data.profile,
+                self.form.tel = resp.data.data.service_mobiles
+            }
+        })
     },
     methods: {
         proUpdate() {
