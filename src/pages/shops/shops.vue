@@ -40,10 +40,10 @@ div.top_bar {
 
     <section class="main">
         <ul class="shops">
-            <li v-for="store in stores" class="shop" @click="into_store(store.id)">
+            <li v-for="store in stores" class="shop" @click="into_store(store.id)" @mouseover="store.active = true" @mouseleave="store.active = false">
                 <h3 class="shop_name">{{store.name}}</h3>
                 <p class="create_at">到期于：{{store.expire_at}}</p>
-                <p style="text-align: right; ">
+                <p class="operate" v-show="store.active">
                     <el-button style="font-size: 12px;" type="text">删除</el-button>
                 </p>
             </li>
@@ -58,10 +58,17 @@ div.top_bar {
 </template>
 
 <script>
+
+$('li.shop').mouseenter(function(){
+    console.log('asdfasdf');
+})
+
+
 import axios from '../../scripts/http.js'
 export default {
     data(){
         return {
+            active: false,
             stores: []
         }
     },
@@ -75,6 +82,8 @@ export default {
         // get seller's stores
         axios.post('/v1/seller/self_stores', {}).then(resp=>{
             this.stores = resp.data.data.map(val=>{
+                val.active = false
+
                 val.create_at = moment.unix(val.create_at).format('YYYY-MM-DD')
                 val.expire_at = moment.unix(val.expire_at).format('YYYY-MM-DD')
                 return val

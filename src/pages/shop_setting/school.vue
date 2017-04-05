@@ -108,7 +108,7 @@ ul#schools {
     </ul>
 
     <!-- 学校信息弹出框 -->
-    <el-dialog :title="title" v-model="visible" size="large" style="top:-14%;" :close-on-click-modal="false" @close="dialog_close_handle">
+    <el-dialog :title="pointer.name" v-model="visible" size="large" style="top:-14%;" :close-on-click-modal="false" @close="dialog_close_handle">
         <div id="amap">
             <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult" :events="events"></el-amap-search-box>
             <el-amap :vid="'amap'" :center="center" :zoom="zoom" :plugin="plugin">
@@ -121,11 +121,10 @@ ul#schools {
                 <el-input v-model="pointer.name"></el-input>
             </el-form-item>
             <el-form-item label="客服电话">
-                <el-input></el-input>
+                <el-input v-model="pointer.tel"></el-input>
             </el-form-item>
             <el-form-item label="配送费用">
-                <el-input placeholder="单位: 元">
-                    <!-- <template slot="append">元</template> -->
+                <el-input v-model="pointer.express_fee" placeholder="单位: 元">
                 </el-input>
             </el-form-item>
         </el-form>
@@ -134,8 +133,6 @@ ul#schools {
             <el-button @click="visible = false">取 消</el-button>
             <el-button type="primary" @click="visible = false">确 定</el-button>
         </div>
-
-
     </el-dialog>
 
 </div>
@@ -159,7 +156,10 @@ var pointer = {
     }
 
     export default {
-        created() {},
+        created() {
+            // 客服电话默认给出该云店铺seller的电话
+            pointer.tel = this.$store.state.current_store.seller.mobile
+        },
 
             data() {
                 return {
@@ -175,7 +175,7 @@ var pointer = {
                     center: [121.59996, 31.197646],
                     markers: [],
                     searchOption: {
-                        city: '上海',
+                        // city: '上海',
                         citylimit: true
                     },
                     events: {
@@ -201,8 +201,6 @@ var pointer = {
                     marker_events: {
                         click(e) {
                             console.log(e);
-
-                            console.log('kai');
 
                             //解析必要数据到 pointer
                             pointer.lat = e.lnglat.lat

@@ -1,7 +1,7 @@
 @import "../../common/_color.scss";
 
 section.main{
-    width: 750px;
+    width: 780px;
     font-size: 13px;
     margin: 16px auto;
     ul.shops{
@@ -21,9 +21,12 @@ section.main{
         }
 
         li.shop{
-            padding: 12px;
+            padding: 12px 12px 0;
             // width: 200px;
+            height: 114px;
+            box-sizing: border-box;
             min-width: 180px;
+
             h3.shop_name{
                 font-size: 16px;
                 line-height: 48px;
@@ -34,11 +37,14 @@ section.main{
                 color: $font_light;
                 line-height: 22px;
             }
+            p.operate{
+                text-align: right;
+            }
         }
 
         li.add_btn{
-            width: 126px;
-            height: 126px;
+            width: 114px;
+            height: 114px;
             display: flex;
             justify-content: center;
             flex-direction: column;

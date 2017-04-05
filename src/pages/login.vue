@@ -201,7 +201,7 @@ export default {
     },
     mounted() {
         $('.mobile input').focus()
-        localStorage.removeItem('adminInfo')
+        localStorage.removeItem('store')
         localStorage.removeItem('token')
     },
     methods: {
