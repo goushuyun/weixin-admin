@@ -64,12 +64,12 @@
             <el-col :span="14">
                 <p class="shop_name">商户名称</p>
                 <p style="padding-top:8px;">
-                    <a href="#">
+                    <router-link :to="{name:'shops'}">
                         <i class="fa fa-arrow-left icon" aria-hidden="true"></i>
-                    </a>
-                    <a href="#">
+                    </router-link>
+                    <router-link :to="{name:'login'}">
                         <i class="fa fa-power-off icon" aria-hidden="true"></i>
-                    </a>
+                    </router-link>
                 </p>
             </el-col>
         </el-row>
@@ -111,6 +111,9 @@ export default {
         mainPage: function() {
 
         }
+    },
+    computed: {
+
     }
 }
 

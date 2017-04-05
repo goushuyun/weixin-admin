@@ -65,11 +65,6 @@ export default {
             stores: []
         }
     },
-    created(){
-        console.log('created !');
-        console.log(this.$store.state.adminInfo);
-    },
-
     computed:{
         info(){
             return this.$store.state.adminInfo
