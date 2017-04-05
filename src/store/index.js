@@ -1,15 +1,12 @@
-import Vuex from "vuex"
-import Vue from 'Vue'
-Vue.use(Vuex)
-const store = new Vuex.Store({
+// genarate a obj for vuex
+
+export default {
     state: {
-        adminInfo: ''
+        adminInfo: 'sdfdf'
     },
     mutations: {
-        setAdminInfo(state, adminInfo){
+        setAdminInfo(state, adminInfo) {
             state.adminInfo = adminInfo
         }
     }
-})
-
-export default store
+}

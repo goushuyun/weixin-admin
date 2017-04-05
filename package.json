@@ -30,7 +30,7 @@
     "vue-html-loader": "^1.2.3",
     "vue-loader": "^9.7.0",
     "vue-style-loader": "^1.0.0",
-    "webpack": "^1.13.1",
+    "webpack": "^1.13.2",
     "webpack-dev-server": "^1.14.1"
   }
 }

@@ -53,8 +53,6 @@ div.top_bar {
             </li>
         </ul>
     </section>
-
-
 </div>
 
 </template>
@@ -67,6 +65,16 @@ export default {
             stores: []
         }
     },
+    created(){
+        console.log('created !');
+        console.log(this.$store.state.adminInfo);
+    },
+
+    computed:{
+        info(){
+            return this.$store.state.adminInfo
+        }
+    },
 
     mounted(){
         // get seller's stores
@@ -77,6 +85,10 @@ export default {
                 return val
             })
         })
+
+        this.$store.commit('setAdminInfo', 'WangKai')
+
+
     },
 
     methods: {
@@ -85,12 +97,8 @@ export default {
             // put store info into localstorage
             localStorage.setItem('store', JSON.stringify(store))
             this.$router.push("admin")
-
-            console.log('>>>>>>>>>>>>>>>>>>>>>>.');
             console.log(store);
-            console.log('>>>>>>>>>>>>>>>>>>>>>>.');
         },
-
 
         add_shop() {
             this.$prompt('请输入店铺名称', '店铺名称', {

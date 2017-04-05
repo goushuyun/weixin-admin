@@ -23,6 +23,14 @@ AMap.initAMapApiLoader({
 
 var App = require('./App')
 
-new Vue({
+// import vuex for state manage
+import Vuex from "vuex"
+import vuexObj from './store/index'
+Vue.use(Vuex)
+
+let store = new Vuex.Store(vuexObj)
+
+const app = new Vue({
+    store,
     router
 }).$mount('#app')
