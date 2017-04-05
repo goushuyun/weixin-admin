@@ -39,8 +39,14 @@
     <el-form ref="form" :model="form" label-width="110px">
         <el-form-item label="店铺头像：">
           <div>
-            <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/" :show-file-list="false" :on-success="handleAvatarScucess">
-              <img v-if="form.logo" :src="form.logo" class="avatar">
+            <el-upload class="avatar-uploader"
+            action="http://upload.qiniu.com/"
+            :data="imagesFormData"
+            :show-file-list="false"
+            :before-upload="beforeAvatarUpload"
+            :on-success="handleAvatarSuccess"
+            :on-error="handleAvatarError">
+              <img v-if="form.logo" :src="'http://ojrfwndal.bkt.clouddn.com/' + form.logo" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
@@ -51,28 +57,33 @@
         </el-form-item>
 
         <el-form-item label="店主手机：">
-          <label style="margin-right:10px;">{{form.tel}}</label>
-          <el-button type="text" @click="update_tel = true">转让店铺</el-button>
+          <label style="margin-right:10px;">{{form.mobile}}</label>
+          <el-button type="text" @click="preTransfer">转让店铺</el-button>
         </el-form-item>
 
-        <el-dialog size="tiny" title="更换联系人手机" v-model="update_tel">
+        <el-dialog size="tiny" title="更换联系人手机" @close="cancelTransfer" v-model="update_tel">
           <el-form :model="form">
             <el-form-item>
               <p>更换后，原手机号失效，需使用新手机号登陆</p>
             </el-form-item>
-            <el-form-item label="原手机号：">
-              <p>{{form.tel}}</p>
+            <el-form-item v-if="step==1" label="原手机号：">
+              <p>{{form_submit.mobile}}</p>
             </el-form-item>
-
+            <el-form-item v-if="step==2" label="新手机号：">
+              <el-input style="width:200px;" v-model="form_submit.mobile"></el-input>
+            </el-form-item>
             <el-form-item label="短信校验：">
-              <el-input style="width:200px;" v-model="input4">
-                <template slot="append">获取验证码</template>
+              <el-input style="width:200px;" v-model="form_submit.message_code">
+                <template slot="append">
+                  <el-button slot="append" @click="getMessageCode" :disabled="timer_disabled">获取验证码<span v-show="timer_disabled">（{{timer_second}}）</span></el-button>
+                </template>
               </el-input>
             </el-form-item>
           </el-form>
           <div slot="footer">
-            <el-button @click="update_tel = false">取 消</el-button>
-            <el-button type="primary" @click="update_tel = false">确 定</el-button>
+            <el-button @click="cancelTransfer">取 消</el-button>
+            <el-button v-if="step==1" type="primary" @click="nextStep">下一步</el-button>
+            <el-button v-if="step==2" type="primary" @click="confirmTransfer">确 定</el-button>
           </div>
         </el-dialog>
 
@@ -100,51 +111,196 @@
 <script>
 import axios from "../../scripts/http"
 import uploadImage from "../../scripts/uploadImage"
-import getTimeVal from "../../scripts/utils"
-
+import {
+    testMobile,testMsgCode,stamp2date
+} from "../../scripts/utils"
 export default {
     data() {
         return {
             update_flag: false,
             update_tel: false,
+            step:1,
             update_main_service: false,
-            requestData: {
+
+            /* 倒计时 */
+            timer_second: 60,
+            timer_disabled: false,
+
+            /* 上传logo的数据 */
+            imagesFormData: {
                 key: '',
                 token: ''
             },
-            shop_id: '',
 
+            store_id: '',
+
+            /* 修改后提交的数据 */
             form_submit: {
                 shop_name: '',
                 profile: '',
-                tel: ''
+                mobile: '',
+                message_code: ''
             },
 
+            /* 展示数据 */
             form: {
                 logo: '',
                 shop_name: '',
                 creat_date: '',
                 profile: '',
-                tel: '18818000305'
+                mobile: ''
             }
         }
     },
     mounted() {
-        var self = this
-        self.shop_id = localStorage.shop_id
-        axios.post('/v1/store/store_info', {
-            id: '170403000003'
-        }).then(resp => {
-            if (resp.data.message == 'ok') {
-                self.form.logo = resp.data.data.logo,
-                self.form.shop_name = resp.data.data.name,
-                self.form.creat_date = stamp2date(resp.data.data.create_at, 'YYYY-MM-DD HH:mm'),
-                self.form.profile = resp.data.data.profile,
-                self.form.tel = resp.data.data.service_mobiles
-            }
-        })
+        var store = this.$store.getters.getCurrentStore
+        this.store_id = store.id
+        console.log(this.$store.state.current_store);
+        this.getStoreInfo()
+        this.getToken()
     },
     methods: {
+        getMessageCode() {
+            if (!testMobile(this.form_submit.mobile)) {
+                this.$message.error('手机号码格式不正确！')
+                return
+            }
+            axios.post('/v1/seller/get_update_sms', {
+                mobile: this.form_submit.mobile
+            }).then(resp => {
+                if (resp.data.code != '00000') {
+                    this.$message.error("获取验证码失败，请重试！")
+                }
+                if (resp.data.message == 'needRegister') {
+                    this.$message.error("该用户需要注册！")
+                }
+                if (resp.data.message == 'ok') {
+                    this.$message.info("已发送，请查收短信！")
+                    this.timer_disabled = true
+                    this.timer()
+                }
+            })
+        },
+        timer() {
+            var self = this
+            if (self.timer_second > 0 && self.this.form_submit.mobile!='') {
+                self.timer_second--;
+                setTimeout(function() {
+                    self.timer()
+                }, 1000);
+            } else {
+                self.timer_disabled = false
+            }
+        },
+        preTransfer() {
+            this.update_tel = true
+            this.form_submit.mobile = this.form.mobile
+        },
+        nextStep() {
+            if (!testMsgCode(this.form_submit.message_code)) {
+                this.$message.error('验证码格式不正确！')
+                this.form_submit.message_code = ''
+                return
+            }
+            axios.post('/v1/store/check_code', {
+                mobile: this.form_submit.mobile,
+                message_code: this.form_submit.message_code
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.step += 1
+                    this.form_submit.mobile = ''
+                    this.timer_second = 60
+                    this.timer_disabled = false
+                    clearTimeout()
+                } else {
+                    this.$message.error("验证失败，请重新获取验证码后重试！")
+                }
+            })
+        },
+        cancelTransfer() {
+            this.step = 1
+            this.form_submit.mobile = this.form.mobile
+            this.form_submit.message_code = ''
+            this.update_tel = false
+        },
+        confirmTransfer() {
+            var self = this
+            if (!testMobile(self.form_submit.mobile)) {
+                self.$message.error('手机号码格式不正确！')
+                return
+            }
+            if (!testMsgCode(self.form_submit.message_code)) {
+                self.$message.error('验证码格式不正确！')
+                self.form_submit.message_code = ''
+                return
+            }
+            axios.post('/v1/store/transfer_store', {
+                mobile: self.form_submit.mobile,
+                message_code: self.form_submit.message_code
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    self.cancelTransfer()
+                }
+            })
+        },
+        getToken() {
+            let key = '/store_' + this.store_id + '/logo_' + moment().unix() + '.png'
+            //获取token
+            axios.post('/v1/mediastore/get_upload_token', {
+                zone: 0,
+                key
+            }).then(resp => {
+                this.imagesFormData.key = key
+                this.imagesFormData.token = resp.data.data.token
+                return true
+            }).catch(() => {
+                return false
+            });
+        },
+        beforeAvatarUpload(file) {
+            const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
+            const isLt2M = file.size / 1024 / 1024 < 2;
+            if (!isJPG) {
+                this.$message.error('上传头像图片只能是 JPG、JPEG、PNG 格式!');
+            }
+            if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 2MB!');
+            }
+            return isJPG && isLt2M;
+        },
+        handleAvatarSuccess(res, file, fileList) {
+            this.updateLogo(res.key)
+            this.getStoreInfo()
+            this.getToken()
+        },
+        updateLogo(logo_key) {
+            axios.post('/v1/store/change_logo', {
+                logo: logo_key
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.$message.success('logo修改成功')
+                }
+                return true
+            }).catch(() => {
+                return false
+            });
+        },
+        handleAvatarError(err, file, fileList) {
+            this.$message.error('上传失败，请重试');
+            this.getToken()
+        },
+        getStoreInfo() {
+            var self = this
+            axios.post('/v1/store/store_info', {}).then(resp => {
+                if (resp.data.message == 'ok') {
+                    self.form.logo = resp.data.data.logo,
+                        self.form.shop_name = resp.data.data.name,
+                        self.form.creat_date = stamp2date(resp.data.data.create_at, 'YYYY-MM-DD HH : mm : ss'),
+                        self.form.profile = resp.data.data.profile,
+                        self.form.mobile = resp.data.data.admin_mobile
+                }
+            })
+        },
         proUpdate() {
             this.update_flag = true
             this.form_submit.shop_name = this.form.shop_name
@@ -162,33 +318,22 @@ export default {
         },
         cancelUpdate() {
             this.update_flag = false
-            this.form_submit.shop_name = this.form.shop_name
-            this.form_submit.profile = this.form.profile
         },
         confirmUpdate() {
-          axios.post('/v1/store/update', {
-            id: localStorage.shop_id,
-            name: this.form_submit.shop_name,
-            profile: this.form_submit.profile
-          }).then(resp => {
-              if (resp.data.message == 'ok') {
-                this.$message.success('修改成功')
-                this.update_flag = false
-              }
-          })
-        },
-        handleAvatarScucess(res, file) {
-            this.form.logo = file.url
-            // this.form.logo = URL.createObjectURL(file.raw);
-            // let data = {
-            //     id: this.shop_id,
-            //     logo: 'http://image.cumpusbox.com/shop/' + this.shop_id
-            // }
-            // axios.post('/v1/admin/update_shop_logo', data).then(resp=>{
-            //     if(resp.data.code == '00000'){
-            //
-            //     }
-            // })
+            if (this.form_submit.shop_name.length <= 0 || this.form_submit.shop_name.length > 20) {
+                this.$message.warning('请输入店铺名称')
+                return
+            }
+            axios.post('/v1/store/update', {
+                name: this.form_submit.shop_name,
+                profile: this.form_submit.profile
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.$message.success('修改成功')
+                    this.update_flag = false
+                    this.getStoreInfo()
+                }
+            })
         }
     }
 }
