@@ -103,6 +103,10 @@ export default {
             axios.post('/v1/store/enter_store', {id}).then(resp=>{
                 let store = resp.data.data
                 this.$store.commit('setCurrentStore', store)
+
+                // change token
+                localStorage.setItem('token', resp.data.token)
+
                 this.$router.push("admin")
             })
         },
