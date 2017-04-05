@@ -40,7 +40,7 @@ div.top_bar {
 
     <section class="main">
         <ul class="shops">
-            <li v-for="store in stores" class="shop" @click="into_store(store)">
+            <li v-for="store in stores" class="shop" @click="into_store(store.id)">
                 <h3 class="shop_name">{{store.name}}</h3>
                 <p class="create_at">到期于：{{store.expire_at}}</p>
                 <p style="text-align: right; ">
@@ -85,19 +85,22 @@ export default {
                 return val
             })
         })
-
-        this.$store.commit('setAdminInfo', 'WangKai')
-
-
     },
 
     methods: {
+        // delete store
+        del_store(){
+
+        },
+
         // go into shop
-        into_store(store){
+        into_store(id){
             // put store info into localstorage
-            localStorage.setItem('store', JSON.stringify(store))
-            this.$router.push("admin")
-            console.log(store);
+            axios.post('/v1/store/enter_store', {id}).then(resp=>{
+                let store = resp.data.data
+                this.$store.commit('setCurrentStore', store)
+                this.$router.push("admin")
+            })
         },
 
         add_shop() {
@@ -110,16 +113,19 @@ export default {
                 // add store
                 let name = value.trim()
                 axios.post('/v1/store/add', {name}).then(resp=>{
-                    console.log(resp.data);
+                    // modify expire_at
+                    let store = resp.data.data
+                    store.expire_at = moment.unix(store.expire_at).format('YYYY-MM-DD')
+                    store.create_at = moment.unix(store.create_at).format('YYYY-MM-DD')
+
+                    // push new store into array
+                    this.stores.push(store)
+
+                    this.$message({
+                        type: 'success',
+                        message: '云店铺 ' + name + ' 添加成功！'
+                    })
                 })
-
-                console.log(value);
-
-
-                // this.$message({
-                //     type: 'success',
-                //     message: '你的邮箱是: ' + value
-                // });
             }).catch(() => {
                 this.$message({
                     type: 'info',

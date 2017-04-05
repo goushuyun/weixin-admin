@@ -2,11 +2,11 @@
 
 export default {
     state: {
-        adminInfo: 'sdfdf'
+        current_store: {}
     },
     mutations: {
-        setAdminInfo(state, adminInfo) {
-            state.adminInfo = adminInfo
+        setCurrentStore(state, store) {
+            state.current_store = store
         }
     }
 }
