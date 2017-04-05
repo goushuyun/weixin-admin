@@ -75,7 +75,7 @@
             <el-form-item label="短信校验：">
               <el-input style="width:200px;" v-model="form_submit.message_code">
                 <template slot="append">
-                  <el-button slot="append" @click="getMessageCode" :disabled="timer_disabled">获取验证码<span v-show="timer_disabled">（{{timer_second}}）</span></el-button>
+                  <el-button slot="append" @click="getMessageCode" :disabled="timer_disabled">获取验证码<span v-show="timer_disabled">({{timer_second}})</span></el-button>
                 </template>
               </el-input>
             </el-form-item>
@@ -153,9 +153,8 @@ export default {
         }
     },
     mounted() {
-        var store = this.$store.getters.getCurrentStore
+        var store = this.$store.state.current_store
         this.store_id = store.id
-        console.log(this.$store.state.current_store);
         this.getStoreInfo()
         this.getToken()
     },
@@ -202,6 +201,7 @@ export default {
                 this.form_submit.message_code = ''
                 return
             }
+            this.form_submit.message_code = ''
             axios.post('/v1/store/check_code', {
                 mobile: this.form_submit.mobile,
                 message_code: this.form_submit.message_code
@@ -209,6 +209,7 @@ export default {
                 if (resp.data.message == 'ok') {
                     this.step += 1
                     this.form_submit.mobile = ''
+                    this.form_submit.message_code = ''
                     this.timer_second = 60
                     this.timer_disabled = false
                     clearTimeout()
