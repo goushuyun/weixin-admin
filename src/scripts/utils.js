@@ -8,6 +8,11 @@ function testPassword(pwd){
     return pwdReg.test(pwd)
 }
 
+function testMsgCode(code){
+    let msgCodeReg = /\d{4}/
+    return msgCodeReg.test(code)
+}
+
 function getTimeVal(){
     var date = new Date()
     return date.getSeconds()
@@ -30,4 +35,4 @@ function isISBNFormat (isbn){
 }
 
 
-export {testMobile, testPassword, getTimeVal, stamp2date, isISBNFormat}
+export {testMobile, testPassword, testMsgCode, getTimeVal, stamp2date, isISBNFormat}
