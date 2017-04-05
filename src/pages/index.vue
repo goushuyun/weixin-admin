@@ -58,7 +58,7 @@
     <div id="left_bar">
         <el-row class="left_top">
             <el-col :span="10">
-                <img src="https://img.yzcdn.cn/upload_files/2016/06/16/de7f0d4ef972065c52ca132a6bc17f88.jpeg" class="shop_logo">
+                <img :src="logo" class="shop_logo">
             </el-col>
 
             <el-col :span="14">
@@ -102,18 +102,16 @@
 export default {
     data() {
         return {
-            shopName: '',
-            adminName: ''
-        }
-    },
-    mounted() {},
-    methods: {
-        mainPage: function() {
-
+            store_logo: '',
+            seller_name: '',
         }
     },
     computed: {
-
+        logo(){
+            // get logo from vuex
+            let logo = this.$store.state.current_store.logo
+            return logo=='' ? 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png' : logo
+        }
     }
 }
 

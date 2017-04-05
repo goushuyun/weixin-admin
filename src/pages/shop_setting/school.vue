@@ -147,115 +147,113 @@ import {
 from 'vue-amap';
 
 var pointer = {
-        lat: 0,
-        lng: 0,
+    lat: 0,
+    lng: 0,
 
-        name: '',
-        tel: '',
-        express_fee: 0
-    }
+    name: '',
+    tel: '',
+    express_fee: 0
+}
 
-    export default {
-        created() {
+export default {
+    created() {
             // 客服电话默认给出该云店铺seller的电话
             pointer.tel = this.$store.state.current_store.seller.mobile
         },
 
-            data() {
-                return {
-                    // dialog 数据
-                    visible: false,
-                    title: '请选择学校',
+        data() {
+            return {
+                // dialog 数据
+                visible: false,
+                title: '请选择学校',
 
-                    // 业务数据
-                    pointer: pointer,
+                // 业务数据
+                pointer: pointer,
 
-                    // map paramter
-                    zoom: 12,
-                    center: [121.59996, 31.197646],
-                    markers: [],
-                    searchOption: {
-                        // city: '上海',
-                        citylimit: true
-                    },
+                // map paramter
+                zoom: 12,
+                center: [121.59996, 31.197646],
+                markers: [],
+                searchOption: {
+                    // city: '上海',
+                    citylimit: true
+                },
+                events: {
+                    init(o) {
+                        console.log(o);
+                    }
+                },
+                plugin: [{
+                    pName: 'Geolocation',
                     events: {
                         init(o) {
                             console.log(o);
-                        }
-                    },
-                    plugin: [{
-                        pName: 'Geolocation',
-                        events: {
-                            init(o) {
-                                console.log(o);
 
-                                // o 是高德地图定位插件实例
-                                o.getCurrentPosition((status, result) => {
-                                    self.center = [result.position.lng, result.position.lat];
-                                });
-                            }
-                        }
-                    }],
-
-                    // markers
-                    marker_events: {
-                        click(e) {
-                            console.log(e);
-
-                            //解析必要数据到 pointer
-                            pointer.lat = e.lnglat.lat
-                            pointer.lng = e.lnglat.lng
-
-                            pointer.name = e.target.G.title
-
-
-                            console.log(pointer)
+                            // o 是高德地图定位插件实例
+                            o.getCurrentPosition((status, result) => {
+                                self.center = [result.position.lng, result.position.lat];
+                            });
                         }
                     }
+                }],
 
+                // markers
+                marker_events: {
+                    click(e) {
+                        console.log(e);
+
+                        //解析必要数据到 pointer
+                        pointer.lat = e.lnglat.lat
+                        pointer.lng = e.lnglat.lng
+
+                        pointer.name = e.target.G.title
+
+                        console.log(pointer)
+                    }
+                }
+
+
+            }
+        },
+        methods: {
+            dialog_close_handle() {
+                    // handle model close
+                    this.zoom = 12
+                    this.markers = []
+                },
+                add_school() {
+                    // add school
+                    this.visible = true
+                },
+                onSearchResult(pois) {
+                    console.log(pois);
+                    let latSum = 0;
+                    let lngSum = 0;
+                    if (pois.length > 0) {
+                        pois.forEach(poi => {
+                            let marker = {
+                                name: poi.name,
+                                loc: [poi.lng, poi.lat]
+                            }
+                            let {
+                                lng, lat
+                            } = poi;
+                            lngSum += lng;
+                            latSum += lat;
+                            this.markers.push(marker);
+                        });
+                        let center = {
+                            lng: lngSum / pois.length,
+                            lat: latSum / pois.length
+                        };
+                        this.center = [center.lng, center.lat];
+                    }
+
+                    // 修改zoom值，放大搜索结果
+                    this.zoom = 15
 
                 }
-            },
-            methods: {
-                dialog_close_handle() {
-                        // handle model close
-                        this.zoom = 12
-                        this.markers = []
-                    },
-                    add_school() {
-                        // add school
-                        this.visible = true
-                    },
-                    onSearchResult(pois) {
-                        console.log(pois);
-
-                        let latSum = 0;
-                        let lngSum = 0;
-                        if (pois.length > 0) {
-                            pois.forEach(poi => {
-                                let marker = {
-                                    name: poi.name,
-                                    loc: [poi.lng, poi.lat]
-                                }
-                                let {
-                                    lng, lat
-                                } = poi;
-                                lngSum += lng;
-                                latSum += lat;
-                                this.markers.push(marker);
-                            });
-                            let center = {
-                                lng: lngSum / pois.length,
-                                lat: latSum / pois.length
-                            };
-                            this.center = [center.lng, center.lat];
-                        }
-
-                        // 修改zoom值，放大搜索结果
-                        this.zoom = 15
-
-                    }
-            }
-    }
+        }
+}
 
 </script>
