@@ -59,7 +59,12 @@
                           <el-input class="mobile" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
                       </el-form-item>
                       <el-form-item prop="message_code">
-                          <el-input placeholder="短信验证码" v-model="sign.message_code"><el-button slot="append" @click="getMessageCode('register')" :disabled="registe_timer_disabled">获取验证码<span v-show="registe_timer_disabled">（{{register_timer_second}}）</span></el-button></el-input>
+                          <el-input placeholder="短信验证码" v-model="sign.message_code">
+                            <el-button slot="append" style="width:100px" @click="getMessageCode('register')" :disabled="registe_timer_disabled">
+                              <span v-show="!registe_timer_disabled">获取验证码</span>
+                              <span v-show="registe_timer_disabled">（{{register_timer_second}}s）</span>
+                            </el-button>
+                          </el-input>
                       </el-form-item>
                       <el-form-item prop="username">
                           <el-input placeholder="姓名" v-model="sign.username"></el-input>
@@ -80,7 +85,12 @@
                           <el-input placeholder="登录密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
                       </el-form-item>
                       <el-form-item prop="message_code" v-show="forgetPwd">
-                          <el-input placeholder="短信验证码" v-model="sign.message_code"><el-button slot="append" @click="getMessageCode('update_pwd')" :disabled="update_pwd_timer_disabled">获取验证码<span v-show="update_pwd_timer_disabled">（{{update_pwd_timer_second}}）</span></el-button></el-input>
+                          <el-input placeholder="短信验证码" v-model="sign.message_code">
+                            <el-button slot="append" style="width:100px" @click="getMessageCode('update_pwd')" :disabled="update_pwd_timer_disabled">
+                              <span v-show="!update_pwd_timer_disabled">获取验证码</span>
+                              <span v-show="update_pwd_timer_disabled">（{{update_pwd_timer_second}}s）</span>
+                            </el-button>
+                          </el-input>
                       </el-form-item>
                       <el-form-item prop="password" v-show="forgetPwd">
                           <el-input placeholder="新密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
@@ -335,7 +345,8 @@ export default {
                         this.$message.error("获取验证码失败，请重试！")
                     }
                     if (resp.data.message == 'needRegister') {
-                        // this.$message.info("该用户已被注册！")
+                        this.$message.info("用户名不存在，请注册！")
+                        this.activeName = 'sign_up'
                     }
                     if (resp.data.message == 'ok') {
                         this.$message.info("已发送，请查收短信！")

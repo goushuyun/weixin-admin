@@ -64,7 +64,7 @@
         <el-dialog size="tiny" title="更换联系人手机" @close="cancelTransfer" v-model="update_tel">
           <el-form :model="form">
             <el-form-item>
-              <p>更换后，原手机号失效，需使用新手机号登陆</p>
+              <p>更换手机号后，此店铺归属于新手机号</p>
             </el-form-item>
             <el-form-item v-if="step==1" label="原手机号：">
               <p>{{form_submit.mobile}}</p>
@@ -75,7 +75,10 @@
             <el-form-item label="短信校验：">
               <el-input style="width:200px;" v-model="form_submit.message_code">
                 <template slot="append">
-                  <el-button slot="append" @click="getMessageCode" :disabled="timer_disabled">获取验证码<span v-show="timer_disabled">（{{timer_second}}）</span></el-button>
+                  <el-button slot="append" style="width:100px" @click="getMessageCode" :disabled="timer_disabled">
+                    <span v-show="!timer_disabled">获取验证码</span>
+                    <span v-show="timer_disabled">（{{timer_second}}s）</span>
+                  </el-button>
                 </template>
               </el-input>
             </el-form-item>
@@ -155,7 +158,6 @@ export default {
     mounted() {
         var store = this.$store.state.current_store
         this.store_id = store.id
-        console.log(this.$store.state.current_store);
         this.getStoreInfo()
         this.getToken()
     },
@@ -183,7 +185,7 @@ export default {
         },
         timer() {
             var self = this
-            if (self.timer_second > 0 && self.this.form_submit.mobile!='') {
+            if (self.timer_second > 0 && self.form_submit.mobile!='') {
                 self.timer_second--;
                 setTimeout(function() {
                     self.timer()
@@ -209,6 +211,7 @@ export default {
                 if (resp.data.message == 'ok') {
                     this.step += 1
                     this.form_submit.mobile = ''
+                    this.form_submit.message_code = ''
                     this.timer_second = 60
                     this.timer_disabled = false
                     clearTimeout()
