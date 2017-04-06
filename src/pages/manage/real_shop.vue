@@ -1,34 +1,38 @@
 <template lang="html">
   <div class="body">
-    <div v-for="(rs,index) in real_stores" class="box-card" @click="updateRealStore(index)">
-      <div class="item">实体店名：{{rs.name}}</div>
-      <div class="item">店铺地址：{{rs.addressStr}}</div>
-      <div style="text-align:right"><el-button style="color:#FF4949;" type="text" @click.stop="deleteRealStore">删除</el-button></div>
+    <div v-for="(store,index) in real_stores" class="box-card" @click="preUpdateRealStore(index)" @mouseover="store.active = true" @mouseleave="store.active = false">
+      <div class="item">实体店名：{{store.name}}</div>
+      <div class="item">店铺地址：{{store.address}}</div>
+      <div class="delete_btn" style="text-align:right">
+        <!-- <el-button v-show="store.active" style="color:#FF4949;" type="text" @click.stop="deleteRealStore">删除</el-button> -->
+        <i v-show="store.active" style="color:#FF4949;" class="el-icon-delete2" @click.stop="deleteRealStore(index)"></i>
+      </div>
     </div>
 
     <div class="box-card" @click="preAddRealStore">
       <el-button style="width:100%" type="text">新增店铺</el-button>
     </div>
 
-    <el-dialog title="实体店信息" @close="cancelAddRealStore" v-model="dialogFormVisible">
+    <el-dialog title="实体店信息" @close="closeDialog" v-model="dialogFormVisible">
       <el-form ref="form" :model="form" :rules="rules" label-width="110px">
           <el-form-item prop="name" label="店铺名称：">
             <el-input size="small" v-model="form.name"></el-input>
           </el-form-item>
-          <el-form-item prop="address" label="店铺地址：">
-            <div id="distpicker" data-toggle="distpicker" data-autoselect="3">
+          <el-form-item prop="address_detail" label="店铺地址：">
+            <div id="distpicker" data-toggle="distpicker">
               <select id="province" class="distpicker"></select>
               <select id="city" class="distpicker"></select>
               <select id="district" class="distpicker"></select>
-              <el-input size="small" placeholder="请填写具体地址" v-model="form.address"></el-input>
+              <el-input size="small" placeholder="请填写具体地址" v-model="form.address_detail"></el-input>
             </div>
           </el-form-item>
+          <!-- :file-list="fileList" -->
           <el-form-item label="店铺头像：">
             <el-upload
               action="http://upload.qiniu.com/"
               :data="imagesFormData"
               list-type="picture-card"
-              :file-list="picture_list"
+              :file-list="fileList"
               :before-upload="beforeAvatarUpload"
               :on-success="handleAvatarSuccess"
               :on-error="handleAvatarError"
@@ -41,8 +45,9 @@
           </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="cancelAddRealStore">取 消</el-button>
-        <el-button type="primary" :loading="btn_loading" @click="confirmAddRealStore('form')">确 定</el-button>
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button v-if="add_update=='add'" type="primary" :loading="btn_loading" @click="confirmAddRealStore('form')">确定添加</el-button>
+        <el-button v-if="add_update=='update'" type="primary" :loading="btn_loading" @click="confirmUpdateRealStore('form')">确定更新</el-button>
       </div>
     </el-dialog>
 
@@ -54,26 +59,38 @@ import axios from "../../scripts/http"
 export default {
     data() {
         return {
+            active: false,
+            add_update: '',
             /* 实体店列表 */
-            picture_list: [],
             real_stores: [],
 
             btn_loading: false,
             dialogFormVisible: false,
 
+            fileList: [],
             /* 创建实体店时提交的数据 */
             form: {
                 name: '',
                 province_code: '',
+                province_text: '',
+
                 city_code: '',
+                city_text: '',
+
                 scope_code: '',
+                scope_text: '',
+
+                address_detail: '',
                 address: '',
+
                 images: '',
-                store_id: ''
+                imagesArray: [],
+
+                id: ''
             },
 
             rules: {
-                address: [{
+                address_detail: [{
                     required: true,
                     message: '请输入详细地址',
                     trigger: 'blur'
@@ -95,39 +112,74 @@ export default {
             imagesFormData: {
                 key: '',
                 token: ''
-            },
-            images: []
+            }
         };
     },
     mounted() {
-        var store = this.$store.getters.getCurrentStore
-        this.form.store_id = store.id
         this.getRealStores()
     },
     methods: {
-        updateRealStore(index) {
-          console.log(this.real_stores);
-          console.log(index);
-            var store = this.real_stores[index]
-            this.form.name = store.name
-            this.form.province_code = store.province_code
-            this.form.city_code = store.city_code
-            this.form.scope_code = store.scope_code
-            this.form.address = store.address
-            this.form.images = store.images
-            this.form.store_id = store.store_id
+        preUpdateRealStore(index) {
+            var self = this
+            var store = self.real_stores[index]
+            self.form.id = store.id
+            self.form.name = store.name
+            self.form.images = store.images
+            self.form.address = store.address
 
-            this.dialogFormVisible = true
+            self.getAddress2Array()
+            self.getImages2Array()
+
+            self.add_update = 'update'
+            self.dialogFormVisible = true
+
+            setTimeout(function() {
+                self.distpicker()
+                self.getToken()
+            }, 100)
+        },
+        confirmUpdateRealStore() {
+            var self = this
+            self.getDistpickerValue()
+            if (!self.form.province_code) {
+                self.$message.warning("请选择省份")
+                return
+            }
+            if (!self.form.city_code) {
+                self.$message.warning("请选择城市")
+                return
+            }
+            if (!self.form.scope_code) {
+                self.$message.warning("请选择县区")
+                return
+            }
+            if (!self.form.address_detail) {
+                self.$message.warning("请输入详细地址")
+                return
+            }
+            if (self.form.imagesArray.length == 0) {
+                self.$message.warning("请上传至少一张图片")
+                return
+            }
+            self.btn_loading = true
+            self.getAddress2String()
+            self.getImages2String()
+            axios.post('/v1/store/update_real_store', self.form).then(resp => {
+                if (resp.data.message == 'ok') {
+                    self.$message.success('实体店更新成功')
+                }
+                self.dialogFormVisible = false
+                self.getRealStores()
+            }).catch(() => {
+                return false
+            });
         },
         getRealStores() {
             var self = this
             axios.post('/v1/store/real_stores', {}).then(resp => {
                 if (resp.data.message == 'ok') {
                     self.real_stores = resp.data.data.map(rs => {
-                        var province = $().distpicker('getDistricts', rs.province_code)
-                        var city = $().distpicker('getDistricts', rs.city_code)
-                        var scope = $().distpicker('getDistricts', rs.scope_code)
-                        rs.addressStr = province + ' | ' + city + ' | ' + scope + ' | ' + rs.address
+                        rs.active = false
                         return rs
                     })
                 }
@@ -150,38 +202,51 @@ export default {
             });
         },
         beforeAvatarUpload(file) {
+            var isThree = this.form.imagesArray.length < 3
             const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
             const isLt2M = file.size / 1024 / 1024 < 2;
+            if (!isThree) {
+                this.$message.error('最多上传三张照片!');
+            }
             if (!isJPG) {
                 this.$message.error('上传头像图片只能是 JPG、JPEG、PNG 格式!');
             }
             if (!isLt2M) {
                 this.$message.error('上传头像图片大小不能超过 2MB!');
             }
-            return isJPG && isLt2M;
+            return isJPG && isLt2M && isThree;
         },
         handleAvatarSuccess(res, file, fileList) {
             var self = this
-            self.images = []
+            self.form.imagesArray = []
             fileList.forEach(f => {
-                self.images.push(f.response.key)
+                if (f.key) {
+                    self.form.imagesArray.push(f.key)
+                } else {
+                    self.form.imagesArray.push(f.response.key)
+                }
             })
-            console.log(self.picture_list);
             self.getToken()
         },
         handleAvatarError(err, file, fileList) {
             this.getToken()
         },
         handleRemove(file, fileList) {
+            console.log(fileList);
             var self = this
-            self.images = []
+            self.form.imagesArray = []
             fileList.forEach(f => {
-                self.images.push(f.response.key)
+                if (f.key) {
+                    self.form.imagesArray.push(f.key)
+                } else {
+                    self.form.imagesArray.push(f.response.key)
+                }
             })
             self.getToken()
         },
         preAddRealStore() {
             var self = this
+            self.add_update = 'add'
             self.dialogFormVisible = true
             setTimeout(function() {
                 self.distpicker()
@@ -203,21 +268,22 @@ export default {
                 self.$message.warning("请选择县区")
                 return
             }
-            if (self.images.length == 0) {
+            if (self.form.imagesArray.length == 0) {
                 self.$message.warning("请上传至少一张图片")
                 return
             }
             self.$refs[formName].validate((valid) => {
                 if (valid) {
                     self.btn_loading = true
-                    self.form.images = JSON.stringify(self.images)
+                    self.getAddress2String()
+                    self.getImages2String()
                     var data = self.form
                     axios.post('/v1/store/add_real_store', data).then(resp => {
                         if (resp.data.message == 'ok') {
                             self.$message.success('实体店创建成功')
                         }
-                        this.btn_loading = false
                         self.dialogFormVisible = false
+                        self.getRealStores()
                     })
                 } else {
                     console.log('error submit!!');
@@ -225,30 +291,91 @@ export default {
                 }
             });
         },
-        cancelAddRealStore() {
-            this.dialogFormVisible = false
-            this.images = []
+        closeDialog() {
+            if (this.btn_loading) {
+                this.btn_loading = false
+            }
+            this.fileList = []
+            this.form.name = ''
+            this.form.province_code = ''
+            this.form.province_text = ''
+
+            this.form.city_code = ''
+            this.form.city_text = ''
+
+            this.form.scope_code = ''
+            this.form.scope_text = ''
+
+            this.form.address_detail = ''
+            this.form.address = ''
+
+            this.form.images = ''
+            this.form.imagesArray = []
         },
         distpicker() {
-            $('.el-form-item #distpicker').distpicker();
+            $('#distpicker').distpicker('destroy');
+            $('#distpicker').distpicker({
+                province: this.form.province_text ? this.form.province_text : '---- 所在省 ----',
+                city: this.form.city_text ? this.form.city_text : '---- 所在市 ----',
+                district: this.form.scope_text ? this.form.scope_text : '---- 所在区 ----'
+            });
         },
         getDistpickerValue() {
-            this.form.province_code = $('#distpicker #province').find('option:selected').attr('data-code')
-            this.form.city_code = $('#distpicker #city').find('option:selected').attr('data-code')
-            this.form.scope_code = $('#distpicker #district').find('option:selected').attr('data-code')
+            this.form.province_code = $('#province option:selected').data('code')
+            this.form.city_code = $('#city option:selected').data('code')
+            this.form.scope_code = $('#district option:selected').data('code')
         },
-        deleteRealStore() {
-            this.$confirm('此操作将永久删除该实体店, 是否继续?', '提示', {
+        getAddress2String() {
+            var province = $('#province option:selected').data('text')
+            var city = $('#city option:selected').data('text')
+            var scope = $('#district option:selected').data('text')
+            var address_detail = this.form.address_detail
+            this.form.address = province + ' | ' + city + ' | ' + scope + ' | ' + address_detail
+        },
+        getAddress2Array() {
+            var addressArray = this.form.address.split('|')
+            this.form.province_text = addressArray[0].trim()
+            this.form.city_text = addressArray[1].trim()
+            this.form.scope_text = addressArray[2].trim()
+            this.form.address_detail = addressArray[3].trim()
+        },
+        getImages2String() {
+            this.form.images = this.form.imagesArray.join()
+        },
+        getImages2Array() {
+            this.form.imagesArray = this.form.images.split(',')
+            var imagesArray = []
+            this.form.imagesArray.forEach(i => {
+                var obj = {
+                    key: i,
+                    url: 'http://ojrfwndal.bkt.clouddn.com/' + i
+                }
+                imagesArray.push(obj)
+            })
+            this.fileList = imagesArray
+        },
+        deleteRealStore(index) {
+            var self = this
+            var id = self.real_stores[index].id
+            console.log(id);
+            self.$confirm('此操作将永久删除该实体店, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.$message({
-                    type: 'success',
-                    message: '删除成功!'
+                axios.post('/v1/store/del_real_store', {
+                    id: id
+                }).then(resp => {
+                    if (resp.data.message == 'ok') {
+                        self.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        self.getRealStores()
+                    }
                 });
             }).catch(() => {
-                this.$message({
+                self.$message({
                     type: 'info',
                     message: '已取消删除'
                 });
@@ -269,6 +396,7 @@ export default {
 }
 
 .box-card {
+    position: relative;
     font-size: 14px;
     width: 480px;
     margin: 10px;
@@ -279,6 +407,11 @@ export default {
     &:hover {
         cursor: pointer;
         box-shadow: 0 0 10px rgba(0, 0, 0,.3);
+    }
+    .delete_btn {
+        position: absolute;
+        right: 30px;
+        top: 30px;
     }
 }
 .add {

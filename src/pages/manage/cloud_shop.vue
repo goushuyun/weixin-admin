@@ -64,7 +64,7 @@
         <el-dialog size="tiny" title="更换联系人手机" @close="cancelTransfer" v-model="update_tel">
           <el-form :model="form">
             <el-form-item>
-              <p>更换后，原手机号失效，需使用新手机号登陆</p>
+              <p>更换手机号后，此店铺归属于新手机号</p>
             </el-form-item>
             <el-form-item v-if="step==1" label="原手机号：">
               <p>{{form_submit.mobile}}</p>
