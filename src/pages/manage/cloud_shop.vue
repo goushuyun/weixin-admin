@@ -153,7 +153,7 @@ export default {
         }
     },
     mounted() {
-        var store = this.$store.getters.getCurrentStore
+        var store = this.$store.state.current_store
         this.store_id = store.id
         console.log(this.$store.state.current_store);
         this.getStoreInfo()
