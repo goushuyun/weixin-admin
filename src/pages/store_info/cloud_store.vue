@@ -46,7 +46,7 @@
             :before-upload="beforeAvatarUpload"
             :on-success="handleAvatarSuccess"
             :on-error="handleAvatarError">
-              <img v-if="form.logo" :src="'http://ojrfwndal.bkt.clouddn.com/' + form.logo" class="avatar">
+              <img v-if="form.logo" :src="'http://onv8eua8j.bkt.clouddn.com/' + form.logo" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>
@@ -247,7 +247,7 @@ export default {
             })
         },
         getToken() {
-            let key = '/store_' + this.store_id + '/logo_' + moment().unix() + '.png'
+            let key = 'store_' + this.store_id + '/logo_' + moment().unix() + '.png'
             //获取token
             axios.post('/v1/mediastore/get_upload_token', {
                 zone: 0,
