@@ -5,7 +5,7 @@
         <el-col>
           <div>
             <label v-if="!update_depot" class="margin_right20">{{p_depot.name}}</label>
-            <el-input v-else class="margin_right20" style="max-width:200px;" size="small" v-model="p_depot.update_name"></el-input>
+            <el-input v-else class="margin_right20" style="max-width:200px;" size="small" v-model="p_depot.update_name" v-on:keyup.enter.native="confirmUpdateDepot"></el-input>
             <el-button v-if="!update_depot" type="text" @click="proUpdateDepot">修改</el-button>
             <el-button v-if="update_depot" type="text" @click="confirmUpdateDepot">确定</el-button>
             <el-button v-if="update_depot" type="text" style="color:#13CE66" @click="update_depot = false">取消</el-button>
@@ -21,7 +21,7 @@
         <div v-for="(shelf,s_index) in locations" class="box-card">
             <div class="title">
               <label v-if="!shelf.update">{{shelf.name}}</label>
-              <el-input v-else style="max-width:200px;" size="small" v-model="shelf.name"></el-input>
+              <el-input v-else style="max-width:200px;" size="small" v-model="shelf.name" v-on:keyup.enter.native="comfirmUpdate(shelf.id,shelf.name,s_index)"></el-input>
               <el-button-group>
                   <el-button class="btn" type="text" icon="plus" size="large" @click="preAddFloor"></el-button>
                   <el-button v-if="!shelf.update" class="btn" type="text" icon="edit" size="large" @click="shelf.update = true"></el-button>
@@ -31,7 +31,7 @@
             </div>
             <div v-for="(floor,f_index) in shelf.children" class="item">
               <label v-if="!floor.update">{{floor.name}}</label>
-              <el-input v-else style="max-width:200px;" size="small" v-model="floor.name"></el-input>
+              <el-input v-else style="max-width:200px;" size="small" v-model="floor.name" v-on:keyup.enter.native="comfirmUpdate(floor.id,floor.name,s_index,f_index)"></el-input>
               <el-button-group>
                   <el-button v-if="!floor.update" class="btn" type="text" icon="edit" @click="floor.update = true"></el-button>
                   <el-button v-if="floor.update" class="btn" type="text" style="color:#13CE66" icon="check" size="large" @click="comfirmUpdate(floor.id,floor.name,s_index,f_index)"></el-button>
@@ -39,7 +39,7 @@
               </el-button-group>
             </div>
             <div v-if="add_floor.add" class="item">
-              <el-input id="add_floor" style="max-width:200px;" size="small" v-model="add_floor.name" @blur="comfirmAddFloor(shelf.id)"></el-input>
+              <el-input id="add_floor" style="max-width:200px;" size="small" v-model="add_floor.name" v-on:keyup.enter.native="comfirmAddFloor(shelf.id)" @blur="comfirmAddFloor(shelf.id)"></el-input>
               <el-button-group>
                   <el-button v-if="add_floor.add" class="btn" type="text" style="color:#13CE66" icon="check" size="large" @click="comfirmAddFloor(shelf.id)"></el-button>
               </el-button-group>
@@ -139,6 +139,11 @@ export default {
             })
         },
         comfirmUpdate(id, name, s_index, f_index) {
+            if (name == '') {
+                this.$message.warning('未输入任何内容')
+                this.getLocations()
+                return
+            }
             var data = {
                 id,
                 name
