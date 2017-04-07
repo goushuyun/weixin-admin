@@ -40,9 +40,6 @@ export default {
             activeName: 'location'
         };
     },
-    mounted() {
-
-    },
     methods: {
         handleClick(tab, event) {
             this.activeName = tab.name

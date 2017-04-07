@@ -1,79 +1,7 @@
 <style lang="scss" scoped>
 
-@import "../../common/_color.scss";
-ul#schools {
-    font-size: 0;
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    li {
-        box-sizing: border-box;
-        display: inline-block;
-        border-radius: 4px;
-    }
-    li.school {
-        width: 245px;
-        // height: 141px;
-        background-color: white;
-        border-left: 4px solid $blue;
-        padding: 6px 12px;
-        margin-right: 14px;
-        margin-bottom: 10px;
-        &:hover {
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 0, 0, .2);
-        }
-        p.name {
-            line-height: 48px;
-            font-size: 14px;
-            color: $font_normal;
-        }
-        p.tel {
-            font-size: 13px;
-            line-height: 24px;
-            color: $font_light;
-            .price {
-                color: $weixin_green;
-                padding-right: 82px;
-            }
-        }
-        p.operate {
-            text-align: right;
-            button {
-                line-height: 16px;
-                padding: 0;
-                font-size: 12px;
-            }
-        }
-    }
-    li.add {
-        font-size: 20px;
-        width: 124px;
-        height: 124px;
-        background-color: white;
-        line-height: 124px;
-        text-align: center;
-        color: $bg_grey;
-        &:hover {
-            cursor: pointer;
-            color: lighten($blue, 12%);
-            border: 1px solid lighten($blue, 16%);
-        }
-    }
-}
-
-.el-dialog--large {
-    top: 5% !important;
-}
-
-#amap {
-    height: 400px;
-    .search-box {
-        position: relative;
-        top: 2px;
-        left: 2px;
-    }
-}
+@import "../../../common/_color.scss";
+@import "./school.scss";
 
 </style>
 
@@ -81,24 +9,14 @@ ul#schools {
 
 <div>
     <ul id="schools">
-        <li class="school">
-            <p class="name">上海应用技术大学（奉贤校区）</p>
-            <p class="tel">客服电话：18817935420</p>
+        <li class="school" v-for="school in schools" @mouseover="school.active = true" @mouseleave="school.active= false" @click="view_school(school)">
+            <p class="name">{{school.name}}</p>
+            <p class="tel">客服电话：{{school.tel}}</p>
             <p class="tel">
-                配送费用：<span class="price">¥ 4.00</span>
+                配送费用：<span class="price">¥ {{(school.express_fee/100).toFixed(2)}}</span>
             </p>
-            <p class="operate">
-                <el-button type="text">删除</el-button>
-            </p>
-        </li>
-        <li class="school">
-            <p class="name">上海应用技术大学（奉贤校区）</p>
-            <p class="tel">客服电话：18817935420</p>
-            <p class="tel">
-                配送费用：<span class="price">¥ 4.00</span>
-            </p>
-            <p class="operate">
-                <el-button type="text">删除</el-button>
+            <p class="operate" v-show="school.active">
+                <el-button type="text" @click="del_school(school.id)">删除</el-button>
             </p>
         </li>
 
@@ -108,10 +26,10 @@ ul#schools {
     </ul>
 
     <!-- 学校信息弹出框 -->
-    <el-dialog :title="pointer.name" v-model="visible" size="large" style="top:-14%;" :close-on-click-modal="false" @close="dialog_close_handle">
+    <el-dialog :title="' ' + pointer.name" v-model="visible" size="large" style="top:-14%;" :close-on-click-modal="false" @close="dialog_close_handle">
         <div id="amap">
             <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult" :events="events"></el-amap-search-box>
-            <el-amap :vid="'amap'" :center="center" :zoom="zoom" :plugin="plugin">
+            <el-amap :vid="'amap'" :center="center" :events="map_events" :zoom="zoom" :plugin="plugin">
                 <el-amap-marker :events="marker_events" :clickable="true" :title="marker.name" v-for="marker in markers" :position="marker.loc"></el-amap-marker>
             </el-amap>
         </div>
@@ -131,7 +49,7 @@ ul#schools {
 
         <div slot="footer" class="dialog-footer">
             <el-button @click="visible = false">取 消</el-button>
-            <el-button type="primary" @click="visible = false">确 定</el-button>
+            <el-button type="primary" @click="confirm">确 定</el-button>
         </div>
     </el-dialog>
 
@@ -140,13 +58,13 @@ ul#schools {
 </template>
 
 <script>
-
 import {
     AMapManager
 }
 from 'vue-amap';
 
 var pointer = {
+    id: '',
     lat: 0,
     lng: 0,
 
@@ -154,21 +72,27 @@ var pointer = {
     tel: '',
     express_fee: 0
 }
-
+import mix from './school.js'
+var self
 export default {
+    mixins: [mix],
     created() {
             // 客服电话默认给出该云店铺seller的电话
-            pointer.tel = this.$store.state.current_store.seller.mobile
+            if(this.$store.state.current_store.seller){
+                pointer.tel = this.$store.state.current_store.seller.mobile
+            }
+            this.list_school()
         },
 
         data() {
             return {
                 // dialog 数据
                 visible: false,
-                title: '请选择学校',
+                title: '',
 
                 // 业务数据
                 pointer: pointer,
+                schools: [],
 
                 // map paramter
                 zoom: 12,
@@ -177,6 +101,12 @@ export default {
                 searchOption: {
                     // city: '上海',
                     citylimit: true
+                },
+                map_events: {
+                    'click': (e)=>{
+                        console.log('click map');
+                        console.log(e);
+                    }
                 },
                 events: {
                     init(o) {
@@ -191,7 +121,7 @@ export default {
 
                             // o 是高德地图定位插件实例
                             o.getCurrentPosition((status, result) => {
-                                self.center = [result.position.lng, result.position.lat];
+                                // self.center = [result.position.lng, result.position.lat];
                             });
                         }
                     }
@@ -202,27 +132,46 @@ export default {
                     click(e) {
                         console.log(e);
 
+                        console.log(pointer);
+
                         //解析必要数据到 pointer
                         pointer.lat = e.lnglat.lat
                         pointer.lng = e.lnglat.lng
-
                         pointer.name = e.target.G.title
-
-                        console.log(pointer)
                     }
                 }
-
 
             }
         },
         methods: {
+            view_school(school){
+                console.log(school);
+                pointer.name = school.name
+                pointer.tel = school.tel
+                pointer.express_fee = (school.express_fee/100).toFixed(2)
+                pointer.lat = school.lat
+                pointer.lng = school.lng
+                pointer.id = school.id
+
+                this.center = [pointer.lng, pointer.lat]
+                let marker = {
+                    name: pointer.name,
+                    loc: [pointer.lng, pointer.lat]
+                }
+                this.markers.push(marker)
+                this.zoom = 15
+                this.visible = true
+            },
             dialog_close_handle() {
                     // handle model close
                     this.zoom = 12
                     this.markers = []
                 },
                 add_school() {
-                    // add school
+                    // add school, clear pointer info
+                    pointer.id = ''
+                    pointer.express_fee = pointer.lat = pointer.lng = 0
+                    pointer.name = pointer.tel = ''
                     this.visible = true
                 },
                 onSearchResult(pois) {
@@ -250,7 +199,7 @@ export default {
                     }
 
                     // 修改zoom值，放大搜索结果
-                    this.zoom = 15
+                    this.zoom = 12
 
                 }
         }

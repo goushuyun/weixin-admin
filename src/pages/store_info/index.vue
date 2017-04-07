@@ -31,9 +31,6 @@ export default {
             activeName: 'cloud'
         };
     },
-    mounted() {
-        // this.$router.push('cloud_store')
-    },
     methods: {
         handleClick(tab, event) {
             this.activeName = tab.name

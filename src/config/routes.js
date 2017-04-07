@@ -14,7 +14,7 @@ const store_setting = r => require(['../pages/store_setting/index'], r)
 // *** 人员管理
 const people = r => require(['../pages/store_setting/people'], r)
 // *** 经营学校
-const school = r => require(['../pages/store_setting/school'], r)
+const school = r => require(['../pages/store_setting/school/school.vue'], r)
 // *** 仓库设置
 const location = r => require(['../pages/store_setting/location'], r)
 // *** 配送费设置
