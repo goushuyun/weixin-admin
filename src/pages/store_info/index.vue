@@ -32,16 +32,16 @@ export default {
         };
     },
     mounted() {
-        this.$router.push('cloud_shop')
+        // this.$router.push('cloud_store')
     },
     methods: {
         handleClick(tab, event) {
             this.activeName = tab.name
             if (tab.name == 'cloud') {
-                this.$router.push('cloud_shop')
+                this.$router.push('cloud_store')
             }
             if (tab.name == 'real') {
-                this.$router.push('real_shop')
+                this.$router.push('real_store')
             }
         }
     }

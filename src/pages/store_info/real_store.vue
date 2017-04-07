@@ -41,7 +41,7 @@
             </el-upload>
           </el-form-item>
           <el-form-item label="">
-            <p>请添加正方形照片，最多三张</p>
+            <p>请添加正方形照片，最多三张。只能上传jpg/png文件，且不超过500kb</p>
           </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
