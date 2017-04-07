@@ -16,7 +16,9 @@ const people = r => require(['../pages/store_setting/people'], r)
 // *** 经营学校
 const school = r => require(['../pages/store_setting/school/school.vue'], r)
 // *** 仓库设置
-const location = r => require(['../pages/store_setting/location'], r)
+const location = r => require(['../pages/store_setting/location/depot'], r)
+// **** 货架管理
+const shelf = r => require(['../pages/store_setting/location/shelf'], r)
 // *** 配送费设置
 const freight = r => require(['../pages/store_setting/freight'], r)
 // *** 客服、售后设置
@@ -63,6 +65,10 @@ export default [{
             path: 'location',
             name: "location",
             component: location
+        },{
+            path: 'shelf',
+            name: "shelf",
+            component: shelf
         },{
             path: 'freight',
             name: "freight",

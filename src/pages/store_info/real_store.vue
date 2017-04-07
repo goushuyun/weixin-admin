@@ -385,7 +385,7 @@ export default {
 }
 </script>
 
-<style lang="scss">@import "../../common/_color.scss";
+<style lang="scss" scoped>@import "../../common/_color.scss";
 .body {
     background-color: white;
     padding: 16px;
