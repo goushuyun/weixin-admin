@@ -110,7 +110,7 @@ export default {
         logo(){
             // get logo from vuex
             let logo = this.$store.state.current_store.logo
-            return logo=='' ? 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png' : logo
+            return logo=='' ? 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png' : 'http://onv8eua8j.bkt.clouddn.com/' + logo
         }
     }
 }
