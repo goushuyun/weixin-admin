@@ -79,7 +79,7 @@
 
         <el-menu theme="dark" mode="vertical" :router="true">
             <el-menu-item-group title="设置">
-                <el-menu-item index="/admin/shop_info/">
+                <el-menu-item index="/admin/store_info/cloud_store">
                     <i class="fa fa-info-circle" aria-hidden="true"></i></i>店铺信息
                 </el-menu-item>
                 <el-menu-item index="/admin/shop_setting/school/">
