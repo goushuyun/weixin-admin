@@ -39,7 +39,7 @@
               </el-button-group>
             </div>
             <div v-if="add_floor.add" class="item">
-              <el-input id="add_floor" style="max-width:200px;" size="small" v-model="add_floor.name" v-on:keyup.enter.native="comfirmAddFloor(shelf.id)" @blur="comfirmAddFloor(shelf.id)"></el-input>
+              <el-input id="add_floor" style="max-width:200px;" size="small" v-model="add_floor.name" @blur="comfirmAddFloor(shelf.id)"></el-input>
               <el-button-group>
                   <el-button v-if="add_floor.add" class="btn" type="text" style="color:#13CE66" icon="check" size="large" @click="comfirmAddFloor(shelf.id)"></el-button>
               </el-button-group>
