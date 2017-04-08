@@ -23,7 +23,7 @@
               <label v-if="!shelf.update">{{shelf.name}}</label>
               <el-input v-else style="max-width:200px;" size="small" v-model="shelf.name" v-on:keyup.enter.native="comfirmUpdate(shelf.id,shelf.name,s_index)"></el-input>
               <el-button-group>
-                  <el-button class="btn" type="text" icon="plus" size="large" @click="preAddFloor"></el-button>
+                  <el-button class="btn" type="text" icon="plus" size="large" @click="preAddFloor(s_index)"></el-button>
                   <el-button v-if="!shelf.update" class="btn" type="text" icon="edit" size="large" @click="shelf.update = true"></el-button>
                   <el-button v-if="shelf.update" class="btn" type="text" style="color:#13CE66" icon="check" size="large" @click="comfirmUpdate(shelf.id,shelf.name,s_index)"></el-button>
                   <el-button class="btn" type="text" style="color:#FF4949" icon="delete" size="large" @click="deleteLocations(shelf.id)"></el-button>
@@ -38,10 +38,10 @@
                   <el-button class="btn" type="text" style="color:#FF4949" icon="delete" @click="deleteLocations(floor.id)"></el-button>
               </el-button-group>
             </div>
-            <div v-if="add_floor.add" class="item">
-              <el-input id="add_floor" style="max-width:200px;" size="small" v-model="add_floor.name" @blur="comfirmAddFloor(shelf.id)"></el-input>
+            <div v-if="shelf.add" class="item">
+              <el-input :id="'add_shelf_' + s_index" style="max-width:200px;" size="small" v-model="add_floor.name" @blur="comfirmAddFloor(shelf.id,s_index)"></el-input>
               <el-button-group>
-                  <el-button v-if="add_floor.add" class="btn" type="text" style="color:#13CE66" icon="check" size="large" @click="comfirmAddFloor(shelf.id)"></el-button>
+                  <el-button v-if="shelf.add" class="btn" type="text" style="color:#13CE66" icon="check" size="large" @click="comfirmAddFloor(shelf.id,s_index)"></el-button>
               </el-button-group>
             </div>
         </div>
@@ -58,8 +58,7 @@ export default {
             add_floor: {
                 level: 2,
                 pid: '',
-                name: '',
-                add: false
+                name: ''
             },
             update_floor: false,
             p_depot: {
@@ -97,18 +96,18 @@ export default {
               });
           });
         },
-        preAddFloor() {
+        preAddFloor(s_index) {
+            this.locations[s_index].add = true
             this.add_floor = {
                 level: 2,
                 pid: '',
-                name: '',
-                add: true
+                name: ''
             }
             setTimeout(function() {
-                $('#add_floor input').focus()
+                $('#add_shelf_' + s_index + ' input').focus()
             }, 100);
         },
-        comfirmAddFloor(id) {
+        comfirmAddFloor(id,s_index) {
             if (this.add_floor.name.trim() != '') {
                 this.add_floor.pid = id
                 axios.post('/v1/location/add_location', this.add_floor).then(resp => {
@@ -120,7 +119,7 @@ export default {
             } else {
                 this.$message.warning('没输入任何内容！')
             }
-            this.add_floor.add = false
+            this.locations[s_index].add = false
         },
         proUpdateDepot() {
             this.update_depot = true
@@ -192,6 +191,7 @@ export default {
                 if (resp.data.message == 'ok') {
                     this.locations = resp.data.data.map(d => {
                         d.update = false
+                        d.add = false
                         d.children.map(s => {
                             s.update = false
                             return s
