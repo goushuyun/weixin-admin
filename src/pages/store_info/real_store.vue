@@ -132,11 +132,10 @@ export default {
 
             self.add_update = 'update'
             self.dialogFormVisible = true
-
-            setTimeout(function() {
+            this.$nextTick(() => {
                 self.distpicker()
                 self.getToken()
-            }, 100)
+            })
         },
         confirmUpdateRealStore() {
             var self = this
@@ -248,10 +247,10 @@ export default {
             var self = this
             self.add_update = 'add'
             self.dialogFormVisible = true
-            setTimeout(function() {
+            this.$nextTick(() => {
                 self.distpicker()
                 self.getToken()
-            }, 100)
+            })
         },
         confirmAddRealStore(formName) {
             var self = this

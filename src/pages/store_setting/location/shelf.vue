@@ -103,9 +103,9 @@ export default {
                 pid: '',
                 name: ''
             }
-            setTimeout(function() {
+            this.$nextTick(function(){
                 $('#add_shelf_' + s_index + ' input').focus()
-            }, 100);
+            })
         },
         comfirmAddFloor(id,s_index) {
             if (this.add_floor.name.trim() != '') {
