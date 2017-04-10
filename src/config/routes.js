@@ -1,6 +1,12 @@
 // 将组件抽离成不同的代码块，当路由访问到的时候再去加载，实现路由懒加载
 const shops = r => require(['../pages/shops/shops'], r)
 
+// * 图书上架
+// ** ISBN 上传
+const by_isbn = r => require(['../pages/add_book/by_isbn'], r)
+// ** Excel 上传
+const by_excel = r => require(['../pages/add_book/by_excel'], r)
+
 // * 设置
 // ** 店铺信息
 const store_info = r => require(['../pages/store_info/index'], r)
@@ -49,6 +55,14 @@ export default [{
             path: 'real_store',
             component: real_store
         }]
+    },{
+        name: 'by_isbn',
+        path: 'add_book/by_isbn',
+        component: by_isbn
+    },{
+        name: 'by_excel',
+        path: 'add_book/by_excel',
+        component: by_excel
     }, {
         name: 'store_setting',
         path: 'store_setting',
