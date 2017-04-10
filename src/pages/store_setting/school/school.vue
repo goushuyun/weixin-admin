@@ -26,30 +26,21 @@
     </ul>
 
     <!-- 学校信息弹出框 -->
-    <el-dialog :title="' ' + pointer.name" v-model="visible" size="large" style="top:-14%;" :close-on-click-modal="false" @close="dialog_close_handle">
-        <div id="amap">
-            <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult" :events="events"></el-amap-search-box>
-            <el-amap :vid="'amap'" :center="center" :events="map_events" :zoom="zoom" :plugin="plugin">
-                <el-amap-marker :events="marker_events" :clickable="true" :title="marker.name" v-for="marker in markers" :position="marker.loc"></el-amap-marker>
-            </el-amap>
-        </div>
+    <el-dialog @open="open" v-model="visible" :title="title" size="large" style="top:-14%;" :close-on-click-modal="false">
 
-        <el-form :inline="true" style="margin-top: 16px;">
-            <el-form-item label="学校名称">
-                <el-input v-model="pointer.name"></el-input>
+        <amap :school-info="school" :school-name="title" :btn-disabled="btn_disabled"></amap>
+
+        <el-form :model="ruleForm" :inline="true" style="margin-top: 12px;" :rules="rules" ref="ruleForm">
+            <el-form-item label="客服电话" style="margin-bottom:0;" prop="tel">
+                <el-input v-model="ruleForm.tel" size="small"></el-input>
             </el-form-item>
-            <el-form-item label="客服电话">
-                <el-input v-model="pointer.tel"></el-input>
-            </el-form-item>
-            <el-form-item label="配送费用">
-                <el-input v-model="pointer.express_fee" placeholder="单位: 元">
-                </el-input>
+            <el-form-item label="配送费用" style="margin-bottom:0;" prop="express_fee">
+                <el-input v-model.number="ruleForm.express_fee" size="small" placeholder="单位：元"></el-input>
             </el-form-item>
         </el-form>
-
-        <div slot="footer" class="dialog-footer">
-            <el-button @click="visible = false">取 消</el-button>
-            <el-button type="primary" @click="confirm">确 定</el-button>
+        <div slot="footer" class="dialog-footer" style="padding-top: 0;">
+            <el-button size="small" @click="visible = false">取 消</el-button>
+            <el-button size="small" type="primary" @click="confirm('ruleForm')">确 定</el-button>
         </div>
     </el-dialog>
 
@@ -58,151 +49,61 @@
 </template>
 
 <script>
-import {
-    AMapManager
-}
-from 'vue-amap';
-
-var pointer = {
-    id: '',
-    lat: 0,
-    lng: 0,
-
-    name: '',
-    tel: '',
-    express_fee: 0
-}
+import axios from '../../../scripts/http'
+import amap from './map'
 import mix from './school.js'
-var self
 export default {
     mixins: [mix],
-    created() {
-            // 客服电话默认给出该云店铺seller的电话
-            if(this.$store.state.current_store.seller){
-                pointer.tel = this.$store.state.current_store.seller.mobile
-            }
-            this.list_school()
-        },
-
-        data() {
-            return {
-                // dialog 数据
-                visible: false,
-                title: '',
-
-                // 业务数据
-                pointer: pointer,
-                schools: [],
-
-                // map paramter
-                zoom: 12,
-                center: [121.59996, 31.197646],
-                markers: [],
-                searchOption: {
-                    // city: '上海',
-                    citylimit: true
-                },
-                map_events: {
-                    'click': (e)=>{
-                        console.log('click map');
-                        console.log(e);
-                    }
-                },
-                events: {
-                    init(o) {
-                        console.log(o);
-                    }
-                },
-                plugin: [{
-                    pName: 'Geolocation',
-                    events: {
-                        init(o) {
-                            console.log(o);
-
-                            // o 是高德地图定位插件实例
-                            o.getCurrentPosition((status, result) => {
-                                // self.center = [result.position.lng, result.position.lat];
-                            });
-                        }
-                    }
-                }],
-
-                // markers
-                marker_events: {
-                    click(e) {
-                        console.log(e);
-
-                        console.log(pointer);
-
-                        //解析必要数据到 pointer
-                        pointer.lat = e.lnglat.lat
-                        pointer.lng = e.lnglat.lng
-                        pointer.name = e.target.G.title
-                    }
-                }
-
-            }
-        },
-        methods: {
-            view_school(school){
-                console.log(school);
-                pointer.name = school.name
-                pointer.tel = school.tel
-                pointer.express_fee = (school.express_fee/100).toFixed(2)
-                pointer.lat = school.lat
-                pointer.lng = school.lng
-                pointer.id = school.id
-
-                this.center = [pointer.lng, pointer.lat]
-                let marker = {
-                    name: pointer.name,
-                    loc: [pointer.lng, pointer.lat]
-                }
-                this.markers.push(marker)
-                this.zoom = 15
-                this.visible = true
+    components: {
+        amap
+    },
+    data() {
+        return {
+            visible: false,
+            btn_disabled: true,
+            title: '上海应用技术大学',
+            schools: [],
+            ruleForm: {
+                tel: '',
+                express_fee: 0
             },
-            dialog_close_handle() {
-                    // handle model close
-                    this.zoom = 12
-                    this.markers = []
-                },
-                add_school() {
-                    // add school, clear pointer info
-                    pointer.id = ''
-                    pointer.express_fee = pointer.lat = pointer.lng = 0
-                    pointer.name = pointer.tel = ''
-                    this.visible = true
-                },
-                onSearchResult(pois) {
-                    console.log(pois);
-                    let latSum = 0;
-                    let lngSum = 0;
-                    if (pois.length > 0) {
-                        pois.forEach(poi => {
-                            let marker = {
-                                name: poi.name,
-                                loc: [poi.lng, poi.lat]
-                            }
-                            let {
-                                lng, lat
-                            } = poi;
-                            lngSum += lng;
-                            latSum += lat;
-                            this.markers.push(marker);
-                        });
-                        let center = {
-                            lng: lngSum / pois.length,
-                            lat: latSum / pois.length
-                        };
-                        this.center = [center.lng, center.lat];
-                    }
-
-                    // 修改zoom值，放大搜索结果
-                    this.zoom = 12
-
-                }
+            rules: {
+                tel: [
+                    {required: true, message: '请输入客服电话', trigger: 'blur'}
+                ],
+                express_fee: [
+                    {required: true, message: '请输入配送费用'},
+                    { type: 'number', message: '配送费必须为数字值', trigger: 'blur'}
+                ]
+            },
+            school: {
+                name: '',
+                tel: '',
+                express_fee: 0,
+                lat: 0,
+                lng: 0,
+                image: '',
+                id: ''
+            },
         }
+    },
+    methods: {
+        open(){
+            if(this.school.lat != 0 && this.school.lng != 0){
+                // this.
+            }
+        },
+        view_school(school){
+            this.school = school
+            console.log(school);
+        },
+        add_school() {
+            this.visible = true
+            this.$nextTick(() => {
+                $('#search_box').focus()
+            })
+        }
+    }
 }
 
 </script>

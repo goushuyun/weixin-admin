@@ -1,49 +1,41 @@
 import axios from '../../../scripts/http'
 
 export default {
-    mounted() {
-
-
+    created(){
     },
-
-
+    mounted() {
+        this.getData()
+    },
     methods: {
-        addMarker(vm, poi){
-            let marker = {
-                name: poi.name,
-                loc: [poi.lng, poi.lat]
-            }
-            vm.markers.push(marker);
-            vm.center = market.loc;
-        },
-        confirm() {
-            console.log(this.pointer);
-            this.visible = false
+        confirm(ruleForm) {
+            this.$refs[ruleForm].validate(valid=>{
+                if(!valid){
+                    return false
+                }else{
+                    console.log(this.school);
+                    this.school.tel = this.ruleForm.tel
+                    this.school.express_fee = this.ruleForm.express_fee
 
-            this.pointer.express_fee *= 100
-            if (this.pointer.id != '') {
-                // update school
-                axios.post('/v1/school/update', this.pointer).then(res => {
-                    console.log(res.data);
-                })
-            } else {
-                // add new school
-                axios.post('/v1/school/add', this.pointer).then((res) => {
-                    console.log(res.data);
-                })
-            }
+                    this.visible = false
 
-            this.list_school()
-        },
+                    this.school.express_fee *= 100
+                    if (this.school.id != '') {
+                        // update school
+                        axios.post('/v1/school/update', this.school).then(res => {
+                            console.log(res.data);
+                        })
+                    } else {
+                        // add new school
+                        axios.post('/v1/school/add', this.school).then((res) => {
+                            console.log(res.data);
+                        })
+                    }
 
-        list_school() {
-            axios.post('/v1/school/store_schools', {}).then(res => {
-                console.log(res.data);
-                this.schools = res.data.data.map(school => {
-                    school.active = false
-                    return school
-                })
+                    this.getData()
+                }
             })
+
+
         },
 
         del_school(id) {
@@ -67,9 +59,17 @@ export default {
                     message: '已取消删除'
                 });
             });
-
-
-
+        },
+        // list all schools
+        getData(){
+            axios.post('/v1/school/store_schools', {}).then(res=>{
+                this.schools = res.data.data.map(el=>{
+                    el.active = false
+                    return el
+                })
+                console.log(res);
+            })
         }
+
     }
 }

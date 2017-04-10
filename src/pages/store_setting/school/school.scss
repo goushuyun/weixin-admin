@@ -3,10 +3,13 @@ ul#schools {
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
+    // background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
+    padding: 12px;
     li {
         box-sizing: border-box;
         display: inline-block;
         border-radius: 4px;
+        box-shadow: 0 0 1px rgba(0, 0, 0, .3);
     }
     li.school {
         width: 245px;
