@@ -1,6 +1,4 @@
-<style lang="scss" scoped>
-
-@import "../common/_color.scss";
+<style lang="scss" scoped>@import "../common/_color.scss";
 #page {
     height: 100%;
     background-color: $bg_grey;
@@ -15,7 +13,7 @@
     bottom: 0;
     background-color: #324057;
 
-    .left_top{
+    .left_top {
         padding: 8px 0 8px 20px;
     }
 
@@ -36,7 +34,7 @@
         font-size: 13px;
         padding: 0 8px;
     }
-    i.fa{
+    i.fa {
         width: 14px;
         padding-right: 10px;
     }
@@ -49,7 +47,6 @@
     overflow-x: hidden;
     box-sizing: border-box;
 }
-
 </style>
 
 <template lang="html">
@@ -78,14 +75,24 @@
         </div>
 
         <el-menu theme="dark" mode="vertical" :router="true">
-            <el-menu-item-group title="设置">
-                <el-menu-item index="/admin/store_info/cloud_store">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i></i>店铺信息
-                </el-menu-item>
-                <el-menu-item index="/admin/store_setting/location/">
-                    <i class="fa fa-cog" aria-hidden="true"></i></i>店铺设置
-                </el-menu-item>
-            </el-menu-item-group>
+            <el-submenu index="1">
+              <template slot="title"><i class="fa fa-book" aria-hidden="true"></i></i>图书上架</template>
+              <el-menu-item index="/admin/add_book/by_isbn">
+                <i class="fa fa-info-circle" aria-hidden="true"></i></i>ISBN上架
+              </el-menu-item>
+              <el-menu-item index="/admin/add_book/by_excel">
+                  <i class="fa fa-cog" aria-hidden="true"></i></i>批量上架
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="2">
+              <template slot="title"><i class="el-icon-setting"></i>设置</template>
+              <el-menu-item index="/admin/store_info/cloud_store">
+                <i class="fa fa-info-circle" aria-hidden="true"></i></i>店铺信息
+              </el-menu-item>
+              <el-menu-item index="/admin/store_setting/location/">
+                  <i class="fa fa-cog" aria-hidden="true"></i></i>店铺设置
+              </el-menu-item>
+            </el-submenu>
         </el-menu>
     </div>
 
@@ -98,7 +105,6 @@
 </template>
 
 <script>
-
 export default {
     data() {
         return {
@@ -107,12 +113,11 @@ export default {
         }
     },
     computed: {
-        logo(){
+        logo() {
             // get logo from vuex
             let logo = this.$store.state.current_store.logo
-            return logo=='' ? 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png' : 'http://onv8eua8j.bkt.clouddn.com/' + logo
+            return logo == '' ? 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png' : 'http://onv8eua8j.bkt.clouddn.com/' + logo
         }
     }
 }
-
 </script>
