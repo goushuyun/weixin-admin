@@ -70,7 +70,7 @@
                           <el-input placeholder="姓名" v-model="sign.username"></el-input>
                       </el-form-item>
                       <el-form-item prop="password">
-                          <el-input placeholder="设置密码" type="password" v-model="sign.password" @keyup.enter.native="signUp"></el-input>
+                          <el-input placeholder="设置密码" type="password" v-model="sign.password" @keyup.enter.native="signUp('sign')"></el-input>
                       </el-form-item>
                       <el-form-item>
                           <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signUp('sign')">立即注册</el-button>
@@ -84,7 +84,7 @@
                       <el-form-item prop="password" v-show="!forgetPwd">
                           <el-input placeholder="登录密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
                       </el-form-item>
-                      <el-form-item prop="message_code" v-show="forgetPwd">
+                      <el-form-item prop="message_code" v-if="forgetPwd">
                           <el-input placeholder="短信验证码" v-model="sign.message_code">
                             <el-button slot="append" style="width:100px" @click="getMessageCode('update_pwd')" :disabled="update_pwd_timer_disabled">
                               <span v-show="!update_pwd_timer_disabled">获取验证码</span>
@@ -92,12 +92,12 @@
                             </el-button>
                           </el-input>
                       </el-form-item>
-                      <el-form-item prop="password" v-show="forgetPwd">
-                          <el-input placeholder="新密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
+                      <el-form-item prop="password" v-if="forgetPwd">
+                          <el-input placeholder="新密码" type="password" v-model="sign.password" @keyup.enter.native="signIn('sign')"></el-input>
                       </el-form-item>
                       <el-form-item style="text-align:left">
-                          <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signIn">立即登录</el-button>
-                          <el-button v-show="!forgetPwd" type="text" @click="forgetPwd=true">忘记密码？</el-button>
+                          <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signIn('sign')">立即登录</el-button>
+                          <el-button v-show="!forgetPwd" type="text" @click="forgetPwd=true;sign.password=''">忘记密码？</el-button>
                           <el-button v-show="forgetPwd" type="text" @click="forgetPwd=false">密码登录</el-button>
                       </el-form-item>
                     </div>
@@ -142,7 +142,7 @@ export default {
             setTimeout(() => {
                 let pwdReg = /^[A-Za-z0-9]{6,20}$/
                 if (!pwdReg.test(value)) {
-                    callback(new Error('密码格式不正确'));
+                    callback(new Error('请输入6-20英文字母或数字组合'));
                 } else {
                     callback();
                 }
@@ -221,54 +221,50 @@ export default {
             this.sign.message_code = ''
             this.forgetPwd = false
         },
-        signIn() {
-            var self = this
-            //校验手机号码格式
-            if (!testMobile(self.sign.mobile)) {
-                return
-            }
-            //check password
-            if (!testPassword(self.sign.password)) {
-                return
-            }
-            self.btn_loading = true
-
-            if (self.forgetPwd) {
+        signIn(formName) {
+            if (this.forgetPwd) {
                 axios.post('/v1/seller/update_password', {
-                    mobile: self.sign.mobile,
-                    password: self.sign.password,
-                    message_code: self.sign.message_code
+                    mobile: this.sign.mobile,
+                    password: this.sign.password,
+                    message_code: this.sign.message_code
                 }).then(resp => {
                     if (resp.data.message == 'ok') {
-                        self.$message.success("密码已更改")
-                        self.forgetPwd = false
-                        self.login()
+                        this.$message.success("密码已更改")
+                        this.forgetPwd = false
+                        this.login(formName)
                     } else {
-                        self.$message.error("密码更改失败")
+                        this.$message.error("密码更改失败")
                         return
                     }
                 })
             }
-
-            axios.post('/v1/seller/login', {
-                mobile: self.sign.mobile,
-                password: self.sign.password
-            }).then(resp => {
-                if (resp.data.message == 'ok') {
-                    //login success
-                    //put token into localStorage
-                    localStorage.setItem("token", resp.data.data.token)
-                    //put adminInfo into admin
-                    localStorage.setItem('adminInfo', JSON.stringify(resp.data.data))
-                    self.$router.push({
-                        name: 'shops'
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    this.btn_loading = true
+                    axios.post('/v1/seller/login', {
+                        mobile: this.sign.mobile,
+                        password: this.sign.password
+                    }).then(resp => {
+                        if (resp.data.message == 'ok') {
+                            //login success
+                            //put token into localStorage
+                            localStorage.setItem("token", resp.data.data.token)
+                            //put adminInfo into admin
+                            localStorage.setItem('adminInfo', JSON.stringify(resp.data.data))
+                            this.$router.push({
+                                name: 'shops'
+                            })
+                        } else if (resp.data.message == 'notFound') {
+                            this.$message.error("用户名或密码错误")
+                            $('.mobile input').focus()
+                        }
+                        this.btn_loading = false
                     })
-                } else if (resp.data.message == 'notFound') {
-                    self.$message.error("用户名或密码错误")
-                    $('.mobile input').focus()
+                } else {
+                    console.log('error submit!!');
+                    return false;
                 }
-                self.btn_loading = false
-            })
+            });
         },
         checkSignUp() {
             if (testMobile(this.sign.mobile)) {
@@ -361,22 +357,22 @@ export default {
             if (type == 'register') {
                 if (self.register_timer_second > 0) {
                     self.register_timer_second--;
-                    setTimeout(function(){
-                      self.timer(type)
+                    setTimeout(function() {
+                        self.timer(type)
                     }, 1000);
                 } else {
                     self.registe_timer_disabled = false
                 }
             }
             if (type == 'update_pwd') {
-              if (self.update_pwd_timer_second > 0) {
-                  self.update_pwd_timer_second--;
-                  setTimeout(function(){
-                    self.timer(type)
-                  }, 1000);
-              } else {
-                  self.update_pwd_timer_disabled = false
-              }
+                if (self.update_pwd_timer_second > 0) {
+                    self.update_pwd_timer_second--;
+                    setTimeout(function() {
+                        self.timer(type)
+                    }, 1000);
+                } else {
+                    self.update_pwd_timer_disabled = false
+                }
             }
         }
     }

@@ -5,7 +5,7 @@
         <el-col>
           <div>
             <label v-if="!update_depot" class="margin_right20">{{p_depot.name}}</label>
-            <el-input v-else class="margin_right20" style="max-width:200px;" size="small" v-model="p_depot.update_name" v-on:keyup.enter.native="confirmUpdateDepot"></el-input>
+            <el-input id="adepot_name" v-else class="margin_right20" style="max-width:200px;" size="small" v-model="p_depot.update_name" @blur="confirmUpdateDepot" v-on:keyup.enter.native="confirmUpdateDepot"></el-input>
             <el-button v-if="!update_depot" type="text" @click="proUpdateDepot">修改</el-button>
             <el-button v-if="update_depot" type="text" @click="confirmUpdateDepot">确定</el-button>
             <el-button v-if="update_depot" type="text" style="color:#13CE66" @click="update_depot = false">取消</el-button>
@@ -13,7 +13,7 @@
         </el-col>
         <el-col style="text-align:right;padding-right:30px;">
           <span class="margin_right20">两个仓库/10000册图书</span>
-          <el-button type="primary" size="small" icon="plus" @click="addDepot">添加货架</el-button>
+          <el-button type="primary" size="small" icon="plus" @click="addShelf">添加货架</el-button>
         </el-col>
       </el-row>
     </div>
@@ -21,19 +21,19 @@
         <div v-for="(shelf,s_index) in locations" class="box-card">
             <div class="title">
               <label v-if="!shelf.update">{{shelf.name}}</label>
-              <el-input v-else style="max-width:200px;" size="small" v-model="shelf.name" v-on:keyup.enter.native="comfirmUpdate(shelf.id,shelf.name,s_index)"></el-input>
+              <el-input :id="'shelf_' + s_index" v-else style="max-width:200px;" size="small" v-model="shelf.name" @blur="comfirmUpdate(shelf.id,shelf.name,s_index)" v-on:keyup.enter.native="comfirmUpdate(shelf.id,shelf.name,s_index)"></el-input>
               <el-button-group>
                   <el-button class="btn" type="text" icon="plus" size="large" @click="preAddFloor(s_index)"></el-button>
-                  <el-button v-if="!shelf.update" class="btn" type="text" icon="edit" size="large" @click="shelf.update = true"></el-button>
+                  <el-button v-if="!shelf.update" class="btn" type="text" icon="edit" size="large" @click="preUpdateShelf(s_index)"></el-button>
                   <el-button v-if="shelf.update" class="btn" type="text" style="color:#13CE66" icon="check" size="large" @click="comfirmUpdate(shelf.id,shelf.name,s_index)"></el-button>
                   <el-button class="btn" type="text" style="color:#FF4949" icon="delete" size="large" @click="deleteLocations(shelf.id)"></el-button>
               </el-button-group>
             </div>
             <div v-for="(floor,f_index) in shelf.children" class="item">
               <label v-if="!floor.update">{{floor.name}}</label>
-              <el-input v-else style="max-width:200px;" size="small" v-model="floor.name" v-on:keyup.enter.native="comfirmUpdate(floor.id,floor.name,s_index,f_index)"></el-input>
+              <el-input :id="'shelf_' + s_index + '_floor_' + f_index" v-else style="max-width:200px;" size="small" v-model="floor.name" @blur="comfirmUpdate(floor.id,floor.name,s_index,f_index)" v-on:keyup.enter.native="comfirmUpdate(floor.id,floor.name,s_index,f_index)"></el-input>
               <el-button-group>
-                  <el-button v-if="!floor.update" class="btn" type="text" icon="edit" @click="floor.update = true"></el-button>
+                  <el-button v-if="!floor.update" class="btn" type="text" icon="edit" @click="preUpdateFloor(s_index,f_index)"></el-button>
                   <el-button v-if="floor.update" class="btn" type="text" style="color:#13CE66" icon="check" size="large" @click="comfirmUpdate(floor.id,floor.name,s_index,f_index)"></el-button>
                   <el-button class="btn" type="text" style="color:#FF4949" icon="delete" @click="deleteLocations(floor.id)"></el-button>
               </el-button-group>
@@ -75,56 +75,38 @@ export default {
         this.getLocations()
     },
     methods: {
-        deleteLocations(id) {
-          this.$confirm('您正在执行删除操作, 是否继续?', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-          }).then(() => {
-              axios.post('/v1/location/del_location', {
-                  id: id
-              }).then(resp => {
-                  if (resp.data.message == 'ok') {
-                      this.$message.success('删除成功!');
-                      this.getLocations()
-                  }
-              });
-          }).catch(() => {
-              this.$message({
-                  type: 'info',
-                  message: '已取消删除'
-              });
-          });
+        // 获取本页数据 --> 货架、货架层
+        getLocations() {
+            axios.post('/v1/location/list_children_location', {
+                id: this.p_depot.id,
+                level: 2
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.locations = resp.data.data.map(d => {
+                        d.update = false
+                        d.add = false
+                        d.children.map(s => {
+                            s.update = false
+                            return s
+                        })
+                        return d
+                    })
+                    console.log(this.locations);
+                }
+            }).catch(() => {
+                return false
+            });
         },
-        preAddFloor(s_index) {
-            this.locations[s_index].add = true
-            this.add_floor = {
-                level: 2,
-                pid: '',
-                name: ''
-            }
-            this.$nextTick(function(){
-                $('#add_shelf_' + s_index + ' input').focus()
-            })
-        },
-        comfirmAddFloor(id,s_index) {
-            if (this.add_floor.name.trim() != '') {
-                this.add_floor.pid = id
-                axios.post('/v1/location/add_location', this.add_floor).then(resp => {
-                    if (resp.data.message = 'ok') {
-                        this.getLocations()
-                    }
-                    this.$message.success('添加成功！')
-                })
-            } else {
-                this.$message.warning('没输入任何内容！')
-            }
-            this.locations[s_index].add = false
-        },
+
+        // 点击修改 仓库名称 自动聚焦
         proUpdateDepot() {
             this.update_depot = true
             this.p_depot.update_name = this.p_depot.name
+            this.$nextTick(() => {
+                $('#adepot_name input').focus()
+            })
         },
+        // 确定修改 仓库名称
         confirmUpdateDepot() {
             axios.post('/v1/location/update_location', {
                 id: this.p_depot.id,
@@ -137,31 +119,9 @@ export default {
                 }
             })
         },
-        comfirmUpdate(id, name, s_index, f_index) {
-            if (name == '') {
-                this.$message.warning('未输入任何内容')
-                this.getLocations()
-                return
-            }
-            var data = {
-                id,
-                name
-            }
-            this.updateLocation(data)
-            if (f_index != undefined) {
-                this.locations[s_index].children[f_index].update = false
-            } else {
-                this.locations[s_index].update = false
-            }
-        },
-        updateLocation(data) {
-            axios.post('/v1/location/update_location', data).then(resp => {
-                if (resp.data.message == 'ok') {
-                    this.$message.success('修改成功')
-                }
-            })
-        },
-        addDepot() {
+
+        // 添加货架
+        addShelf() {
             this.$prompt('请输入货架名称', '货架名称', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -183,25 +143,92 @@ export default {
                 this.$message.info('取消输入')
             });
         },
-        getLocations() {
-            axios.post('/v1/location/list_children_location', {
-                id: this.p_depot.id,
-                level: 2
-            }).then(resp => {
+        // 点击添加 货架层 自动聚焦
+        preAddFloor(s_index) {
+            this.locations[s_index].add = true
+            this.add_floor = {
+                level: 2,
+                pid: '',
+                name: ''
+            }
+            this.$nextTick(function() {
+                $('#add_shelf_' + s_index + ' input').focus()
+            })
+        },
+        // 确定添加 货架层
+        comfirmAddFloor(id, s_index) {
+            if (this.add_floor.name.trim() != '') {
+                this.add_floor.pid = id
+                axios.post('/v1/location/add_location', this.add_floor).then(resp => {
+                    if (resp.data.message = 'ok') {
+                        // 添加 货架层 后重新获取本页数据
+                        this.getLocations()
+                    }
+                    this.$message.success('添加成功！')
+                })
+            } else {
+                this.$message.warning('没输入任何内容！')
+            }
+            this.locations[s_index].add = false
+        },
+
+        // 点击修改 货架名称 自动聚焦
+        preUpdateShelf(s_index) {
+            this.locations[s_index].update = true
+            this.$nextTick(() => {
+                $('#shelf_' + s_index + ' input').focus()
+            })
+        },
+        // 点击修改 货架层 名称自动聚焦
+        preUpdateFloor(s_index, f_index) {
+            this.locations[s_index].children[f_index].update = true
+            this.$nextTick(() => {
+                $('#shelf_' + s_index + '_floor_' + f_index + ' input').focus()
+            })
+        },
+        // 确定修改 货架名称 或者 货架层名称
+        comfirmUpdate(id, name, s_index, f_index) {
+            if (name == '') {
+                this.$message.warning('未输入任何内容')
+                this.getLocations()
+                return
+            }
+            var data = {
+                id,
+                name
+            }
+            axios.post('/v1/location/update_location', data).then(resp => {
                 if (resp.data.message == 'ok') {
-                    this.locations = resp.data.data.map(d => {
-                        d.update = false
-                        d.add = false
-                        d.children.map(s => {
-                            s.update = false
-                            return s
-                        })
-                        return d
-                    })
-                    console.log(this.locations);
+                    this.$message.success('修改成功')
                 }
+            })
+            if (f_index != undefined) {
+                this.locations[s_index].children[f_index].update = false
+            } else {
+                this.locations[s_index].update = false
+            }
+        },
+
+        // 删除 货架 或者 货架层
+        deleteLocations(id) {
+            this.$confirm('您正在执行删除操作, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                axios.post('/v1/location/del_location', {
+                    id: id
+                }).then(resp => {
+                    if (resp.data.message == 'ok') {
+                        this.$message.success('删除成功!');
+                        this.getLocations()
+                    }
+                });
             }).catch(() => {
-                return false
+                this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });
             });
         }
     }
