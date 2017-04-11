@@ -24,13 +24,16 @@ ul#schools {
             box-shadow: 0 0 10px rgba(0, 0, 0, .2);
         }
         p.name {
-            line-height: 48px;
+            height: 42px;
+            line-height: 20px;
             font-size: 14px;
             color: $font_normal;
+            // padding: 12px 0 10px;
+            padding-top: 12px;
         }
         p.tel {
             font-size: 13px;
-            line-height: 24px;
+            line-height: 20px;
             color: $font_light;
             .price {
                 color: $weixin_green;
@@ -38,6 +41,7 @@ ul#schools {
             }
         }
         p.operate {
+            height: 16px;
             text-align: right;
             button {
                 line-height: 16px;
@@ -73,4 +77,26 @@ ul#schools {
         top: 2px;
         left: 2px;
     }
+}
+
+
+div#amap {
+    height: 400px;
+}
+
+div#panel {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    height: 400px;
+}
+
+input#search_box{
+    width: 100%;
+    line-height: 30px;
+    border-radius: 4px;
+    border: 1px solid #BFCBD9;
+    padding: 0 12px;
+    outline: none;
+    font-size: 12px;
 }
