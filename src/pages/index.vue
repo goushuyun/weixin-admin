@@ -1,7 +1,7 @@
 <style lang="scss" scoped>@import "../common/_color.scss";
 #page {
     height: 100%;
-    background-color: $bg_grey;
+    // background-color: $bg_grey;
     font-size: 14px;
 }
 
@@ -11,7 +11,8 @@
     top: 0;
     left: 0;
     bottom: 0;
-    background-color: #324057;
+    // background-color: #324057;
+    background-color: rgba(0, 0, 0, .85);
 
     .left_top {
         padding: 8px 0 8px 20px;
@@ -41,6 +42,8 @@
 }
 
 #content {
+    background-image: url(http://7xvl2k.com1.z0.glb.clouddn.com/bg_3.jpg);
+    background-size: 100%, 100%;
     padding-left: 180px;
     min-height: 100%;
     min-width: 100%;
