@@ -82,7 +82,7 @@
                           <el-input class="mobile" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
                       </el-form-item>
                       <el-form-item prop="password" v-show="!forgetPwd">
-                          <el-input placeholder="登录密码" type="password" v-model="sign.password" @keyup.enter.native="signIn"></el-input>
+                          <el-input placeholder="登录密码" type="password" v-model="sign.password" @keyup.enter.native="signIn('sign')"></el-input>
                       </el-form-item>
                       <el-form-item prop="message_code" v-if="forgetPwd">
                           <el-input placeholder="短信验证码" v-model="sign.message_code">
@@ -125,42 +125,36 @@ export default {
             if (!value) {
                 return callback(new Error('手机号码不能为空'));
             }
-            setTimeout(() => {
-                let telReg = /^1\d{10}$/
-                if (!telReg.test(value)) {
-                    callback(new Error('请输正确的手机号码'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            let telReg = /^1\d{10}$/
+            if (!telReg.test(value)) {
+              callback(new Error('请输正确的手机号码'));
+            } else {
+              callback();
+            }
         };
 
         var checkPassword = (rule, value, callback) => {
             if (!value) {
                 return callback(new Error('密码不能为空'));
             }
-            setTimeout(() => {
-                let pwdReg = /^[A-Za-z0-9]{6,20}$/
-                if (!pwdReg.test(value)) {
-                    callback(new Error('请输入6-20英文字母或数字组合'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            let pwdReg = /^[A-Za-z0-9]{6,20}$/
+            if (!pwdReg.test(value)) {
+              callback(new Error('请输入6-20英文字母或数字组合'));
+            } else {
+              callback();
+            }
         };
 
         var checkMessageCode = (rule, value, callback) => {
             if (!value) {
                 return callback(new Error('验证码不能为空'));
             }
-            setTimeout(() => {
-                let msgCodeReg = /\d{4}/
-                if (!msgCodeReg.test(value)) {
-                    callback(new Error('验证码格式不正确'));
-                } else {
-                    callback();
-                }
-            }, 1000);
+            let msgCodeReg = /\d{4}/
+            if (!msgCodeReg.test(value)) {
+              callback(new Error('验证码格式不正确'));
+            } else {
+              callback();
+            }
         };
         return {
             year: '',
@@ -298,7 +292,7 @@ export default {
                         } else if (resp.data.message == 'exist') {
                             this.$message.info("用户名已存在！")
                         } else if (resp.data.message == 'codeErr') {
-                            this.$message.warn("验证码错误！")
+                            this.$message.warning("验证码错误！")
                         }
                         this.btn_loading = false
                     })

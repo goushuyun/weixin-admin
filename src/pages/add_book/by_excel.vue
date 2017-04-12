@@ -1,8 +1,8 @@
 <template lang="html">
   <div class="container">
-  <div class="top_bar">
-    <h2 class="title">图书上架</h2>
-  </div>
+    <div class="top_bar">
+      <h2 class="title">图书上架</h2>
+    </div>
     <div class="body">
       <div class="upload_status">
         <el-row type="flex" justify="center" align="middle">
@@ -17,16 +17,15 @@
       </div>
       <el-card v-if="upload_status==1" class="box-card">
         <div slot="header" class="clearfix"><span>选择文件</span></div>
-        <div>
+        <div style="margin-bottom:20px;">
           <p>• <a href="http://okxy9gsls.bkt.clouddn.com/uploadExcel.xlsx">下载样例文件</a></p>
           <p>• 只能上传xlsx和xls文件，且不超过2M</p>
+          <p>• 书&nbsp;&nbsp;&nbsp;名：不能超过30个字符（包括汉字、英文、标点符号）</p>
           <p>• 出版社：请使用完整的出版社名称</p>
-          <p>• 类&nbsp;&nbsp;&nbsp;别：1.教材  2.教辅  3.外语  4.阅读  5.考证</p>
           <p>• 类&nbsp;&nbsp;&nbsp;型：1.新书  2.旧书</p>
           <p>• 折&nbsp;&nbsp;&nbsp;扣：0.7表示7折 ，请保持折扣值在0~1之间</p>
           <p>• 仓库名、货架名：请使用完整的仓库名、货架名</p>
         </div>
-        <img style="margin: 10px 0;border: 1px solid;" src="../../images/example.jpg">
         <div class="btn">
           <el-checkbox v-model="select_checked" style="margin-right:10px;">已仔细阅读以上内容</el-checkbox>
           <el-button type="primary" size="small" v-show="!select_checked" :disabled="true">选取文件</el-button>

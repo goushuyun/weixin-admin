@@ -34,5 +34,16 @@ function isISBNFormat (isbn){
     return /^\d{10}$/.test(isbn)
 }
 
+function priceFloat (price) {
+    if (price) {
+        return parseFloat(price/100).toFixed(2)
+    }
+}
 
-export {testMobile, testPassword, testMsgCode, getTimeVal, stamp2date, isISBNFormat}
+function priceInt (price) {
+    if (price) {
+        return parseInt(price * 100)
+    }
+}
+
+export {testMobile, testPassword, testMsgCode, getTimeVal, stamp2date, isISBNFormat, priceFloat, priceInt}
