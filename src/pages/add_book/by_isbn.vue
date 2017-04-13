@@ -61,7 +61,7 @@
         <img v-if="book_info.image" :src="'http://onv8eua8j.bkt.clouddn.com/' + book_info.image" class="avatar">
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
-      <el-form ref="ruleForm" :model="book_info" :rules="rules" label-width="80px">
+      <el-form ref="book_info" :model="book_info" :rules="rules" label-width="80px">
           <el-form-item label="ISBN" prop="isbn">
               <el-input id="isbn" :autofocus="true" v-model.trim="book_info.isbn" v-on:keyup.enter.native="search">
                   <el-button slot="append" icon="search" @click="search"></el-button>
@@ -77,31 +77,31 @@
               <el-input v-model.trim="book_info.author"></el-input>
           </el-form-item>
           <el-form-item label="原 价" prop="price">
-              <el-input type="number" v-model="book_info.price"></el-input>
+              <el-input min="0" type="number" v-model="book_info.price"></el-input>
           </el-form-item>
           <el-form-item label="类 型">
               <td style="width:260px;text-align:center;color: #1AAD19;margin-right:10px;">二手书</td>
               <td style="width:260px;text-align:center;color: #3A8AFF;">新书</td>
           </el-form-item>
           <el-form-item label="折 扣">
-              <el-input type="number" placeholder="二手书折扣"><template slot="append" v-model="old_book.discount">折</template></el-input>
-              <el-input type="number" placeholder="新书折扣"><template slot="append" v-model="new_book.discount">折</template></el-input>
+              <el-input min="0" type="number" placeholder="二手书折扣"  v-model="old_book.discount" @input="inputDiscount(1)" @blur="blurDiscount(1)"><template slot="append">折</template></el-input>
+              <el-input min="0" type="number" placeholder="新书折扣" v-model="new_book.discount" @input="inputDiscount(0)" @blur="blurDiscount(0)"><template slot="append">折</template></el-input>
           </el-form-item>
           <el-form-item label="价 格">
-              <el-input type="number" placeholder="二手书价格"><template slot="append" v-model="old_book.price">元</template></el-input>
-              <el-input type="number" placeholder="新书价格"><template slot="append" v-model="new_book.price">元</template></el-input>
+              <el-input type="number" min="0" placeholder="二手书价格" v-model="old_book.price" @input="inputPrice(1)" @blur="blurPrice(1)"><template slot="append">元</template></el-input>
+              <el-input type="number" min="0" placeholder="新书价格" v-model="new_book.price" @input="inputPrice(0)" @blur="blurPrice(0)"><template slot="append">元</template></el-input>
           </el-form-item>
           <el-form-item label="数 量">
-              <el-input type="number" placeholder="二手书数量"><template slot="append" v-model="old_book.amount">本</template></el-input>
-              <el-input type="number" placeholder="新书数量"><template slot="append" v-model="new_book.amount">本</template></el-input>
+              <el-input type="number" min="0" placeholder="二手书数量" v-model="old_book.amount" @input="inputAmount(1)"><template slot="append">当前库存 <span style="color:#1AAD19;font-size:16px">{{old_book.stock}}</span> 本</template></el-input>
+              <el-input type="number" min="0" placeholder="新书数量" v-model="new_book.amount" @input="inputAmount(0)"><template slot="append">当前库存 <span style="color:#3A8AFF;font-size:16px">{{new_book.stock}}</span> 本</template></el-input>
           </el-form-item>
           <el-form-item label="位 置">
-              <el-cascader placeholder="二手书货架位" expand-trigger="hover" filterable :options="locations" v-model="old_book.location" @change="getLocations"></el-cascader>
-              <el-cascader placeholder="新书货架位" expand-trigger="hover" filterable :options="locations" v-model="new_book.location" @change="getLocations"></el-cascader>
+              <el-cascader placeholder="二手书货架位" filterable :options="old_book.locations" v-model="old_book.location" @change="handleChange"></el-cascader>
+              <el-cascader placeholder="新书货架位" filterable :options="new_book.locations" v-model="new_book.location" @change="handleChange"></el-cascader>
           </el-form-item>
           <el-form-item>
-              <el-button type="primary" @click="addBook">上架销售</el-button>
-              <el-button>重置</el-button>
+              <el-button type="primary" @click="addBook('book_info')">上架销售</el-button>
+              <el-button @click="reset('book_info')">重置</el-button>
           </el-form-item>
       </el-form>
     </div>
@@ -127,21 +127,58 @@ export default {
                 publisher: '',
                 author: '',
                 image: '',
-                price: 0
+                price: ''
+            },
+            rules: {
+                isbn: [{
+                    required: true,
+                    message: '请填写ISBN',
+                    trigger: 'blur'
+                }],
+                title: [{
+                    required: true,
+                    message: '请填写书名',
+                    trigger: 'blur'
+                }],
+                publisher: [{
+                    required: true,
+                    message: '请填写出版社名称',
+                    trigger: 'blur'
+                }],
+                author: [{
+                    required: true,
+                    message: '请填写作者名称',
+                    trigger: 'blur'
+                }],
+                price: [{
+                    required: true,
+                    message: '请填写图书原价',
+                    trigger: 'blur'
+                }]
             },
             //二手书
             old_book: {
                 location: [],
-                discount: 0,
-                price: 0,
-                amount: 0
+                price: '',
+                amount: '',
+                stock: 0,
+                discount: '',
+                locations: [{
+                    value: 'old_all',
+                    label: '-->展开全部位置<--'
+                }]
             },
             //新书
             new_book: {
-              location: [],
-              discount: 0,
-              price: 0,
-              amount: 0
+                location: [],
+                price: '',
+                amount: '',
+                stock: 0,
+                discount: '',
+                locations: [{
+                    value: 'new_all',
+                    label: '-->展开全部位置<--'
+                }]
             },
             /* 上传logo的数据 */
             imagesFormData: {
@@ -155,18 +192,110 @@ export default {
             }]
         };
     },
+    computed: {
+        old_book_discount() {
+            var discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
+            this.old_book.discount = discount
+            return discount
+        },
+        old_book_price() {
+            var price = priceFloat(this.book_info.price * this.old_book.discount * 10)
+            this.old_book.price = price
+            return price
+        }
+    },
     mounted() {
         $('#isbn input').focus()
         var store = this.$store.state.current_store
         this.store_id = store.id
+        this.getLocations()
     },
     methods: {
+        inputDiscount(type) {
+            if (type) {
+                if (this.old_book.discount < 0) {
+                    this.old_book.discount = 0
+                }
+                this.old_book.price = priceFloat(this.book_info.price * this.old_book.discount * 10)
+            } else {
+                if (this.new_book.discount < 0) {
+                    this.new_book.discount = 0
+                }
+                this.new_book.price = priceFloat(this.book_info.price * this.new_book.discount * 10)
+            }
+        },
+        inputPrice(type) {
+            if (type) {
+                if (this.old_book.price < 0) {
+                    this.old_book.price = 0
+                }
+                this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
+            } else {
+                if (this.new_book.price < 0) {
+                    this.new_book.price = 0
+                }
+                this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
+            }
+        },
+        inputAmount(type) {
+          if (type) {
+              if (this.old_book.amount < 0) {
+                  this.old_book.amount = 0
+              }
+          } else {
+              if (this.new_book.amount < 0) {
+                  this.new_book.amount = 0
+              }
+          }
+        },
+        blurDiscount(type) {
+          if (type) {
+              this.old_book.discount = parseFloat(this.old_book.discount).toFixed(1)
+              this.old_book.price = priceFloat(this.book_info.price * this.old_book.discount * 10)
+          } else {
+              this.new_book.discount = parseFloat(this.new_book.discount).toFixed(1)
+              this.new_book.price = priceFloat(this.book_info.price * this.new_book.discount * 10)
+          }
+        },
+        blurPrice(type) {
+          if (type) {
+              this.old_book.price = parseFloat(this.old_book.price).toFixed(2)
+              this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
+          } else {
+              this.new_book.price = parseFloat(this.new_book.price).toFixed(2)
+              this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
+          }
+        },
+        reset(formName) {
+            this.$refs[formName].resetFields();
+            //二手书
+            this.old_book = {
+                location: [],
+                price: '',
+                amount: '',
+                discount: '',
+                locations: [{
+                    value: 'old_all',
+                    label: '-->展开全部位置<--'
+                }]
+            }
+            //新书
+            this.new_book = {
+                location: [],
+                price: '',
+                amount: '',
+                discount: '',
+                locations: [{
+                    value: 'new_all',
+                    label: '-->展开全部位置<--'
+                }]
+            }
+        },
         search() {
             if (!isISBNFormat(this.book_info.isbn)) {
                 this.$message.warning('ISBN 码格式不正确！')
                 return
             }
-            this.loading_text = '正在搜索'
             this.loading = true
             axios.post('/v1/books/get_book_info_by_isbn', {
                 // "isbn": "9787115249494"
@@ -198,21 +327,137 @@ export default {
                 "search_picture": "-100"
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    var data = resp.data.data[0]
+                    if (resp.data.data.length > 0) {
+                        var data = resp.data.data[0]
+                        if (data.new_book) {
+                            console.log('>>>>>----- have new_book ----->');
+                            this.new_book.stock = data.new_book.amount
+                            this.new_book.price = priceFloat(data.new_book.price)
+                            this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
+                            if (data.new_book.location.length > 0) {
+                                var new_location = data.new_book.location[0]
+                                this.new_book.location = [new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]
+                                this.handleGoodsLocations(data.new_book.location, 0)
 
-                    console.log(resp.data.data);
+                            }
+                        }
+                        if (data.old_book) {
+                            console.log('>>>>>----- have old_book ----->');
+                            this.old_book.stock = data.old_book.amount
+                            this.old_book.price = priceFloat(data.old_book.price)
+                            this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
+                            if (data.old_book.location.length > 0) {
+                                var old_location = data.old_book.location[0]
+                                this.old_book.location = [old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]
+                                this.handleGoodsLocations(data.old_book.location, 1)
+                            }
+                        }
+                    }
                 }
             })
         },
-        getLocations(val) {
-            if (val[0] != 'all') {
+        handleGoodsLocations(locations, type) {
+            var stores = this.locations
+            var temp_locations = new Array()
+            var store
+            //遍历stores
+            for (var i = 0; i < stores.length; i++) {
+                store = stores[i]
+                //遍历shelfs
+                var shelfs = store.children
+                if (shelfs == undefined) {
+                    continue
+                }
+                for (var j = 0; j < shelfs.length; j++) {
+                    var shelf = shelfs[j]
+                    //遍历 floors
+                    var floors = shelf.children
+                    if (floors == undefined) {
+                        continue
+                    }
+                    for (var k = 0; k < floors.length; k++) {
+                        var floor = floors[k]
+                        for (var m = 0; m < locations.length; m++) {
+                            if (locations[m].floor_id == floor.value) {
+                                if (store.value == undefined || shelf.value == undefined || floor.value == undefined) {
+                                    continue
+                                }
+                                var temp1 = new Object();
+                                var temp2 = new Object();
+                                var temp3 = new Object();
+                                temp1.value = store.value;
+                                temp1.label = store.label;
+                                temp1.children = new Array();
+                                temp2.value = shelf.value;
+                                temp2.label = shelf.label;
+                                temp2.children = new Array();
+                                temp3.value = floor.value;
+                                temp3.label = floor.label;
+                                temp2.children.push(temp3);
+                                temp1.children.push(temp2);
+                                this.insertLocations(temp_locations, temp1)
+                            }
+                        }
+                    }
+                }
+            }
+            console.log(temp_locations);
+            if (type == 0) {
+                var temp = {
+                    value: 'new_all',
+                    label: '-->展开全部位置<--'
+                }
+                temp_locations.push(temp)
+                this.new_book.locations = temp_locations
+            }
+            if (type == 1) {
+                var temp = {
+                    value: 'old_all',
+                    label: '-->展开全部位置<--'
+                }
+                temp_locations.push(temp)
+                this.old_book.locations = temp_locations
+
+            }
+        },
+        insertLocations(locations, location) {
+            for (var i = 0; i < locations.length; i++) {
+                var store = locations[i]
+                if (store.value == location.value) {
+                    for (var m = 0; m < store.children.length; m++) {
+                        var shelf = store.children[m]
+                        if (shelf.value == location.children[0].value) {
+                            shelf.children.push(location.children[0].children[0])
+                            return locations
+                        }
+                    }
+                    console.log("====================================");
+                    console.log(store);
+                    console.log(location);
+                    console.log("====================================");
+                    store.children.push(location.children[0])
+                    return locations
+                }
+            }
+            locations.push(location)
+            return locations
+        },
+        handleChange(val) {
+            if (val[0] != 'old_all' && val[0] != 'new_all') {
                 return
             }
+            if (val[0] == 'old_all') {
+                this.old_book.locations = this.locations
+            }
+            if (val[0] == 'new_all') {
+                this.new_book.locations = this.locations
+            }
+        },
+        getLocations() {
             axios.post('/v1/location/list_children_location', {
                 "level": 3
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    console.log(resp.data.data);
                     this.locations = this.handleLocation(resp.data.data)
                 }
             })
@@ -256,7 +501,7 @@ export default {
             return isJPG && isLt2M;
         },
         handleAvatarSuccess(res, file, fileList) {
-            this.ruleForm.image = this.imagesFormData.key
+            this.book_info.image = this.imagesFormData.key
             this.getToken()
         },
         handleAvatarError(err, file, fileList) {
@@ -277,44 +522,68 @@ export default {
                 return false
             });
         },
-        addBook() {
-            if (this.new_book.amount == 0 && this.old_book.amount == 0) {
-                this.$message.warning('请输入图书数量')
-                return
-            }
-            var data = {
-                "book_id": this.book_info.id, //标准图书id编号
-                "isbn": this.book_info.isbn, //图书isbn
-                "location": []
-            }
-            if (this.new_book.amount) {
-                var new_book = {
-                    "type": "0", //0 代表新书 1 旧书
-                    "storehouse_id": this.new_book.location[0], //仓库id
-                    "shelf_id": this.new_book.location[1], //货架id
-                    "floor_id": this.new_book.location[2], //货架层id
-                    "amount": this.book_info.amount, //上传的书的数量
-                    "price": priceInt(this.book_info.price) //上传的书的价格 以分为单位 1元=100分
+        addBook(formName) {
+            this.$refs[formName].validate((valid) => {
+                if (valid) {
+                    if (!this.new_book.amount && !this.old_book.amount) {
+                        this.$message.warning('请输入图书数量')
+                        return
+                    }
+                    var data = {
+                        "book_id": this.book_info.id, //标准图书id编号
+                        "isbn": this.book_info.isbn, //图书isbn
+                        "location": []
+                    }
+                    if (this.new_book.amount) {
+                        if (!this.new_book.price) {
+                            this.$message.warning('请填写新书价格')
+                            return
+                        }
+                        if (this.new_book.location.length < 3) {
+                            this.$message.warning('请选择新书货架层')
+                            return
+                        }
+                        var new_book = {
+                            "type": "0", //0 代表新书 1 旧书
+                            "storehouse_id": this.new_book.location[0], //仓库id
+                            "shelf_id": this.new_book.location[1], //货架id
+                            "floor_id": this.new_book.location[2], //货架层id
+                            "amount": this.new_book.amount, //上传的书的数量
+                            "price": priceInt(this.new_book.price) //上传的书的价格 以分为单位 1元=100分
+                        }
+                        data.location.push(new_book)
+                    }
+                    if (this.old_book.amount) {
+                        if (!this.old_book.price) {
+                            this.$message.warning('请填写二手书价格')
+                            return
+                        }
+                        if (this.old_book.location.length < 3) {
+                            this.$message.warning('请选择二手书货架层')
+                            return
+                        }
+                        var old_book = {
+                            "type": "1",
+                            "storehouse_id": this.old_book.location[0],
+                            "shelf_id": this.old_book.location[1],
+                            "floor_id": this.old_book.location[2],
+                            "amount": this.old_book.amount,
+                            "price": priceInt(this.old_book.price)
+                        }
+                        data.location.push(old_book)
+                    }
+                    axios.post('/v1/goods/add', data).then(resp => {
+                        if (resp.data.message == 'ok') {
+                            this.$message.success('图书上架成功')
+                            this.reset('book_info')
+                            console.log('>>>>>----- success ----->');
+                        }
+                    })
+                } else {
+                    console.log('error submit!!');
+                    return false;
                 }
-                data.location.push(new_book)
-            }
-            if (this.old_book.amount) {
-                var old_book = {
-                    "type": "1",
-                    "storehouse_id": this.old_book.location[0],
-                    "shelf_id": this.old_book.location[1],
-                    "floor_id": this.old_book.location[2],
-                    "amount": this.book_info.amount,
-                    "price": priceInt(this.book_info.price)
-                }
-                data.location.push(old_book)
-            }
-            axios.post('/v1/goods/add', data).then(resp => {
-                if (resp.data.message == 'ok') {
-                    this.locations1 = resp.data.data
-                    console.log(resp.data.data);
-                }
-            })
+            });
         }
     }
 }

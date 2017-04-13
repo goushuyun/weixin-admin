@@ -5,7 +5,7 @@
         <el-col>
           <div>
             <label v-if="!update_depot" class="margin_right20">{{p_depot.name}}</label>
-            <el-input id="adepot_name" v-else class="margin_right20" style="max-width:200px;" size="small" v-model="p_depot.update_name" @blur="confirmUpdateDepot" v-on:keyup.enter.native="confirmUpdateDepot"></el-input>
+            <el-input id="adepot_name" v-else class="margin_right20" style="max-width:200px;" size="small" v-model="p_depot.update_name" v-on:keyup.enter.native="confirmUpdateDepot"></el-input>
             <el-button v-if="!update_depot" type="text" @click="proUpdateDepot">修改</el-button>
             <el-button v-if="update_depot" type="text" @click="confirmUpdateDepot">确定</el-button>
             <el-button v-if="update_depot" type="text" style="color:#13CE66" @click="update_depot = false">取消</el-button>
