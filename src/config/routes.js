@@ -1,6 +1,14 @@
 // 将组件抽离成不同的代码块，当路由访问到的时候再去加载，实现路由懒加载
 const shops = r => require(['../pages/shops/shops'], r)
 
+// * 推荐管理
+// *** 话题推荐
+const topic = r => require(['../pages/recommend/topic/index'], r)
+// *** 新增话题
+const add_topic = r => require(['../pages/recommend/topic/add_topic'], r)
+// *** 轮播图
+const carousel = r => require(['../pages/recommend/carousel/index'], r)
+
 // * 图书上架
 // ** ISBN 上传
 const by_isbn = r => require(['../pages/add_book/by_isbn'], r)
@@ -56,6 +64,19 @@ export default [{
             component: real_store
         }]
     },{
+        name: 'topic',
+        path: 'recommend/topic',
+        component: topic,
+        children: [{
+            name: 'add_topic',
+            path: 'add_topic',
+            component: add_topic
+        }]
+    },{
+        name: 'carousel',
+        path: 'recommend/carousel',
+        component: carousel
+    }, {
         name: 'by_isbn',
         path: 'add_book/by_isbn',
         component: by_isbn

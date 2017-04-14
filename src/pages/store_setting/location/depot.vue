@@ -101,7 +101,6 @@ export default {
 <style lang="scss" scoped>@import "../../../common/_color.scss";
 .body {
     background-color: white;
-    padding: 16px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;

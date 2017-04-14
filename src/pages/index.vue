@@ -79,21 +79,30 @@
 
         <el-menu theme="dark" mode="vertical" :router="true">
             <el-submenu index="1">
-              <template slot="title"><i class="fa fa-book" aria-hidden="true"></i></i>图书上架</template>
-              <el-menu-item index="/admin/add_book/by_isbn">
-                <i class="fa fa-info-circle" aria-hidden="true"></i></i>ISBN上架
+              <template slot="title"><i class="fa fa-flag" aria-hidden="true"></i>推荐管理</template>
+              <el-menu-item index="/admin/recommend/topic">
+                  <i class="fa fa-anchor" aria-hidden="true"></i>话题推荐
               </el-menu-item>
-              <el-menu-item index="/admin/add_book/by_excel">
-                  <i class="fa fa-cog" aria-hidden="true"></i></i>批量上架
+              <el-menu-item index="/admin/recommend/carousel">
+                  <i class="fa fa-picture-o" aria-hidden="true"></i>轮播图
               </el-menu-item>
             </el-submenu>
             <el-submenu index="2">
+              <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>图书上架</template>
+              <el-menu-item index="/admin/add_book/by_isbn">
+                  <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
+              </el-menu-item>
+              <el-menu-item index="/admin/add_book/by_excel">
+                  <i class="fa fa-file-text" aria-hidden="true"></i>批量上架
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="3">
               <template slot="title"><i class="el-icon-setting"></i>设置</template>
               <el-menu-item index="/admin/store_info/cloud_store">
-                <i class="fa fa-info-circle" aria-hidden="true"></i></i>店铺信息
+                <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息
               </el-menu-item>
               <el-menu-item index="/admin/store_setting/location/">
-                  <i class="fa fa-cog" aria-hidden="true"></i></i>店铺设置
+                  <i class="fa fa-cog" aria-hidden="true"></i>店铺设置
               </el-menu-item>
             </el-submenu>
         </el-menu>

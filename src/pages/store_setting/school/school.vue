@@ -21,7 +21,8 @@
         </li>
 
         <li class="add" @click="add_school">
-            <i class="fa fa-plus" aria-hidden="true"></i>
+            <!-- <i class="fa fa-plus" aria-hidden="true"></i> -->
+            <el-button style="width:100%;height:100%;" type="text">添加学校</el-button>
         </li>
     </ul>
 

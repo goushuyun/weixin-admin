@@ -15,13 +15,15 @@ ul#schools {
         width: 245px;
         height: 124px;
         background-color: white;
-        border-left: 4px solid $blue;
+        // border-left: 4px solid $blue;
+        border: 1px solid #D1DBE5;
+        box-shadow: 0 0 10px rgba(0, 0, 0,.1);
         padding: 6px 12px;
         margin-right: 14px;
         margin-bottom: 10px;
         &:hover {
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+            box-shadow: 0 0 10px rgba(0, 0, 0, .3);
         }
         p.name {
             height: 42px;
@@ -51,17 +53,19 @@ ul#schools {
         }
     }
     li.add {
-        font-size: 20px;
+        // font-size: 20px;
         width: 124px;
         height: 124px;
         background-color: white;
-        line-height: 124px;
+        // line-height: 124px;
         text-align: center;
-        color: $bg_grey;
+        // color: $bg_grey;
+        border: 1px solid #D1DBE5;
+        box-shadow: 0 0 10px rgba(0, 0, 0,.1);
         &:hover {
             cursor: pointer;
             color: lighten($blue, 12%);
-            border: 1px solid lighten($blue, 16%);
+            box-shadow: 0 0 10px rgba(0, 0, 0,.3);
         }
     }
 }

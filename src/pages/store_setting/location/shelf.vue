@@ -238,7 +238,6 @@ export default {
 <style lang="scss" scoped>@import "../../../common/_color.scss";
 .body {
     background-color: white;
-    padding: 16px;
     .header {
         width: 100%;
         height: 36px;
