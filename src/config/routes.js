@@ -66,12 +66,11 @@ export default [{
     },{
         name: 'topic',
         path: 'recommend/topic',
-        component: topic,
-        children: [{
-            name: 'add_topic',
-            path: 'add_topic',
-            component: add_topic
-        }]
+        component: topic
+    },{
+        name: 'add_topic',
+        path: 'recommend/add_topic',
+        component: add_topic
     },{
         name: 'carousel',
         path: 'recommend/carousel',
