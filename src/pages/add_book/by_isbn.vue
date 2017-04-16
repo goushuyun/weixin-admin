@@ -119,6 +119,7 @@ import {
 export default {
     data() {
         return {
+            loading: false,
             store_id: '',
             book_info: {
                 id: '',
@@ -290,6 +291,7 @@ export default {
                     label: '-->展开全部位置<--'
                 }]
             }
+            $('#isbn input').focus()
         },
         search() {
             if (!isISBNFormat(this.book_info.isbn)) {
@@ -322,7 +324,7 @@ export default {
         getGoodsInfo() {
             axios.post('/v1/goods/search', {
                 "isbn": this.book_info.isbn,
-                "search_amount": "-100",
+                "search_amount": "0",
                 "search_type": "-100",
                 "search_picture": "-100"
             }).then(resp => {

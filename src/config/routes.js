@@ -9,6 +9,10 @@ const add_topic = r => require(['../pages/recommend/topic/add_topic'], r)
 // *** 轮播图
 const carousel = r => require(['../pages/recommend/carousel/index'], r)
 
+// * 库存管理
+// ** 库存查看
+const stock_list = r => require(['../pages/stock_manage/stock_list'], r)
+
 // * 图书上架
 // ** ISBN 上传
 const by_isbn = r => require(['../pages/add_book/by_isbn'], r)
@@ -76,6 +80,10 @@ export default [{
         path: 'recommend/carousel',
         component: carousel
     }, {
+        name: 'stock_list',
+        path: 'stock_manage/stock_list',
+        component: stock_list
+    },{
         name: 'by_isbn',
         path: 'add_book/by_isbn',
         component: by_isbn

@@ -12,9 +12,18 @@
             <el-table-column prop="sort" label="优先级" width="180">
                 <template scope="scope">
                     <el-select v-model="scope.row.sort" size="small" @change="updateTopicSort(scope.row.id,scope.row.sort)">
-                      <el-option label="低级" value="1"></el-option>
-                      <el-option label="中级" value="2"></el-option>
-                      <el-option label="高级" value="3"></el-option>
+                      <el-option label="低级"value="1">
+                        <span style="float: left">1</span>
+                        <span style="float: right; color: #8492a6; font-size: 13px">低级</span>
+                      </el-option>
+                      <el-option label="中级" value="2">
+                        <span style="float: left">2</span>
+                        <span style="float: right; color: #8492a6; font-size: 13px">中级</span>
+                      </el-option>
+                      <el-option label="高级" value="3">
+                        <span style="float: left">3</span>
+                        <span style="float: right; color: #8492a6; font-size: 13px">高级</span>
+                      </el-option>
                     </el-select>
                 </template>
             </el-table-column>
