@@ -1,7 +1,7 @@
 <style lang="scss" scoped>
 @import "../../common/_color.scss";
 .container{
-    padding-top: 200px;
+    // padding-top: 80px;
 }
 .box{
     width: 400px;
@@ -44,6 +44,7 @@
 <template lang="html">
 
 <div class="container">
+    <div style="height: 120px;"></div>
     <div class="box">
         <i class="el-icon-circle-check"></i>
         <h1>恭喜，授权成功</h1>

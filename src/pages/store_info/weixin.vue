@@ -74,6 +74,7 @@ export default {
         },
         methods: {
             auth() {
+                console.log(this.url);
                 window.open(this.url)
                     // 弹出提示框，给用户选择是否已经授权完毕
                 this.$confirm('请在新窗口完成微信公众号授权', '提示', {
