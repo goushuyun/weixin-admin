@@ -110,6 +110,9 @@
               <el-menu-item index="/admin/store_setting/location/">
                   <i class="fa fa-cog" aria-hidden="true"></i>店铺设置
               </el-menu-item>
+              <el-menu-item index="/admin/weixin_setting/">
+                  <i class="fa fa-weixin" aria-hidden="true"></i></i>微信设置
+              </el-menu-item>
             </el-submenu>
         </el-menu>
     </div>

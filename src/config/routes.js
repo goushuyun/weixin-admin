@@ -26,7 +26,9 @@ const store_info = r => require(['../pages/store_info/index'], r)
 const cloud_store = r => require(['../pages/store_info/cloud_store'], r)
 // *** 实体店信息
 const real_store = r => require(['../pages/store_info/real_store'], r)
-
+// 微信设置
+const weixin_setting = r => require(['../pages/store_info/weixin'], r)
+const auth_redirect_page = r => require(['../pages/auth_redirect_page/redirect_uri'], r)
 // ** 店铺设置
 const store_setting = r => require(['../pages/store_setting/index'], r)
 // *** 人员管理
@@ -51,6 +53,10 @@ export default [{
     name: 'shops',
     component: shops
 }, {
+    path: '/auth_redirect_page',
+    name: 'auth_redirect_page',
+    component: auth_redirect_page
+},{
     path: '/admin',
     name: 'admin',
     component: require('../pages'),
@@ -62,20 +68,24 @@ export default [{
             name: 'cloud_store',
             path: 'cloud_store',
             component: cloud_store
-        },{
+        }, {
             name: 'real_store',
             path: 'real_store',
             component: real_store
         }]
-    },{
+    }, {
         name: 'topic',
         path: 'recommend/topic',
         component: topic
-    },{
+    }, {
+        name: 'weixin_setting',
+        path: 'weixin_setting',
+        component: weixin_setting
+    }, {
         name: 'add_topic',
         path: 'recommend/add_topic',
         component: add_topic
-    },{
+    }, {
         name: 'carousel',
         path: 'recommend/carousel',
         component: carousel
@@ -83,11 +93,11 @@ export default [{
         name: 'stock_list',
         path: 'stock_manage/stock_list',
         component: stock_list
-    },{
+    }, {
         name: 'by_isbn',
         path: 'add_book/by_isbn',
         component: by_isbn
-    },{
+    }, {
         name: 'by_excel',
         path: 'add_book/by_excel',
         component: by_excel
@@ -99,23 +109,23 @@ export default [{
             path: 'people',
             name: "people",
             component: people
-        },{
+        }, {
             path: 'school',
             name: "school",
             component: school
-        },{
+        }, {
             path: 'location',
             name: "location",
             component: location
-        },{
+        }, {
             path: 'shelf',
             name: "shelf",
             component: shelf
-        },{
+        }, {
             path: 'freight',
             name: "freight",
             component: freight
-        },{
+        }, {
             path: 'service',
             name: "service",
             component: service
