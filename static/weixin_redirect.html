@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>购书云</title>
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style media="screen">
+        .container {}
+
+        .box {
+            width: 400px;
+            margin: 0 auto;
+            text-align: center;
+            border: 1px solid #E7E8EB;
+            color: #44B549;
+            padding: 42px 22px;
+            border-radius: 6px;
+        }
+
+        .bottom_bar {
+            padding-top: 42px;
+            width: 100%;
+            text-align: center;
+            height: 128px;
+            color: #888;
+            font-size: 13px;
+            line-height: 128px;
+        }
+
+        i.fa-check-circle {
+            font-size: 32px;
+        }
+
+        .box p {
+            color: #888;
+            font-size: 12px;
+            line-height: 32px;
+        }
+
+        .box p span {
+            color: #C60C1B;
+            padding: 0 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div style="height: 120px;"></div>
+        <div class="box">
+            <i class="fa fa-check-circle" aria-hidden="true"></i>
+            <h1>恭喜，授权成功</h1>
+            <p>本页将在 <span>{{second}}</span> 秒后自动关闭</p>
+        </div>
+        <div class="bottom_bar">© 2017 购书云 版权所有 沪ICP备15022838号-2</div>
+    </div>
+    <script src="https://cdn.bootcss.com/vue/2.2.6/vue.min.js"></script>
+    <script src="http://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        var app = new Vue({
+            el: '#container',
+            data: {
+                second: 5
+            },
+            created() {
+                // 获取url参数，解析并发起请求
+                var url = window.location.href
+                var auth_code = url.split('?')[1].split('&')[0].split('=')[1]
+                var token = localStorage.getItem('token')
+                // 发起请求，获取公众号信息
+                $.ajax({
+                    type: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    url: 'http://weixin-admin.goushuyun.com/v1/weixin/get_api_query_auth',
+                    data: JSON.stringify({auth_code: auth_code}),
+                    success: function(data){
+                        alert('data: ' + data);
+                    },
+                    contentType: "application/json",
+                    dataType: 'json'
+                });
+                console.log(auth_code)
+            },
+            mounted() {
+                // 做倒计时，5秒后关闭当前页
+                setInterval(() => {
+                    if (--this.second == 0) {
+                        window.close()
+                    }
+                }, 1000)
+            }
+        })
+    </script>
+</body>
+
+</html>

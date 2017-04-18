@@ -28,7 +28,6 @@ const cloud_store = r => require(['../pages/store_info/cloud_store'], r)
 const real_store = r => require(['../pages/store_info/real_store'], r)
 // 微信设置
 const weixin_setting = r => require(['../pages/store_info/weixin'], r)
-const auth_redirect_page = r => require(['../pages/auth_redirect_page/redirect_uri'], r)
 // ** 店铺设置
 const store_setting = r => require(['../pages/store_setting/index'], r)
 // *** 人员管理
@@ -53,10 +52,6 @@ export default [{
     name: 'shops',
     component: shops
 }, {
-    path: '/auth_redirect_page',
-    name: 'auth_redirect_page',
-    component: auth_redirect_page
-},{
     path: '/admin',
     name: 'admin',
     component: require('../pages'),

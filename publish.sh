@@ -22,3 +22,4 @@ cp ./dist/* ./build/dist
 rm -rf ./dist
 
 rsync -e ssh -r ./build/* --progress -cv 'root@115.28.109.6:/home/weixin-admin'
+# rsync -e ssh -r ./static/* --progress -cv 'root@115.28.109.6:/home/weixin-admin/static'
