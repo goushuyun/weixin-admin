@@ -50,7 +50,7 @@ p.text {
                 <h4 class="remark_title">绑定微信公众号，把店铺和微信打通</h4>
                 <ul>
                     <li>如果您还没有微信公众号，可以
-                        <el-button size="small" type="text" href="http://baidu.com">点此注册</el-button>
+                        <el-button size="small" type="text" href="https://mp.weixin.qq.com/cgi-bin/readtemplate?t=register/step1_tmpl&lang=zh_CN">点此注册</el-button>
                     </li>
                     <li>一个微信公众号只能和一个店铺绑定</a>
                     </li>
