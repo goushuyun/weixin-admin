@@ -34,16 +34,21 @@ function isISBNFormat (isbn){
     return /^\d{10}$/.test(isbn)
 }
 
+// 金额由“分”转换成“元”
 function priceFloat (price) {
     if (price) {
         return parseFloat(price/100).toFixed(2)
     }
 }
-
+// 金额由“元”转换成“分”
 function priceInt (price) {
     if (price) {
         return parseInt(price * 100)
     }
 }
 
-export {testMobile, testPassword, testMsgCode, getTimeVal, stamp2date, isISBNFormat, priceFloat, priceInt}
+// 判断两个对象是否相等
+function isObjectValueEqual(a, b) {
+    return JSON.stringify(a) == JSON.stringify(b);
+}
+export {testMobile, testPassword, testMsgCode, getTimeVal, stamp2date, isISBNFormat, priceFloat, priceInt, isObjectValueEqual}
