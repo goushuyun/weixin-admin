@@ -76,19 +76,19 @@
             </el-table-column>
             <el-table-column label="位置" min-width="180">
                 <template scope="scope">
-                    <div v-if="scope.row.has_new_book" class="goods_item new_color">
+                    <div v-if="scope.row.has_new_book" class="goods_item new_color ellipsis">
                         <span v-for="item in scope.row.new_book.location">{{item.location_str + '；'}}</span>
                     </div>
-                    <div v-if="scope.row.has_old_book" class="goods_item old_color">
+                    <div v-if="scope.row.has_old_book" class="goods_item old_color ellipsis">
                         <span v-for="item in scope.row.old_book.location">{{item.location_str + '；'}}</span>
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column prop="book.create_at" label="修改时间" width="160"></el-table-column>
+            <el-table-column prop="update_at" label="修改时间" width="160"></el-table-column>
             <el-table-column label="操作" fixed="right" width="120">
                 <template scope="scope">
-                    <el-button type="primary" size="small" @click="preEdit(scope.$index)" icon="edit"></el-button>
-                    <el-button type="danger" size="small" @click="proDelete(scope.$index)" icon="delete"></el-button>
+                    <el-button type="text" size="small" @click="preEdit(scope.$index)" icon="edit"></el-button>
+                    <el-button type="text" style="color:#FF4949" size="small" @click="proDelete(scope.$index)" icon="delete"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -115,7 +115,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog size="" v-model="book_info_show" @close="reset('book_info')">
+    <el-dialog size="" v-model="book_info_show" :close-on-click-modal="false" @close="reset('book_info')">
       <div class="body" v-loading="loading" :element-loading-text="拼命加载中">
         <el-upload
           class="avatar-uploader"
@@ -207,7 +207,6 @@ import axios from "../../scripts/http"
 import {
     getToken
 } from "../../scripts/token"
-import enumVals from "../../scripts/enum"
 export default {
     data() {
         return {
@@ -370,7 +369,7 @@ export default {
                     self.tableData = data.map(item => {
                         item.book.image = item.book.image
                         item.book.price = priceFloat(item.book.price)
-                        item.book.create_at = moment(item.book.create_at).format('YYYY-MM-DD H:mm')
+                        item.update_at = moment(item.update_at * 1000).format('YYYY-MM-DD H:mm')
                         if (item.new_book) {
                             item.has_new_book = true
                             item.new_book.price = priceFloat(item.new_book.price)
@@ -830,6 +829,12 @@ export default {
     line-height: 40px;
     text-align: center;
 }
+.ellipsis {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 .new_color {
     color: #3A8AFF;
 }
@@ -885,12 +890,6 @@ export default {
     .tag_area {
         display: flex;
         flex-direction: column;
-    }
-    .tag_item {
-        height: 36px;
-        line-height: 36px;
-        padding-left: 10px;
-        margin: 5px 0;
     }
 }
 </style>
