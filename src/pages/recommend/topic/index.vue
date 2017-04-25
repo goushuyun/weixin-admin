@@ -1,12 +1,12 @@
 <template lang="html">
   <div class="container">
       <div class="top_bar">
-          <h2 class="title">专题推荐</h2>
+          <h2 class="title">话题推荐</h2>
       </div>
 
       <div class="content_inner">
           <div class="add_topic">
-            <el-button type="primary" icon="plus" @click="addTopic">添加专题</el-button>
+            <el-button type="primary" size="small" icon="plus" @click="addTopic">添加专题</el-button>
           </div>
           <el-table :data="topics" border stripe style="width: 100%">
             <el-table-column prop="sort" label="优先级" width="180">
@@ -128,6 +128,34 @@ export default {
         },
         addTopic() {
             this.$router.push('add_topic')
+            // this.$prompt('请输入话题名称', '话题名称', {
+            //     confirmButtonText: '确定',
+            //     cancelButtonText: '取消',
+            // }).then(({
+            //     value
+            // }) => {
+            //     // add store
+            //     let name = value.trim()
+            //     axios.post('/v1/location/add_location', {
+            //         name
+            //     }).then(resp => {
+            //         if (resp.data.message = 'ok') {
+            //             // this.getLocations()
+            //             var id = resp.data.data.id
+            //             var name = resp.data.data.name
+            //             this.$router.push({
+            //                 name: 'shelf',
+            //                 params: {
+            //                     id,
+            //                     name
+            //                 }
+            //             })
+            //         }
+            //         this.$message.success('仓库添加成功！')
+            //     })
+            // }).catch(() => {
+            //     this.$message.info('已取消输入')
+            // });
         }
     }
 }

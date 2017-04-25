@@ -115,7 +115,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog size="" v-model="book_info_show" :close-on-click-modal="false" @close="reset('book_info')">
+    <el-dialog size="" v-model="book_info_show" top="6%" :close-on-click-modal="false" @close="reset('book_info')">
       <div class="body" v-loading="loading" :element-loading-text="拼命加载中">
         <el-upload
           class="avatar-uploader"
@@ -145,8 +145,8 @@
                 <el-input min="0" type="number" v-model="book_info.price"></el-input>
             </el-form-item>
             <el-form-item label="类 型">
-                <td style="width:260px;text-align:center;color: #1AAD19;margin-right:10px;">二手书</td>
-                <td style="width:260px;text-align:center;color: #3A8AFF;">新书</td>
+                <td style="width:220px;text-align:center;color: #1AAD19;margin-right:6px;">二手书</td>
+                <td style="width:220px;text-align:center;color: #3A8AFF;">新书</td>
             </el-form-item>
             <el-form-item label="折 扣">
                 <el-input min="0" type="number" placeholder="二手书折扣"  v-model="old_book.discount" @input="inputDiscount(1)" @blur="blurDiscount(1)"><template slot="append">折</template></el-input>
@@ -763,7 +763,7 @@ export default {
         .el-cascader,
         .el-input {
             width: 220px;
-            margin-right: 10px;
+            margin-right: 6px;
         }
     }
     .tag_area {

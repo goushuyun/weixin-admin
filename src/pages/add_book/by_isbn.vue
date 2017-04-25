@@ -38,7 +38,7 @@
         width: 260px;
         margin-right: 10px;
         .el-cascader-menus  {
-            width: 260px;
+            width: 260px !important;
             // margin-right: 10px;
         }
     }
@@ -70,7 +70,7 @@
       </el-upload>
       <el-form ref="book_info" :model="book_info" :rules="rules" label-width="80px">
           <el-form-item label="ISBN" prop="isbn">
-              <el-input id="isbn" :autofocus="true" v-model.trim="book_info.isbn" v-on:keyup.enter.native="search">
+              <el-input id="isbn" :autofocus="true" :maxlength="13" v-model.trim="book_info.isbn" v-on:keyup.enter.native="search">
                   <el-button slot="append" icon="search" @click="search"></el-button>
               </el-input>
           </el-form-item>
@@ -84,7 +84,7 @@
               <el-input v-model.trim="book_info.author"></el-input>
           </el-form-item>
           <el-form-item label="原 价" prop="price">
-              <el-input min="0" type="number" v-model="book_info.price"></el-input>
+              <el-input min="0" type="number" v-model="book_info.price" @input="inputBook"></el-input>
           </el-form-item>
           <el-form-item label="类 型">
               <td style="width:260px;text-align:center;color: #1AAD19;margin-right:10px;">二手书</td>
@@ -99,8 +99,8 @@
               <el-input type="number" min="0" placeholder="新书价格" v-model="new_book.price" @input="inputPrice(0)" @blur="blurPrice(0)"><template slot="append">元</template></el-input>
           </el-form-item>
           <el-form-item label="数 量">
-              <el-input type="number" min="0" placeholder="二手书数量" v-model="old_book.amount" @input="inputAmount(1)"><template slot="append">当前库存 <span style="color:#1AAD19;font-size:16px">{{old_book.stock}}</span> 本</template></el-input>
-              <el-input type="number" min="0" placeholder="新书数量" v-model="new_book.amount" @input="inputAmount(0)"><template slot="append">当前库存 <span style="color:#3A8AFF;font-size:16px">{{new_book.stock}}</span> 本</template></el-input>
+              <el-input type="number" min="0" placeholder="新增二手书数量" v-model="old_book.amount" @input="inputAmount(1)"><template slot="append">当前库存 <span style="color:#1AAD19;font-size:16px">{{old_book.stock}}</span> 本</template></el-input>
+              <el-input type="number" min="0" placeholder="新增新书数量" v-model="new_book.amount" @input="inputAmount(0)"><template slot="append">当前库存 <span style="color:#3A8AFF;font-size:16px">{{new_book.stock}}</span> 本</template></el-input>
           </el-form-item>
           <el-form-item label="位 置">
               <el-cascader placeholder="二手书货架位" filterable :options="old_book.locations" v-model="old_book.location" @change="handleChange"></el-cascader>
@@ -108,7 +108,7 @@
           </el-form-item>
           <el-form-item>
               <el-button type="primary" @click="addBook('book_info')">上架销售</el-button>
-              <el-button @click="reset('book_info')">重置</el-button>
+              <el-button @click="reset('book_info','opt')">重置</el-button>
           </el-form-item>
       </el-form>
     </div>
@@ -212,6 +212,10 @@ export default {
         this.getLocations()
     },
     methods: {
+        inputBook() {
+            this.inputDiscount(0)
+            this.inputDiscount(1)
+        },
         inputDiscount(type) {
             if (type) {
                 if (this.old_book.discount < 0) {
@@ -267,24 +271,25 @@ export default {
               this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
           }
         },
-        reset(formName) {
+        reset(formName,opt) {
             this.$refs[formName].resetFields();
             this.book_info.image = ''
             //二手书
-            this.old_book = {
-                location: [],
-                price: '',
-                amount: '',
-                discount: '',
-                locations: this.locations
-            }
+            this.old_book.price = ''
+            this.old_book.amount = ''
+            this.old_book.stock = 0
+            this.old_book.locations = this.locations
+
             //新书
-            this.new_book = {
-                location: [],
-                price: '',
-                amount: '',
-                discount: '',
-                locations: this.locations
+            this.new_book.price = ''
+            this.new_book.amount = ''
+            this.new_book.stock = 0
+            this.new_book.locations = this.locations
+            if (opt) {
+                this.old_book.discount = ''
+                this.new_book.discount = ''
+                this.old_book.location = []
+                this.new_book.location = []
             }
             $('#isbn input').focus()
         },
@@ -295,12 +300,9 @@ export default {
             }
             this.loading = true
             axios.post('/v1/books/get_book_info_by_isbn', {
-                // "isbn": "9787115249494"
                 "isbn": this.book_info.isbn
             }).then(resp => {
-                console.log(resp.data.message);
                 if (resp.data.message == 'ok') {
-                    console.log(resp.data.data);
                     var data = resp.data.data
                     var book = {
                         id: data.id,
@@ -335,9 +337,8 @@ export default {
                             this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
                             if (data.new_book.location.length > 0) {
                                 // var new_location = data.new_book.location[0]
-                                var new_location = data.new_book.location[0]
-                                console.log([new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]);
-                                this.new_book.location = [new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]
+                                // console.log([new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]);
+                                // this.new_book.location = [new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]
                                 this.handleGoodsLocations(data.new_book.location, 0)
                             }
                         }
@@ -347,9 +348,9 @@ export default {
                             this.old_book.price = priceFloat(data.old_book.price)
                             this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
                             if (data.old_book.location.length > 0) {
-                                var old_location = data.old_book.location[0]
-                                console.log([old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]);
-                                this.old_book.location = [old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]
+                                // var old_location = data.old_book.location[0]
+                                // console.log([old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]);
+                                // this.old_book.location = [old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]
                                 this.handleGoodsLocations(data.old_book.location, 1)
                             }
                         }
@@ -358,6 +359,7 @@ export default {
             })
         },
         handleGoodsLocations(locations, type) {
+            var book_location = locations[0]
             var stores = this.locations
             var temp_locations = new Array()
             var store
@@ -402,7 +404,6 @@ export default {
                     }
                 }
             }
-            console.log(temp_locations);
             if (type == 0) {
                 var temp = {
                     value: 'new_all',
@@ -410,6 +411,9 @@ export default {
                 }
                 temp_locations.push(temp)
                 this.new_book.locations = temp_locations
+                this.new_book.location = [book_location.storehouse_id, book_location.shelf_id, book_location.floor_id]
+                console.log(this.new_book.locations);
+                console.log(this.new_book.location);
             }
             if (type == 1) {
                 var temp = {
@@ -418,6 +422,9 @@ export default {
                 }
                 temp_locations.push(temp)
                 this.old_book.locations = temp_locations
+                this.old_book.location = [book_location.storehouse_id, book_location.shelf_id, book_location.floor_id]
+                console.log(this.old_book.locations);
+                console.log(this.old_book.location);
             }
         },
         insertLocations(locations, location) {
@@ -533,7 +540,7 @@ export default {
         addBook(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    if (!this.new_book.amount && !this.old_book.amount) {
+                    if (!parseInt(this.new_book.amount) && !parseInt(this.old_book.amount)) {
                         this.$message.warning('请输入图书数量')
                         return
                     }

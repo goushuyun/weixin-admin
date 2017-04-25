@@ -1,8 +1,8 @@
 <template lang="html">
   <div class="body">
     <div v-for="(store,index) in locations" class="box-card" @click="goToShelf(index)" @mouseover="store.active = true" @mouseleave="store.active = false">
-      <div class="item">{{store.name}}</div>
-      <div class="item">{{store.name}}</div>
+      <div class="item ellipsis" style="margin-top:20px;">{{store.name}}</div>
+      <div class="item">共有 <span style="color:#20A0FF;font-size:18px;">{{store.children_amount}}</span> 个货架</div>
       <div class="delete_btn" style="text-align:right">
         <i v-show="store.active" style="color:#FF4949;" class="el-icon-delete2" @click.stop="deleteLocations(store.id)"></i>
       </div>
@@ -53,7 +53,7 @@ export default {
             var name = this.locations[index].name
             this.$router.push({
                 name: 'shelf',
-                query: {
+                params: {
                     id,
                     name
                 }
@@ -72,7 +72,16 @@ export default {
                     name
                 }).then(resp => {
                     if (resp.data.message = 'ok') {
-                        this.getLocations()
+                        // this.getLocations()
+                        var id = resp.data.data.id
+                        var name = resp.data.data.name
+                        this.$router.push({
+                            name: 'shelf',
+                            params: {
+                                id,
+                                name
+                            }
+                        })
                     }
                     this.$message.success('仓库添加成功！')
                 })
@@ -105,21 +114,27 @@ export default {
     flex-direction: row;
     flex-wrap: wrap;
 }
-
+.ellipsis {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
 .item {
-    padding: 18px 0;
+    padding: 10px 0;
     width: auto;
     text-align: center;
+    line-height: 20px;
 }
 
 .box-card {
     position: relative;
     font-size: 14px;
-    height: 100px;
-    width: 100px;
-    margin: 10px;
-    padding: 20px;
+    height: 122px;
+    width: 122px;
+    margin: 12px;
     border-radius: 4px;
+    text-align: center;
     border: 1px solid #D1DBE5;
     box-shadow: 0 0 10px rgba(0, 0, 0,.1);
     &:hover {

@@ -12,7 +12,7 @@
           </div>
         </el-col>
         <el-col style="text-align:right;padding-right:30px;">
-          <span class="margin_right20">两个仓库/10000册图书</span>
+          <span class="margin_right20">本仓库共有 <span style="color:#20A0FF;font-size:18px;">{{locations.length}}</span> 个货架</span>
           <el-button type="primary" size="small" icon="plus" @click="addShelf">添加货架</el-button>
         </el-col>
       </el-row>
@@ -70,8 +70,8 @@ export default {
         };
     },
     mounted() {
-        this.p_depot.id = this.$route.query.id
-        this.p_depot.name = this.$route.query.name
+        this.p_depot.id = this.$route.params.id
+        this.p_depot.name = this.$route.params.name
         this.getLocations()
     },
     methods: {
