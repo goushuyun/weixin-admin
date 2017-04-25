@@ -7,10 +7,16 @@
 
         <el-form label-width="100px">
             <el-form-item label="话题名称" required>
-                <el-input id="title_input" v-model="title" size="small" :maxlength="10"></el-input>
+                <label v-if="!update && topic_id" class="margin_right20">{{update_title}}</label>
+                <el-input v-if="(update && topic_id) || (!topic_id)" class="margin_right20" id="title_input" v-model="title" size="small" :maxlength="10"></el-input>
+                <el-button v-if="!update && topic_id" type="text" @click="proUpdate">修改</el-button>
+                <el-button v-if="update && topic_id" type="text" @click="confirmUpdate">确定</el-button>
+                <el-button v-if="update && topic_id" type="text" style="color:#13CE66" @click="update = false">取消</el-button>
             </el-form-item>
             <el-form-item label="添加书籍" required>
-                <el-input id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
+              <el-input id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
+              <el-button style="float:right;margin:0 20px" size="small" @click="prePage">返回</el-button>
+              <el-button v-if="!topic_id" style="float:right" type="primary" size="small" @click="addTopic">提交发布</el-button>
             </el-form-item>
         </el-form>
 
@@ -33,10 +39,6 @@
                 </template>
             </el-table-column>
         </el-table>
-
-        <div class="submit_btn">
-          <el-button type="primary" @click="submit">提交发布</el-button>
-        </div>
     </div>
   </div>
 </template>
@@ -51,9 +53,12 @@ import {
 export default {
     data() {
         return {
+            update:false,
             topic_id: '',
 
             title: '',
+            update_title: '',
+
             isbn: '',
 
             goods: [],
@@ -64,17 +69,44 @@ export default {
     mounted() {
         //拿到话题的ID，推荐状态
         this.topic_id = this.$route.params.topic_id ? this.$route.params.topic_id : ''
-        this.title = this.$route.params.title ? this.$route.params.title : ''
-        console.log(this.topic_id);
-        $('#title_input input').focus()
+        this.update_title = this.$route.params.title ? this.$route.params.title : ''
         if (this.topic_id) {
             this.getTopic()
             $('#isbn_input input').focus()
+        } else {
+            this.$nextTick(() => {
+                $('#title_input input').focus()
+            })
         }
     },
     methods: {
         prePage() {
             this.$router.go('-1')
+        },
+        // 点击修改 仓库名称 自动聚焦
+        proUpdate() {
+            this.update = true
+            this.title = this.update_title
+            this.$nextTick(() => {
+                $('#title_input input').focus()
+            })
+        },
+        confirmUpdate() {
+            if (this.title == '') {
+                this.$message.info('请填写专题名称')
+                $('#title_input input').focus()
+                return
+            }
+            axios.post('/v1/topic/update', {
+                "id": this.topic_id, //话题的id
+                "title": this.title //名称
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.update_title = this.title
+                    this.update = false
+                    this.$message.info('更新成功！')
+                }
+            })
         },
         getTopic() {
             axios.post('/v1/topic/topics_info', {
@@ -90,7 +122,7 @@ export default {
                 }
             })
         },
-        submit() {
+        addTopic() {
             //检查话题名称、书本数量
             if (this.title == '') {
                 this.$message.info('请填写专题名称')
@@ -102,13 +134,6 @@ export default {
                 $('#isbn_input input').focus()
                 return
             }
-            if (this.topic_id != '') {
-                this.updateTopic()
-            } else {
-                this.addTopic()
-            }
-        },
-        addTopic() {
             let data = {
                 "title": this.title, //话题名称
                 "sort": 1, //优先级 1 低 2 中 3 高
@@ -122,17 +147,6 @@ export default {
             axios.post('/v1/topic/add', data).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.$message.info('添加成功！')
-                    this.$router.push('topic')
-                }
-            })
-        },
-        updateTopic() {
-            axios.post('/v1/topic/update', {
-                "id": this.topic_id, //话题的id
-                "title": this.title //名称
-            }).then(resp => {
-                if (resp.data.message == 'ok') {
-                    this.$message.info('更新成功！')
                     this.$router.push('topic')
                 }
             })
@@ -272,7 +286,7 @@ export default {
 
 <style lang="scss">
 .el-input {
-    width: 300px;
+    width: 220px;
 }
 .pre_page {
     &:hover {
@@ -280,10 +294,7 @@ export default {
         cursor: pointer;
     }
 }
-.submit_btn {
-    padding: 20px 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
+.margin_right20 {
+    margin-right: 20px;
 }
 </style>
