@@ -108,9 +108,13 @@ export default {
         },
         // 确定修改 仓库名称
         confirmUpdateDepot() {
+            if (this.p_depot.update_name == '') {
+                this.$message.warning('未输入任何内容')
+                return
+            }
             axios.post('/v1/location/update_location', {
                 id: this.p_depot.id,
-                name: this.p_depot.name
+                name: this.p_depot.update_name
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.p_depot.name = this.p_depot.update_name

@@ -84,8 +84,8 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column prop="update_at" label="修改时间" width="160"></el-table-column>
-            <el-table-column label="操作" fixed="right" width="120">
+            <!-- <el-table-column prop="update_at" label="修改时间" width="160"></el-table-column> -->
+            <el-table-column label="操作" width="120">
                 <template scope="scope">
                     <el-button type="text" size="small" @click="preEdit(scope.$index)" icon="edit"></el-button>
                     <el-button type="text" style="color:#FF4949" size="small" @click="proDelete(scope.$index)" icon="delete"></el-button>
@@ -200,8 +200,10 @@ import {
     isObjectValueEqual
 } from '../../scripts/utils'
 import {
+    handleLocation,
     checkLocation,
-    getLocationLabel
+    getLocationLabel,
+    handleGoodsLocation
 } from './utils'
 import axios from "../../scripts/http"
 import {
@@ -295,7 +297,7 @@ export default {
             categories: []
         }
     },
-    beforeMount() {
+    created() {
         this.getLocations()
     },
     mounted() {
@@ -319,36 +321,9 @@ export default {
                 "level": 3
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    this.locations = this.handleLocation(resp.data.data)
+                    this.locations = handleLocation(resp.data.data)
                 }
             })
-        },
-        handleLocation(locations) {
-            locations.forEach(d => {
-                d.value = d.id
-                d.label = d.name
-                if (d.children.length > 0) {
-                    d.children.forEach(s => {
-                        s.value = s.id
-                        s.label = s.name
-                        if (s.children.length > 0) {
-                            s.children.forEach(f => {
-                                f.value = f.id
-                                f.label = f.name
-                                delete f.children
-                                return f
-                            })
-                        } else {
-                            delete s.children
-                        }
-                        return s
-                    })
-                } else {
-                    delete d.children
-                }
-                return d
-            })
-            return locations
         },
         getData() {
             var self = this
@@ -373,16 +348,20 @@ export default {
                         if (item.new_book) {
                             item.has_new_book = true
                             item.new_book.price = priceFloat(item.new_book.price)
-                            item.new_book.location.forEach(lo => {
-                                lo.location_str = self.getGoodsLocationStr(lo.storehouse_id, lo.shelf_id, lo.floor_id)
-                            })
+                            if (item.new_book.location.length > 0) {
+                                item.new_book.location = handleGoodsLocation(self.locations,item.new_book.location)
+                            } else {
+                                item.new_book.location = []
+                            }
                         }
                         if (item.old_book) {
                             item.has_old_book = true
                             item.old_book.price = priceFloat(item.old_book.price)
-                            item.old_book.location.forEach(lo => {
-                                lo.location_str = self.getGoodsLocationStr(lo.storehouse_id, lo.shelf_id, lo.floor_id)
-                            })
+                            if (item.old_book.location.length > 0) {
+                                item.old_book.location = handleGoodsLocation(self.locations,item.old_book.location)
+                            } else {
+                                item.old_book.location = []
+                            }
                         }
                         return item
                     })
@@ -390,32 +369,6 @@ export default {
                 }
                 self.loading = false
             })
-        },
-        getGoodsLocationStr(storehouse_id, shelf_id, floor_id) {
-            var location = ''
-            var locations = this.locations
-            locations.forEach(st => {
-                if (st.value == storehouse_id) {
-                    location += st.name
-                    location += '-'
-                    if (st.children) {
-                        st.children.forEach(sh => {
-                            if (sh.value == shelf_id) {
-                                location += sh.name
-                                location += '-'
-                            }
-                            if (sh.children) {
-                                sh.children.forEach(fl => {
-                                    if (fl.value == floor_id) {
-                                        location += fl.name
-                                    }
-                                })
-                            }
-                        })
-                    }
-                }
-            })
-            return location
         },
         handleSizeChange(size) {
             this.size = size
@@ -468,7 +421,20 @@ export default {
             this.book_info_bak = JSON.parse(JSON.stringify(data.book))
             this.book_info = JSON.parse(JSON.stringify(data.book))
             this.goods_id = data.goods_id
-            this.getGoodsInfo()
+            if (data.has_new_book) {
+                this.new_book.stock = data.new_book.amount
+                this.new_book.amount = data.new_book.amount
+                this.new_book.price = data.new_book.price
+                this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
+                this.new_book.locations_strs = data.new_book.location
+            }
+            if (data.has_old_book) {
+                this.old_book.stock = data.old_book.amount
+                this.old_book.amount = data.old_book.amount
+                this.old_book.price = data.old_book.price
+                this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
+                this.old_book.locations_strs = data.old_book.location
+            }
             this.book_info_show = true
         },
         confirmEdit() {
@@ -689,93 +655,6 @@ export default {
             } else {
                 this.new_book.price = parseFloat(this.new_book.price).toFixed(2)
                 this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
-            }
-        },
-        getGoodsInfo() {
-            axios.post('/v1/goods/search', {
-                "isbn": this.book_info.isbn,
-                "search_amount": "0",
-                "search_type": "-100",
-                "search_picture": "-100"
-            }).then(resp => {
-                if (resp.data.message == 'ok') {
-                    if (resp.data.data.length > 0) {
-                        var data = resp.data.data[0]
-                        if (data.new_book) {
-                            console.log('>>>>>----- have new_book ----->');
-                            console.log(data.new_book.location);
-                            this.new_book.stock = data.new_book.amount
-                            this.new_book.amount = data.new_book.amount
-                            this.new_book.price = priceFloat(data.new_book.price)
-                            this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
-                            if (data.new_book.location.length > 0) {
-                                this.handleGoodsLocations(data.new_book.location, 0)
-                            } else {
-                               this.new_book.locations_strs = []
-                            }
-                        }
-                        if (data.old_book) {
-                            console.log('>>>>>----- have old_book ----->');
-                            console.log(data.old_book.location);
-                            this.old_book.stock = data.old_book.amount
-                            this.old_book.amount = data.old_book.amount
-                            this.old_book.price = priceFloat(data.old_book.price)
-                            this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
-                            if (data.old_book.location.length > 0) {
-                                this.handleGoodsLocations(data.old_book.location, 1)
-                            } else {
-                                this.old_book.locations_strs = []
-                            }
-                        }
-                    }
-                }
-            })
-        },
-        handleGoodsLocations(locations, type) {
-            var stores = this.locations
-            var temp_locations = []
-            var store
-            //遍历stores
-            for (var i = 0; i < stores.length; i++) {
-                store = stores[i]
-                //遍历shelfs
-                var shelfs = store.children
-                if (shelfs == undefined) {
-                    continue
-                }
-                for (var j = 0; j < shelfs.length; j++) {
-                    var shelf = shelfs[j]
-                    //遍历 floors
-                    var floors = shelf.children
-                    if (floors == undefined) {
-                        continue
-                    }
-                    for (var k = 0; k < floors.length; k++) {
-                        var floor = floors[k]
-                        for (var m = 0; m < locations.length; m++) {
-                            if (locations[m].floor_id == floor.value) {
-                                if (store.value == undefined || shelf.value == undefined || floor.value == undefined) {
-                                    continue
-                                }
-                                var temp_location = {
-                                    "id": locations[m].id, //货架id
-                                    "storehouse_id": store.value, //仓库id
-                                    "shelf_id": shelf.value, //货架id
-                                    "floor_id": floor.value,
-                                    location_str: store.label + '-' + shelf.label + '-' + floor.label
-                                }
-                                temp_locations.push(temp_location)
-                            }
-                        }
-                    }
-                }
-            }
-            console.log(temp_locations);
-            if (type == 0) {
-                this.new_book.locations_strs = temp_locations
-            }
-            if (type == 1) {
-                this.old_book.locations_strs = temp_locations
             }
         },
         beforeAvatarUpload(file) {
