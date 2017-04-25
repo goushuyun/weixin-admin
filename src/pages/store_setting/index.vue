@@ -40,6 +40,9 @@ export default {
             activeName: 'location'
         };
     },
+    mounted() {
+        this.$router.push('location')
+    },
     methods: {
         handleClick(tab, event) {
             this.activeName = tab.name

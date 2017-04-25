@@ -107,7 +107,7 @@
               <el-menu-item index="/admin/store_info/cloud_store">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息
               </el-menu-item>
-              <el-menu-item index="/admin/store_setting/location/">
+              <el-menu-item index="/admin/store_setting/">
                   <i class="fa fa-cog" aria-hidden="true"></i>店铺设置
               </el-menu-item>
               <el-menu-item index="/admin/weixin_setting/">

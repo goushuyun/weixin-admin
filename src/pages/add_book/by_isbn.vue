@@ -34,7 +34,14 @@
     display: block;
 }
 .el-form {
-    .el-cascader,
+    .el-cascader {
+        width: 260px;
+        margin-right: 10px;
+        .el-cascader-menus  {
+            width: 260px;
+            // margin-right: 10px;
+        }
+    }
     .el-input {
         width: 260px;
         margin-right: 10px;
@@ -114,7 +121,8 @@ import axios from "../../scripts/http"
 import {
     isISBNFormat,
     priceFloat,
-    priceInt
+    priceInt,
+    isObjectValueEqual
 } from "../../scripts/utils"
 export default {
     data() {
@@ -130,6 +138,7 @@ export default {
                 image: '',
                 price: ''
             },
+            book_info_bak: {},
             rules: {
                 isbn: [{
                     required: true,
@@ -164,10 +173,7 @@ export default {
                 amount: '',
                 stock: 0,
                 discount: '',
-                locations: [{
-                    value: 'old_all',
-                    label: '-->展开全部位置<--'
-                }]
+                locations: []
             },
             //新书
             new_book: {
@@ -176,10 +182,7 @@ export default {
                 amount: '',
                 stock: 0,
                 discount: '',
-                locations: [{
-                    value: 'new_all',
-                    label: '-->展开全部位置<--'
-                }]
+                locations: []
             },
             /* 上传logo的数据 */
             imagesFormData: {
@@ -187,10 +190,7 @@ export default {
                 token: ''
             },
 
-            locations: [{
-                value: 'all',
-                label: '-->展开全部位置<--'
-            }]
+            locations: []
         };
     },
     computed: {
@@ -269,16 +269,14 @@ export default {
         },
         reset(formName) {
             this.$refs[formName].resetFields();
+            this.book_info.image = ''
             //二手书
             this.old_book = {
                 location: [],
                 price: '',
                 amount: '',
                 discount: '',
-                locations: [{
-                    value: 'old_all',
-                    label: '-->展开全部位置<--'
-                }]
+                locations: this.locations
             }
             //新书
             this.new_book = {
@@ -286,10 +284,7 @@ export default {
                 price: '',
                 amount: '',
                 discount: '',
-                locations: [{
-                    value: 'new_all',
-                    label: '-->展开全部位置<--'
-                }]
+                locations: this.locations
             }
             $('#isbn input').focus()
         },
@@ -307,7 +302,7 @@ export default {
                 if (resp.data.message == 'ok') {
                     console.log(resp.data.data);
                     var data = resp.data.data
-                    this.book_info = {
+                    var book = {
                         id: data.id,
                         isbn: data.isbn,
                         title: data.title,
@@ -316,6 +311,8 @@ export default {
                         image: data.image,
                         price: priceFloat(data.price)
                     }
+                    this.book_info_bak = JSON.parse(JSON.stringify(book))
+                    this.book_info = JSON.parse(JSON.stringify(book))
                     this.getGoodsInfo()
                     this.loading = false
                 }
@@ -337,10 +334,11 @@ export default {
                             this.new_book.price = priceFloat(data.new_book.price)
                             this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
                             if (data.new_book.location.length > 0) {
+                                // var new_location = data.new_book.location[0]
                                 var new_location = data.new_book.location[0]
+                                console.log([new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]);
                                 this.new_book.location = [new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]
                                 this.handleGoodsLocations(data.new_book.location, 0)
-
                             }
                         }
                         if (data.old_book) {
@@ -350,6 +348,7 @@ export default {
                             this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
                             if (data.old_book.location.length > 0) {
                                 var old_location = data.old_book.location[0]
+                                console.log([old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]);
                                 this.old_book.location = [old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]
                                 this.handleGoodsLocations(data.old_book.location, 1)
                             }
@@ -419,7 +418,6 @@ export default {
                 }
                 temp_locations.push(temp)
                 this.old_book.locations = temp_locations
-
             }
         },
         insertLocations(locations, location) {
@@ -445,9 +443,6 @@ export default {
             return locations
         },
         handleChange(val) {
-            if (val[0] != 'old_all' && val[0] != 'new_all') {
-                return
-            }
             if (val[0] == 'old_all') {
                 this.old_book.locations = this.locations
             }
@@ -460,7 +455,18 @@ export default {
                 "level": 3
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    this.locations = this.handleLocation(resp.data.data)
+                    var locations = this.handleLocation(resp.data.data)
+                    if (locations.length == 0) {
+                        this.$alert('请移步“仓库设置”添加仓库和货架位', '提示', {
+                            confirmButtonText: '确定',
+                            callback: action => {
+                                this.$router.push('/admin/store_setting/location')
+                            }
+                        });
+                    }
+                    this.locations = locations
+                    this.old_book.locations = this.locations
+                    this.new_book.locations = this.locations
                 }
             })
         },
@@ -574,18 +580,38 @@ export default {
                         }
                         data.location.push(old_book)
                     }
-                    axios.post('/v1/goods/add', data).then(resp => {
-                        if (resp.data.message == 'ok') {
-                            this.$message.success('图书上架成功')
-                            this.reset('book_info')
-                            console.log('>>>>>----- success ----->');
-                        }
-                    })
+                    if (isObjectValueEqual(this.book_info_bak, this.book_info)) {
+                        this.confirmAddBook(data)
+                    } else {
+                        axios.post('/v1/books/modify_book_info', {
+                            "id":this.book_info.id,
+                            "isbn":this.book_info.isbn,
+                            "title":this.book_info.title,
+                            "publisher":this.book_info.publisher,
+                            "author":this.book_info.author,
+                            "price":priceInt(this.book_info.price),
+                            "image":this.book_info.image
+                        }).then(resp => {
+                            if (resp.data.message == 'ok') {
+                                data.book_id = resp.data.data.id
+                                this.confirmAddBook(data)
+                            }
+                        })
+                    }
                 } else {
                     console.log('error submit!!');
                     return false;
                 }
             });
+        },
+        confirmAddBook(data) {
+            axios.post('/v1/goods/add', data).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.$message.success('图书上架成功')
+                    this.reset('book_info')
+                    console.log('>>>>>----- success ----->');
+                }
+            })
         }
     }
 }

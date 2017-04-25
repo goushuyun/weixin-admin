@@ -69,34 +69,6 @@ export default [{
             component: real_store
         }]
     }, {
-        name: 'topic',
-        path: 'recommend/topic',
-        component: topic
-    }, {
-        name: 'weixin_setting',
-        path: 'weixin_setting',
-        component: weixin_setting
-    }, {
-        name: 'add_topic',
-        path: 'recommend/add_topic',
-        component: add_topic
-    }, {
-        name: 'carousel',
-        path: 'recommend/carousel',
-        component: carousel
-    }, {
-        name: 'stock_list',
-        path: 'stock_manage/stock_list',
-        component: stock_list
-    }, {
-        name: 'by_isbn',
-        path: 'add_book/by_isbn',
-        component: by_isbn
-    }, {
-        name: 'by_excel',
-        path: 'add_book/by_excel',
-        component: by_excel
-    }, {
         name: 'store_setting',
         path: 'store_setting',
         component: store_setting,
@@ -125,5 +97,33 @@ export default [{
             name: "service",
             component: service
         }]
+    }, {
+        name: 'topic',
+        path: 'recommend/topic',
+        component: topic
+    }, {
+        name: 'weixin_setting',
+        path: 'weixin_setting',
+        component: weixin_setting
+    }, {
+        name: 'add_topic',
+        path: 'recommend/add_topic',
+        component: add_topic
+    }, {
+        name: 'carousel',
+        path: 'recommend/carousel',
+        component: carousel
+    }, {
+        name: 'stock_list',
+        path: 'stock_manage/stock_list',
+        component: stock_list
+    }, {
+        name: 'by_isbn',
+        path: 'add_book/by_isbn',
+        component: by_isbn
+    }, {
+        name: 'by_excel',
+        path: 'add_book/by_excel',
+        component: by_excel
     }]
 }]
