@@ -128,40 +128,12 @@ export default {
         },
         addTopic() {
             this.$router.push('add_topic')
-            // this.$prompt('请输入话题名称', '话题名称', {
-            //     confirmButtonText: '确定',
-            //     cancelButtonText: '取消',
-            // }).then(({
-            //     value
-            // }) => {
-            //     // add store
-            //     let name = value.trim()
-            //     axios.post('/v1/location/add_location', {
-            //         name
-            //     }).then(resp => {
-            //         if (resp.data.message = 'ok') {
-            //             // this.getLocations()
-            //             var id = resp.data.data.id
-            //             var name = resp.data.data.name
-            //             this.$router.push({
-            //                 name: 'shelf',
-            //                 params: {
-            //                     id,
-            //                     name
-            //                 }
-            //             })
-            //         }
-            //         this.$message.success('仓库添加成功！')
-            //     })
-            // }).catch(() => {
-            //     this.$message.info('已取消输入')
-            // });
         }
     }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .add_topic {
     padding: 10px 0 20px;
 }

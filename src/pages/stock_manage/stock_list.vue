@@ -77,10 +77,10 @@
             <el-table-column label="位置" min-width="180">
                 <template scope="scope">
                     <div v-if="scope.row.has_new_book" class="goods_item new_color ellipsis">
-                        <span v-for="item in scope.row.new_book.location">{{item.location_str + '；'}}</span>
+                        <span v-for="(item,index) in scope.row.new_book.location">{{item.location_str + (index + 1 == scope.row.new_book.location.length ? '' : '，')}}</span>
                     </div>
                     <div v-if="scope.row.has_old_book" class="goods_item old_color ellipsis">
-                        <span v-for="item in scope.row.old_book.location">{{item.location_str + '；'}}</span>
+                        <span v-for="(item,index) in scope.row.old_book.location">{{item.location_str + (index + 1 == scope.row.old_book.location.length ? '' : '，')}}</span>
                     </div>
                 </template>
             </el-table-column>
