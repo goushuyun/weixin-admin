@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="container">
     <div class="top_bar">
-        <h2 class="title"><span class="pre_page"  @click="prePage">话题推荐</span> / 添加话题</h2>
+        <h2 class="title"><span class="pre_page"  @click="prePage">话题推荐</span> / {{topic_id ? '编辑' : '添加'}}话题</h2>
     </div>
     <div class="content_inner">
 
