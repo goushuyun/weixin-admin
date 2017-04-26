@@ -4,8 +4,23 @@
         <h2 class="title">轮播图</h2>
     </div>
     <div class="content_inner">
+      <div v-show="show_tip" class="tip_area">
+        <div class="info_area" style="text-align:right">
+          <i style="color:#50BFFF;" class="el-notification__icon el-icon-information"></i>
+        </div>
+        <div style="margin-left:50px;">
+          <p><span class="title">点击左侧图片修改轮播图</span></p>
+          <p>1.支持 jpg、jpeg、png 格式图片；</p>
+          <p>2.建议图片尺寸 375 px X 150 px ；</p>
+          <p>3.图片大小不要超过2M</p>
+        </div>
+        <div class="delete_btn" style="text-align:right">
+          <i style="color:#97A8B1;" class="el-icon-close" @click.stop="show_tip = false"></i>
+        </div>
+      </div>
+      
       <div v-for="(item,index) in circulars" class="row_area">
-          <el-row v-loading="item.loading" element-loading-text="拼命加载中">
+          <el-row v-loading="item.loading" element-loading-text="正在检索图书">
             <el-col style="width:400px;">
               <div style="width:360px;" @click.stop="getIndex(index)">
                 <el-upload
@@ -33,7 +48,7 @@
                   <el-col :span="24">
                     <el-radio :label="2">点击轮播图跳转到某本书</el-radio>
                     <el-button type="text" v-if="!item.isbn_flag && item.type == 2" style="margin:0 20px">{{item.isbn}}</el-button>
-                    <el-input v-if="item.isbn_flag && item.type == 2" style="margin:0 20px" :id="'num_' + index" v-model="item.update_isbn" size="small" :maxlength="13"></el-input>
+                    <el-input v-if="item.isbn_flag && item.type == 2" style="margin:0 20px" :id="'num_' + index" v-model="item.update_isbn" size="small" :maxlength="13" placeholder="请输入13位ISBN"></el-input>
                     <el-button v-if="!item.isbn_flag && item.type == 2" type="text" @click="proUpdateIsbn(index)">{{item.isbn?'修改':'添加'}}</el-button>
                     <el-button v-if="item.isbn_flag && item.type == 2" type="text" @click="confirmUpdateIsbn(index)">确定</el-button>
                     <el-button v-if="item.isbn_flag && item.type == 2" type="text" style="color:#13CE66" @click="cancelUpdate(index)">取消</el-button>
@@ -41,7 +56,7 @@
                 </el-row>
                 <el-row class="radio_area">
                   <el-col :span="24">
-                    <el-radio :label="3">点击轮播图跳转到否个话题</el-radio>
+                    <el-radio :label="3">点击轮播图跳转到某个话题</el-radio>
                     <el-button type="text" v-if="!item.topic_flag && item.type == 3" style="margin:0 20px">{{item.topic}}</el-button>
                     <el-select v-if="item.topic_flag && item.type == 3" style="margin:0 20px" v-model="item.source_id" size="small" placeholder="请选择">
                       <el-option v-for="topic in item.topics" :label="topic.title" :value="topic.id"></el-option>
@@ -64,6 +79,7 @@ import axios from "../../../scripts/http"
 export default {
     data() {
         return {
+            show_tip: false,
             TEN: 10, // 通过参数的十位上的数获取该index
             circulars: [],
             circulars_bak: [],
@@ -80,11 +96,6 @@ export default {
     },
     mounted() {
         this.getTopics()
-        this.$notify.info({
-          title: '点击左侧图片修改轮播图',
-          message: '1.支持 jpg、jpeg、png 格式图片；2.建议图片尺寸 375 px X 150 px ；3.图片大小不要超过2M',
-          duration: 0
-        });
     },
     methods: {
         getTopics() {
@@ -139,6 +150,7 @@ export default {
                     this.getToken()
                     // 备份数据
                     this.circulars_bak = JSON.parse(JSON.stringify(this.circulars))
+                    this.show_tip = true
                 }
             })
         },
@@ -197,8 +209,17 @@ export default {
                 "search_picture": -100,	//required -100 过滤这个线索 0 查找图片不为空的商品 1查找图片为空的商品
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    this.circulars[index].source_id = resp.data.data[0].goods_id
-                    this.updateCircular(index)
+                    if (resp.data.data.length > 0) {
+                        this.circulars[index].source_id = resp.data.data[0].goods_id
+                        this.updateCircular(index)
+                    } else {
+                        this.$message.warning('没找到这本书！')
+                        this.circulars[index].loading = false
+                        this.$nextTick(function() {
+                            $('#num_' + index + ' input').focus()
+                        })
+                        return
+                    }
                 }
             })
         },
@@ -293,6 +314,37 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.tip_area {
+    padding: 20px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 1px solid #BFCBD9;
+    box-shadow: 0 0 10px rgba(0, 0, 0,.1);
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    width: 300px;
+    p {
+        line-height: 20px;
+        color: #8391A5;
+        font-size: 14px;
+        .title {
+          line-height: 30px;
+          font-size: 16px;
+          color: #1F2D3D;
+        }
+    }
+    .info_area {
+        position: absolute;
+        left: 20px;
+        top: 20px;
+    }
+    .delete_btn {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+}
 .row_area {
     margin:20px;
     padding: 10px;
@@ -307,7 +359,8 @@ export default {
     width: 100%;
     height: 100%;
 }
-.el-input {
+.el-input,
+.el-select {
     margin-left: 50px;
     width: 180px;
 }
