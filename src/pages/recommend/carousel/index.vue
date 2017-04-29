@@ -18,7 +18,7 @@
           <i style="color:#97A8B1;" class="el-icon-close" @click.stop="show_tip = false"></i>
         </div>
       </div>
-      
+
       <div v-for="(item,index) in circulars" class="row_area">
           <el-row v-loading="item.loading" element-loading-text="正在检索图书">
             <el-col style="width:400px;">
@@ -227,6 +227,7 @@ export default {
         // 准备修改 type 为 3
         proUpdateTopic(index) {
             this.circulars[index].topic_flag = true
+            this.circulars[index].source_id = ''
         },
         // 点击 “确认” 修改 type 为 3
         confirmUpdateTopic(index) {
@@ -324,6 +325,7 @@ export default {
     border-radius: 4px;
     background-color: #FFFFFF;
     width: 300px;
+    z-index: 2;
     p {
         line-height: 20px;
         color: #8391A5;
@@ -362,6 +364,6 @@ export default {
 .el-input,
 .el-select {
     margin-left: 50px;
-    width: 180px;
+    width: 180px !important;
 }
 </style>

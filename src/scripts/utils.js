@@ -51,4 +51,17 @@ function priceInt (price) {
 function isObjectValueEqual(a, b) {
     return JSON.stringify(a) == JSON.stringify(b);
 }
-export {testMobile, testPassword, testMsgCode, getTimeVal, stamp2date, isISBNFormat, priceFloat, priceInt, isObjectValueEqual}
+
+// 判断支付方式
+function checkPayChannel(pay_channel) {
+    var pay_wx = /^wx/
+    var pay_al = /^alipay/
+    if (pay_wx.test(pay_channel)) {
+        return '微信支付'
+    }
+    if (pay_al.test(pay_channel)) {
+        return '支付宝'
+    }
+}
+
+export {testMobile, testPassword, testMsgCode, getTimeVal, stamp2date, isISBNFormat, priceFloat, priceInt, isObjectValueEqual, checkPayChannel}
