@@ -1,6 +1,12 @@
 // 将组件抽离成不同的代码块，当路由访问到的时候再去加载，实现路由懒加载
 const shops = r => require(['../pages/shops/shops'], r)
 
+// * 订单管理
+// ** 订单列表
+const order_list = r => require(['../pages/order_manage/order_list'], r)
+// ** 订单详情
+const order_detail = r => require(['../pages/order_manage/order_detail'], r)
+
 // * 推荐管理
 // *** 话题推荐
 const topic = r => require(['../pages/recommend/topic/index'], r)
@@ -69,6 +75,14 @@ export default [{
             component: real_store
         }]
     }, {
+        path: 'order/detail',
+        name: 'order_detail',
+        component: order_detail
+    }, {
+        path: 'order/list',
+        name: 'order_list',
+        component: order_list
+    }, {
         name: 'store_setting',
         path: 'store_setting',
         component: store_setting,
@@ -101,11 +115,7 @@ export default [{
         name: 'topic',
         path: 'recommend/topic',
         component: topic
-    }, {
-        name: 'weixin_setting',
-        path: 'weixin_setting',
-        component: weixin_setting
-    }, {
+    },  {
         name: 'add_topic',
         path: 'recommend/add_topic',
         component: add_topic
@@ -125,5 +135,9 @@ export default [{
         name: 'by_excel',
         path: 'add_book/by_excel',
         component: by_excel
+    }, {
+        name: 'weixin_setting',
+        path: 'weixin_setting',
+        component: weixin_setting
     }]
 }]

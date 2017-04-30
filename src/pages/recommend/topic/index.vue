@@ -11,20 +11,13 @@
           <el-table :data="topics" border stripe style="width: 100%">
             <el-table-column prop="sort" label="优先级" width="180">
                 <template scope="scope">
-                    <el-select v-model="scope.row.sort" size="small" @change="updateTopicSort(scope.row.id,scope.row.sort)">
-                      <el-option label="低级"value="1">
-                        <span style="float: left">1</span>
-                        <span style="float: right; color: #8492a6; font-size: 13px">低级</span>
-                      </el-option>
-                      <el-option label="中级" value="2">
-                        <span style="float: left">2</span>
-                        <span style="float: right; color: #8492a6; font-size: 13px">中级</span>
-                      </el-option>
-                      <el-option label="高级" value="3">
-                        <span style="float: left">3</span>
-                        <span style="float: right; color: #8492a6; font-size: 13px">高级</span>
-                      </el-option>
-                    </el-select>
+                    <el-rate
+                      v-model="scope.row.sort"
+                      :max="3"
+                      show-text
+                      :texts="['低','中','高']"
+                      @change="updateTopicSort(scope.row.id,scope.row.sort)">
+                    </el-rate>
                 </template>
             </el-table-column>
             <el-table-column prop="title" label="专题名" width="180">
@@ -83,7 +76,7 @@ export default {
             })
         },
         updateTopicSort(id, sort) {
-            console.log(id + sort);
+            console.log(id + '-- 等级 -->' + sort);
             axios.post('/v1/topic/update', {
                 "id": id, //话题的id
                 "sort":sort

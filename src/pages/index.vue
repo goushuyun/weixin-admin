@@ -78,6 +78,12 @@
         </div>
 
         <el-menu theme="dark" mode="vertical" :router="true">
+            <el-submenu index="5">
+              <template slot="title"><i class="fa fa-delicious" aria-hidden="true"></i>订单管理</template>
+              <el-menu-item index="/admin/order/list">
+                  <i class="fa fa-list" aria-hidden="true"></i></i>全部订单
+              </el-menu-item>
+            </el-submenu>
             <el-submenu index="1">
               <template slot="title"><i class="fa fa-flag" aria-hidden="true"></i>推荐管理</template>
               <el-menu-item index="/admin/recommend/topic">

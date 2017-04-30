@@ -2,7 +2,7 @@
   <div class="body">
     <div v-for="(store,index) in locations" class="box-card" @click="goToShelf(index)" @mouseover="store.active = true" @mouseleave="store.active = false">
       <div class="item ellipsis" style="margin-top:20px;">{{store.name}}</div>
-      <div class="item">共有 <span style="color:#20A0FF;font-size:18px;">{{store.children_amount}}</span> 个货架</div>
+      <div class="item" style="font-size:13px;color:#888888">共有 <span style="color:#20A0FF;font-size:18px;">{{store.children_amount}}</span> 个货架</div>
       <div class="delete_btn" style="text-align:right">
         <i v-show="store.active" style="color:#FF4949;" class="el-icon-delete2" @click.stop="deleteLocations(store.id)"></i>
       </div>
