@@ -201,15 +201,15 @@ export default {
 
                     // 订单详情
                     var order = data.order
-                    order.order_at = order.order_at ? moment(order.order_at).format('YYYY-MM-DD HH:mm:ss') : 0 //下单时间
-                    order.pay_at = order.pay_at ? moment(order.pay_at).format('YYYY-MM-DD HH:mm:ss') : 0 //支付时间
-                    order.confirm_at = order.confirm_at ? moment(order.confirm_at).format('YYYY-MM-DD HH:mm:ss') : 0 //确认收货时间
-                    order.complete_at = order.complete_at ? moment(order.complete_at).format('YYYY-MM-DD HH:mm:ss') : 0 //订单完成时间
-                    order.after_sale_apply_at = order.after_sale_apply_at ? moment(order.after_sale_apply_at).format('YYYY-MM-DD HH:mm:ss') : 0 //申请售后时间
-                    order.after_sale_end_at = order.after_sale_end_at ? moment(order.after_sale_end_at).format('YYYY-MM-DD HH:mm:ss') : 0 //售后完成时间
-                    order.deliver_at = order.deliver_at ? moment(order.deliver_at).format('YYYY-MM-DD HH:mm:ss') : 0 //发货时间
-                    order.distribute_at = order.distribute_at ? moment(order.distribute_at).format('YYYY-MM-DD HH:mm:ss') : 0 //配送时间
-                    order.print_at = order.print_at ? moment(order.print_at).format('YYYY-MM-DD HH:mm:ss') : 0 //打印时间
+                    order.order_at = order.order_at ? moment.unix(order.order_at).format('YYYY-MM-DD HH:mm:ss') : 0 //下单时间
+                    order.pay_at = order.pay_at ? moment.unix(order.pay_at).format('YYYY-MM-DD HH:mm:ss') : 0 //支付时间
+                    order.confirm_at = order.confirm_at ? moment.unix(order.confirm_at).format('YYYY-MM-DD HH:mm:ss') : 0 //确认收货时间
+                    order.complete_at = order.complete_at ? moment.unix(order.complete_at).format('YYYY-MM-DD HH:mm:ss') : 0 //订单完成时间
+                    order.after_sale_apply_at = order.after_sale_apply_at ? moment.unix(order.after_sale_apply_at).format('YYYY-MM-DD HH:mm:ss') : 0 //申请售后时间
+                    order.after_sale_end_at = order.after_sale_end_at ? moment.unix(order.after_sale_end_at).format('YYYY-MM-DD HH:mm:ss') : 0 //售后完成时间
+                    order.deliver_at = order.deliver_at ? moment.unix(order.deliver_at).format('YYYY-MM-DD HH:mm:ss') : 0 //发货时间
+                    order.distribute_at = order.distribute_at ? moment.unix(order.distribute_at).format('YYYY-MM-DD HH:mm:ss') : 0 //配送时间
+                    order.print_at = order.print_at ? moment.unix(order.print_at).format('YYYY-MM-DD HH:mm:ss') : 0 //打印时间
 
                     order.order_step = this.log2N(order.order_status) //非返回数据，步骤条使用
 
@@ -257,7 +257,7 @@ export default {
                 operateTable.unshift({
                     time: this.order_detail.pay_at,
                     name: '买家',
-                    info: '买家付款，支付方式：' + this.order_detail.pay_channel + '。钱款扣除手续费 ' + this.order_detail.service_fee + ' 元,进入待结算金额。'
+                    info: '买家付款，支付方式：' + this.order_detail.pay_channel + '。钱款扣除手续费 ' + this.order_detail.service_fee + ' 元，进入待结算金额。'
                 })
             }
             // 发货

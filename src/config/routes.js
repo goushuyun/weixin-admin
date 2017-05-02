@@ -7,6 +7,12 @@ const order_list = r => require(['../pages/order_manage/order_list'], r)
 // ** 订单详情
 const order_detail = r => require(['../pages/order_manage/order_detail'], r)
 
+// * 线下零售
+// ** 零售页面
+const retail = r => require(['../pages/offline_retail/retail'], r)
+// ** 零售订单列表
+const retail_list = r => require(['../pages/offline_retail/retail_list'], r)
+
 // * 推荐管理
 // *** 话题推荐
 const topic = r => require(['../pages/recommend/topic/index'], r)
@@ -82,6 +88,14 @@ export default [{
         path: 'order/list',
         name: 'order_list',
         component: order_list
+    }, {
+        path: 'offline/retail',
+        name: 'offline_retail',
+        component: retail
+    }, {
+        path: 'offline/retail_list',
+        name: 'retail_list',
+        component: retail_list
     }, {
         name: 'store_setting',
         path: 'store_setting',

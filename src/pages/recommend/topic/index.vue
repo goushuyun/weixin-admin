@@ -6,18 +6,13 @@
 
       <div class="content_inner">
           <div class="add_topic">
-            <el-button type="primary" size="small" icon="plus" @click="addTopic">添加专题</el-button>
+            <el-button id="add_topic_btn" type="primary" size="small" icon="plus" :disabled="!topics.length" @click="addTopic">添加专题</el-button>
+            <label for="add_topic_btn" style="margin-left:10px;">最多添加 20 个话题</label>
           </div>
           <el-table :data="topics" border stripe style="width: 100%">
             <el-table-column prop="sort" label="优先级" width="180">
                 <template scope="scope">
-                    <el-rate
-                      v-model="scope.row.sort"
-                      :max="3"
-                      show-text
-                      :texts="['低','中','高']"
-                      @change="updateTopicSort(scope.row.id,scope.row.sort)">
-                    </el-rate>
+                    <el-rate v-model="scope.row.sort" :max="3" show-text :texts="['低','中','高']" @change="updateTopicSort(scope.row.id,scope.row.sort)"></el-rate>
                 </template>
             </el-table-column>
             <el-table-column prop="title" label="专题名" width="180">

@@ -77,14 +77,23 @@
         <div class="shop">
         </div>
 
-        <el-menu theme="dark" mode="vertical" :router="true">
-            <el-submenu index="5">
+        <el-menu theme="dark" mode="vertical" :router="true" unique-opened>
+            <el-submenu index="1">
               <template slot="title"><i class="fa fa-delicious" aria-hidden="true"></i>订单管理</template>
               <el-menu-item index="/admin/order/list">
-                  <i class="fa fa-list" aria-hidden="true"></i></i>全部订单
+                  <i class="fa fa-list" aria-hidden="true"></i></i>线上订单
               </el-menu-item>
             </el-submenu>
-            <el-submenu index="1">
+            <el-submenu index="2">
+              <template slot="title"><i class="fa fa-life-ring" aria-hidden="true"></i></i>线下零售</template>
+              <el-menu-item index="/admin/offline/retail">
+                  <i class="fa fa-balance-scale" aria-hidden="true"></i>线下零售
+              </el-menu-item>
+              <el-menu-item index="/admin/offline/retail_list">
+                  <i class="fa fa-list" aria-hidden="true"></i></i>线下订单
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="3">
               <template slot="title"><i class="fa fa-flag" aria-hidden="true"></i>推荐管理</template>
               <el-menu-item index="/admin/recommend/topic">
                   <i class="fa fa-anchor" aria-hidden="true"></i>话题推荐
@@ -93,13 +102,7 @@
                   <i class="fa fa-picture-o" aria-hidden="true"></i>轮播图
               </el-menu-item>
             </el-submenu>
-            <el-submenu index="2">
-              <template slot="title"><i class="fa fa-list-ul" aria-hidden="true"></i>库存管理</template>
-              <el-menu-item index="/admin/stock_manage/stock_list">
-                  <i class="fa fa-university" aria-hidden="true"></i>库存查看
-              </el-menu-item>
-            </el-submenu>
-            <el-submenu index="3">
+            <el-submenu index="4">
               <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>图书上架</template>
               <el-menu-item index="/admin/add_book/by_isbn">
                   <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
@@ -108,7 +111,13 @@
                   <i class="fa fa-file-text" aria-hidden="true"></i>批量上架
               </el-menu-item>
             </el-submenu>
-            <el-submenu index="4">
+            <el-submenu index="5">
+              <template slot="title"><i class="fa fa-list-ul" aria-hidden="true"></i>库存管理</template>
+              <el-menu-item index="/admin/stock_manage/stock_list">
+                  <i class="fa fa-university" aria-hidden="true"></i>库存查看
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="6">
               <template slot="title"><i class="el-icon-setting"></i>设置</template>
               <el-menu-item index="/admin/store_info/cloud_store">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息
