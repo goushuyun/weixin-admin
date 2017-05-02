@@ -14,7 +14,8 @@
                 <el-button v-if="update && topic_id" type="text" style="color:#13CE66" @click="update = false">取消</el-button>
             </el-form-item>
             <el-form-item label="添加书籍" required>
-              <el-input id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
+              <el-input v-if="goods.length < 15" id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
+              <label v-else>每个话题最多可添加 15 本书</label>
               <el-button style="float:right;margin:0 20px" size="small" @click="prePage">返回</el-button>
               <el-button v-if="!topic_id" style="float:right" type="primary" size="small" @click="addTopic">提交发布</el-button>
             </el-form-item>
@@ -27,7 +28,7 @@
             </el-table-column>
             <el-table-column label="出版社" width="200" prop="publisher">
             </el-table-column>
-            <el-table-column label="售价" width="150" prop="price">
+            <el-table-column label="原价" width="150" prop="price">
             </el-table-column>
             <el-table-column label="库存量" width="150" prop="stock">
             </el-table-column>

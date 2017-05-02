@@ -155,16 +155,16 @@
                 <td style="width:220px;text-align:center;color: #3A8AFF;">新书</td>
             </el-form-item>
             <el-form-item label="折 扣">
-                <el-input min="0" type="number" placeholder="二手书折扣"  v-model="old_book.discount" @input="inputDiscount(1)" @blur="blurDiscount(1)"><template slot="append">折</template></el-input>
-                <el-input min="0" type="number" placeholder="新书折扣" v-model="new_book.discount" @input="inputDiscount(0)" @blur="blurDiscount(0)"><template slot="append">折</template></el-input>
+                <el-input :disabled="!old_book.has_old_book" min="0" type="number" placeholder="二手书折扣"  v-model="old_book.discount" @input="inputDiscount(1)" @blur="blurDiscount(1)"><template slot="append">折</template></el-input>
+                <el-input :disabled="!new_book.has_new_book" min="0" type="number" placeholder="新书折扣" v-model="new_book.discount" @input="inputDiscount(0)" @blur="blurDiscount(0)"><template slot="append">折</template></el-input>
             </el-form-item>
             <el-form-item label="价 格">
-                <el-input type="number" min="0" placeholder="二手书价格" v-model="old_book.price" @input="inputPrice(1)" @blur="blurPrice(1)"><template slot="append">元</template></el-input>
-                <el-input type="number" min="0" placeholder="新书价格" v-model="new_book.price" @input="inputPrice(0)" @blur="blurPrice(0)"><template slot="append">元</template></el-input>
+                <el-input :disabled="!old_book.has_old_book" type="number" min="0" placeholder="二手书价格" v-model="old_book.price" @input="inputPrice(1)" @blur="blurPrice(1)"><template slot="append">元</template></el-input>
+                <el-input :disabled="!new_book.has_new_book" type="number" min="0" placeholder="新书价格" v-model="new_book.price" @input="inputPrice(0)" @blur="blurPrice(0)"><template slot="append">元</template></el-input>
             </el-form-item>
             <el-form-item label="数 量">
-                <el-input type="number" min="0" placeholder="二手书数量" v-model="old_book.amount" @input="inputAmount(1)"><template slot="append">当前库存 <span style="color:#1AAD19;font-size:16px">{{old_book.stock}}</span> 本</template></el-input>
-                <el-input type="number" min="0" placeholder="新书数量" v-model="new_book.amount" @input="inputAmount(0)"><template slot="append">当前库存 <span style="color:#3A8AFF;font-size:16px">{{new_book.stock}}</span> 本</template></el-input>
+                <el-input :disabled="!old_book.has_old_book" type="number" min="0" placeholder="二手书数量" v-model="old_book.amount" @input="inputAmount(1)"><template slot="append">当前库存 <span style="color:#1AAD19;font-size:16px">{{old_book.stock}}</span> 本</template></el-input>
+                <el-input :disabled="!new_book.has_new_book" type="number" min="0" placeholder="新书数量" v-model="new_book.amount" @input="inputAmount(0)"><template slot="append">当前库存 <span style="color:#3A8AFF;font-size:16px">{{new_book.stock}}</span> 本</template></el-input>
             </el-form-item>
             <el-form-item label="位 置">
                 <el-row>
@@ -174,7 +174,7 @@
                               <el-button slot="append" style="color:#4DB3FF" @click="preDeleteLocation(index,1)">删除</el-button>
                             </el-input>
                             <el-cascader v-show="old_book.show" style="margin:5px 0;" placeholder="二手书货架位" filterable :options="old_book.locations" v-model="old_book.location" @change="confirmAddOldLocation"></el-cascader>
-                            <el-button v-show="!old_book.show" style="margin:5px 0;" @click="preAddLocation(1)">+ 新增货架位</el-button>
+                            <el-button :disabled="!old_book.has_old_book" v-show="!old_book.show" style="margin:5px 0;" @click="preAddLocation(1)">+ 新增货架位</el-button>
                         </div>
                     </el-col>
                     <el-col style="width: 220px; margin-right: 10px;">
@@ -183,7 +183,7 @@
                               <el-button slot="append" style="color:#4DB3FF" @click="preDeleteLocation(index,0)">删除</el-button>
                             </el-input>
                             <el-cascader v-show="new_book.show" style="margin:5px 0;" placeholder="新书货架位" filterable :options="new_book.locations" v-model="new_book.location" @change="confirmAddNewLocation"></el-cascader>
-                            <el-button v-show="!new_book.show" style="margin:5px 0;" @click="preAddLocation(0)">+ 新增货架位</el-button>
+                            <el-button :disabled="!new_book.has_new_book" v-show="!new_book.show" style="margin:5px 0;" @click="preAddLocation(0)">+ 新增货架位</el-button>
                         </div>
                     </el-col>
                 </el-row>
@@ -273,20 +273,20 @@ export default {
             },
             //二手书
             old_book: {
-                show: false,
-                location: [],
-                price: '',
-                amount: '',
-                stock: 0,
-                discount: '',
-                locations_strs: [],
-                locations: [],
-                location: []
+                has_old_book: false,
+                show: false, //是否显示添加货架位按钮
+                price: '', //价格
+                amount: '', //准备新增的数量
+                stock: 0, //库存
+                discount: '', //折扣
+                locations_strs: [], //货架位名称，如：“A仓库-B货架-1层”
+                locations: [], //全部货架位
+                location: [] //选中的货架位
             },
             //新书
             new_book: {
+                has_new_book: false,
                 show: false,
-                location: [],
                 price: '',
                 amount: '',
                 stock: 0,
@@ -359,6 +359,8 @@ export default {
                             } else {
                                 item.new_book.location = []
                             }
+                        } else {
+                            item.has_new_book = false
                         }
                         if (item.old_book) {
                             item.has_old_book = true
@@ -368,6 +370,8 @@ export default {
                             } else {
                                 item.old_book.location = []
                             }
+                        } else {
+                            item.has_old_book = false
                         }
                         return item
                     })
@@ -427,19 +431,25 @@ export default {
             this.book_info_bak = JSON.parse(JSON.stringify(data.book))
             this.book_info = JSON.parse(JSON.stringify(data.book))
             this.goods_id = data.goods_id
+            this.new_book.has_new_book = data.has_new_book
             if (data.has_new_book) {
                 this.new_book.stock = data.new_book.amount
                 this.new_book.amount = data.new_book.amount
                 this.new_book.price = data.new_book.price
                 this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
                 this.new_book.locations_strs = data.new_book.location
+            } else {
+                this.new_book.stock = 0
             }
+            this.old_book.has_old_book = data.has_old_book
             if (data.has_old_book) {
                 this.old_book.stock = data.old_book.amount
                 this.old_book.amount = data.old_book.amount
                 this.old_book.price = data.old_book.price
                 this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
                 this.old_book.locations_strs = data.old_book.location
+            } else {
+                this.old_book.stock = 0
             }
             this.book_info_show = true
         },

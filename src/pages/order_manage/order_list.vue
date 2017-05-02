@@ -6,26 +6,16 @@
   <div class="content_inner">
     <el-form :inline="true">
         <el-form-item>
-            <el-date-picker :editable="false" v-model="order_time" size="small" type="datetimerange" placeholder="选择下单时间" :picker-options="pickerOptions" @change="getOrders" style="width: 280px;"></el-date-picker>
-        </el-form-item>
-        <el-form-item>
-            <el-select v-model="order_status" style="width: 112px;" placeholder="订单状态" size="small" @change="getOrders">
-                <el-option label="待发货" :value="1"></el-option>
-                <el-option label="已发货" :value="3"></el-option>
-                <el-option label="已完成" :value="7"></el-option>
-                <el-option label="待处理售后" :value="77"></el-option>
-                <el-option label="已处理售后" :value="78"></el-option>
-                <el-option label="全部订单" :value="80"></el-option>
-            </el-select>
-        </el-form-item>
-        <el-form-item>
-            <el-select v-model="school_id" style="width: 165px;" clearable placeholder="学校" size="small" @change="getOrders">
+            <el-select v-model="school_id" style="width: 240px;" clearable placeholder="学校" size="small" @change="getOrders">
                 <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item>
-            <el-input placeholder="搜索值" v-model.trim="search_value" style="width: 280px;" size="small" icon="search" @input="inputSearchValue" :on-icon-click="getOrders">
-                <el-select v-model="search_type" style="width: 130px;" clearable slot="prepend" placeholder="筛选条件" size="small" @change="handleSearchValue">
+            <el-date-picker :editable="false" v-model="order_time" size="small" type="datetimerange" placeholder="选择下单时间" :picker-options="pickerOptions" @change="getOrders" style="width: 300px;"></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+            <el-input placeholder="搜索值" v-model.trim="search_value" style="width: 300px;" size="small" icon="search" @input="inputSearchValue" :on-icon-click="getOrders">
+                <el-select v-model="search_type" style="width: 125px;" clearable slot="prepend" placeholder="筛选条件" size="small" @change="handleSearchValue">
                     <el-option label="订单编号" value="order"></el-option>
                     <el-option label="收货人手机号" value="mobile"></el-option>
                     <el-option label="收货人姓名" value="name"></el-option>
@@ -40,7 +30,7 @@
         </el-form-item>
     </el-form>
     <div class="row">
-      <el-radio-group v-model="order_status" size="small">
+      <el-radio-group v-model="order_status" size="small" @change="getOrders">
         <el-radio-button :label="1">待发货</el-radio-button>
         <el-radio-button :label="3">已发货</el-radio-button>
         <el-radio-button :label="7">已完成</el-radio-button>
@@ -53,6 +43,13 @@
       <el-checkbox v-model="selected_all" style="margin:0 12px;" @change="selectedAllChange">全选</el-checkbox>
       <el-button type="primary" icon="star-off" @click="" size="small">批量打印</el-button>
       <el-button type="primary" icon="star-off" @click="" size="small">批量发货</el-button>
+    </div>
+    <div class="row" v-if="!orders.length">
+      <div class="order_item">
+        <div class="title" style="text-align:center">
+          暂无数据
+        </div>
+      </div>
     </div>
     <div class="row">
       <div class="order_item" v-for="(order,index) in orders">
@@ -283,7 +280,7 @@ export default {
                 if (resp.data.message == 'ok') {
                     self.total_count = resp.data.total_count
                     self.orders = resp.data.data.map(el => {
-                        el.order.pay_at = moment(el.order.pay_at).format('YYYY-MM-DD HH:mm:ss')
+                        el.order.pay_at = moment.unix(el.order.pay_at).format('YYYY-MM-DD HH:mm:ss')
                         el.order.school_name = self.getSchoolName(el.order.school_id)
                         el.order.freight = priceFloat(el.order.freight)
                         el.order.total_fee = priceFloat(el.order.total_fee)
