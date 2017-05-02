@@ -100,7 +100,7 @@
         </el-table>
     </div>
     <div class="pagination">
-        <el-pagination :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+        <el-pagination :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" :total="total_count" @size-change="handleSizeChange" @current-change="handleCurrentChange">
         </el-pagination>
     </div>
     <el-dialog size="mini" :title="'删除《' + deleteDialog.title + '》'" v-model="deleteDialog.show">
@@ -227,6 +227,7 @@ export default {
             search_picture: -100,
             page: 1,
             size: 10,
+            total_count: 0,
 
             tableData: [],
 
@@ -347,6 +348,7 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
+                    self.total_count = resp.data.total_count
                     self.tableData = data.map(item => {
                         item.book.image = item.book.image
                         item.book.price = priceFloat(item.book.price)

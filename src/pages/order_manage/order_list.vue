@@ -168,6 +168,7 @@ export default {
         }
     },
     mounted() {
+        this.getStoreData()
         this.getSchools()
         this.getOrders()
     },
@@ -197,6 +198,19 @@ export default {
             })
         },
         goToDetail(index) {
+            this.$store.commit('setOrderSearch', {
+                order_time: this.order_time, //时间选择器[最早时间,最晚时间]
+                order_status: this.order_status, //订单状态
+                school_id: this.school_id,
+                search_type: this.search_type,
+                search_value: this.search_value,
+                order_id: this.order_id,
+                mobile: this.mobile,
+                name: this.name,
+                isbn: this.isbn,
+                page: this.page,
+                size: this.size
+            })
             var school_name = this.orders[index].order.school_name
             var order_id = this.orders[index].order.id
             this.$router.push({
@@ -221,11 +235,11 @@ export default {
             this.name = ''
             this.isbn = ''
             if (this.search_value.trim() != '') {
-                this.inputSearchValue(0,type)
+                this.inputSearchValue(0, type)
             }
         },
         // 第一个参数为input事件的参数，在此需要使用的是自己传入的参数，即第二个参数
-        inputSearchValue(val,type) {
+        inputSearchValue(val, type) {
             var search_type = this.search_type
             if (type) {
                 search_type = type
@@ -257,6 +271,20 @@ export default {
             this.name = ''
             this.isbn = ''
             this.getOrders()
+        },
+        getStoreData() {
+            var order_search = this.$store.state.order_search
+            this.order_time = order_search.order_time ? order_search.order_time : [null, null]
+            this.order_status = order_search.order_status ? order_search.order_status : 80
+            this.school_id = order_search.school_id ? order_search.school_id : ''
+            this.search_type = order_search.search_type ? order_search.search_type : ''
+            this.search_value = order_search.search_value ? order_search.search_value : ''
+            this.order_id = order_search.order_id ? order_search.order_id : ''
+            this.mobile = order_search.mobile ? order_search.mobile : ''
+            this.name = order_search.name ? order_search.name : ''
+            this.isbn = order_search.isbn ? order_search.isbn : ''
+            this.page = order_search.page ? order_search.page : 1
+            this.size = order_search.size ? order_search.size : 10
         },
         getOrders() {
             if (this.search_value && !this.search_type) {
@@ -291,7 +319,6 @@ export default {
                         })
                         return el
                     })
-                    console.log(self.orders);
                 }
             })
         },
