@@ -16,12 +16,11 @@
                 配送费用：<span class="price">¥ {{(school.express_fee/100).toFixed(2)}}</span>
             </p>
             <p class="operate" v-show="school.active">
-                <el-button type="text" @click="del_school(school.id)">删除</el-button>
+                <el-button type="text" @click.stop="del_school(school.id)">删除</el-button>
             </p>
         </li>
 
         <li class="add" @click="add_school">
-            <!-- <i class="fa fa-plus" aria-hidden="true"></i> -->
             <el-button style="width:100%;height:100%;" type="text">添加学校</el-button>
         </li>
     </ul>

@@ -77,7 +77,7 @@
         <div class="shop">
         </div>
 
-        <el-menu theme="dark" mode="vertical" :router="true" unique-opened>
+        <el-menu theme="dark" mode="vertical" :router="true" unique-opened :default-active="menu_active">
             <el-submenu index="1">
               <template slot="title"><i class="fa fa-delicious" aria-hidden="true"></i>订单管理</template>
               <el-menu-item index="/admin/order/list">
@@ -122,7 +122,7 @@
               <el-menu-item index="/admin/store_info/cloud_store">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息
               </el-menu-item>
-              <el-menu-item index="/admin/store_setting/">
+              <el-menu-item index="/admin/store_setting/location">
                   <i class="fa fa-cog" aria-hidden="true"></i>店铺设置
               </el-menu-item>
               <el-menu-item index="/admin/weixin_setting/">
@@ -153,6 +153,9 @@ export default {
             // get logo from vuex
             let logo = this.$store.state.current_store.logo
             return logo == '' ? 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png' : 'http://onv8eua8j.bkt.clouddn.com/' + logo
+        },
+        menu_active() {
+            return this.$store.state.menu_active
         }
     }
 }

@@ -14,7 +14,7 @@
             <el-date-picker :editable="false" v-model="order_time" size="small" type="datetimerange" placeholder="选择下单时间" :picker-options="pickerOptions" @change="getOrders" style="width: 300px;"></el-date-picker>
         </el-form-item>
         <el-form-item>
-            <el-input placeholder="搜索值" v-model.trim="search_value" style="width: 300px;" size="small" icon="search" @input="inputSearchValue" :on-icon-click="getOrders">
+            <el-input placeholder="搜索值" v-model.trim="search_value" style="width: 290px;" size="small" icon="search" @input="inputSearchValue" :on-icon-click="getOrders">
                 <el-select v-model="search_type" style="width: 125px;" clearable slot="prepend" placeholder="筛选条件" size="small" @change="handleSearchValue">
                     <el-option label="订单编号" value="order"></el-option>
                     <el-option label="收货人手机号" value="mobile"></el-option>
@@ -25,8 +25,8 @@
             </el-input>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click="resetForm" size="small">重置</el-button>
-            <el-button type="primary" @click="test" size="small">导出</el-button>
+            <el-button type="primary" @click="resetForm" size="small"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
+            <el-button type="primary" @click="test" size="small"><i class="fa fa-download" aria-hidden="true"></i> 导出</el-button>
         </el-form-item>
     </el-form>
     <div class="row">
@@ -41,8 +41,8 @@
     </div>
     <div class="row">
       <el-checkbox v-model="selected_all" style="margin:0 12px;" @change="selectedAllChange">全选</el-checkbox>
-      <el-button type="primary" icon="star-off" @click="" size="small">批量打印</el-button>
-      <el-button type="primary" icon="star-off" @click="" size="small">批量发货</el-button>
+      <el-button type="primary" @click="" size="small"><i class="fa fa-truck" aria-hidden="true"></i> 批量发货</el-button>
+      <el-button type="primary" @click="" size="small"><i class="fa fa-print" aria-hidden="true"></i> 批量打印</el-button>
     </div>
     <div class="row" v-if="!orders.length">
       <div class="order_item">
@@ -61,15 +61,15 @@
              <span style="margin:0 10px;">付款时间：{{order.order.pay_at}}</span>
              <span style="margin:0 10px;">学校：{{order.order.school_name}}</span>
              <div class="tag_area">
-                <el-tag v-if="order.order.groupon_id" color="#13CE66">班级购</el-tag>
-                <el-tag v-if="order.order.print_at" color="#F7BA2A">已打印</el-tag>
+                <el-tag v-if="order.order.groupon_id" type="success">班级购</el-tag>
+                <el-tag v-if="order.order.print_at" type="warning">已打印</el-tag>
 
-                <el-tag v-if="order.order.after_sale_status == 1" color="#FF4949">待处理售后</el-tag>
-                <el-tag v-if="order.order.after_sale_status > 1" color="#20A0FF">已处理售后</el-tag>
+                <el-tag v-if="order.order.after_sale_status == 1" type="danger">待处理售后</el-tag>
+                <el-tag v-if="order.order.after_sale_status > 1" type="primary">已处理售后</el-tag>
 
-                <el-tag v-if="order.order.order_status == 1" color="#FF4949">待发货</el-tag>
-                <el-tag v-if="order.order.order_status == 3" color="#20A0FF">已发货</el-tag>
-                <el-tag v-if="order.order.order_status == 7" color="#20A0FF">已完成</el-tag>
+                <el-tag v-if="order.order.order_status == 1" type="danger">待发货</el-tag>
+                <el-tag v-if="order.order.order_status == 3" type="primary">已发货</el-tag>
+                <el-tag v-if="order.order.order_status == 7" type="primary">已完成</el-tag>
              </div>
         </div>
         <div class="detail">
@@ -95,7 +95,7 @@
             <p style="color:#888">（含快递￥{{order.order.freight}}）</p>
           </div>
           <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
-            <el-button type="text" @click="goToDetail(index)">查看详情</el-button>
+            <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-eye" aria-hidden="true"></i> 查看详情</el-button>
             <p v-if="order.order.groupon_id">班级购编号：{{order.order.groupon_id}}</p>
           </div>
         </div>
@@ -172,6 +172,21 @@ export default {
         this.getSchools()
         this.getOrders()
     },
+    destroyed() {
+        this.$store.commit('setOrderSearch', {
+            order_time: this.order_time, //时间选择器[最早时间,最晚时间]
+            order_status: this.order_status, //订单状态
+            school_id: this.school_id,
+            search_type: this.search_type,
+            search_value: this.search_value,
+            order_id: this.order_id,
+            mobile: this.mobile,
+            name: this.name,
+            isbn: this.isbn,
+            page: this.page,
+            size: this.size
+        })
+    },
     methods: {
         test() {
             this.getSelectedOrders()
@@ -198,19 +213,6 @@ export default {
             })
         },
         goToDetail(index) {
-            this.$store.commit('setOrderSearch', {
-                order_time: this.order_time, //时间选择器[最早时间,最晚时间]
-                order_status: this.order_status, //订单状态
-                school_id: this.school_id,
-                search_type: this.search_type,
-                search_value: this.search_value,
-                order_id: this.order_id,
-                mobile: this.mobile,
-                name: this.name,
-                isbn: this.isbn,
-                page: this.page,
-                size: this.size
-            })
             var school_name = this.orders[index].order.school_name
             var order_id = this.orders[index].order.id
             this.$router.push({
@@ -308,6 +310,9 @@ export default {
                 if (resp.data.message == 'ok') {
                     self.total_count = resp.data.total_count
                     self.orders = resp.data.data.map(el => {
+                        if (el.order.order_status >= 17 && el.order.order_status <= 23) {
+                            el.order.order_status = el.order.order_status - 16
+                        }
                         el.order.pay_at = moment.unix(el.order.pay_at).format('YYYY-MM-DD HH:mm:ss')
                         el.order.school_name = self.getSchoolName(el.order.school_id)
                         el.order.freight = priceFloat(el.order.freight)
