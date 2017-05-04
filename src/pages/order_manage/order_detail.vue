@@ -1,7 +1,7 @@
 <template lang="html">
 <div class="container">
   <div class="top_bar">
-      <h2 class="title">订单管理 / 订单详情</h2>
+      <h2 class="title"><span class="pre_page"  @click="goToList">订单管理</span> / 订单详情</h2>
   </div>
   <div class="content_inner">
     <div id="order_status">
@@ -64,7 +64,7 @@
         </div>
         <div class="opt_area" :style="'height:' + 74 * order_items.length + 'px;'">
           <p>
-            <el-button v-if="order_detail.order_status < 3" type="primary" style="width:60px" size="mini" @click="deliver"><i class="fa fa-truck" aria-hidden="true"></i> 发货</el-button>
+            <el-button v-if="order_detail.order_status < 3 && order_detail.after_sale_status == 0" type="primary" style="width:60px" size="mini" @click="deliver"><i class="fa fa-truck" aria-hidden="true"></i> 发货</el-button>
             <el-button type="primary" style="width:60px" size="mini"><i class="fa fa-print" aria-hidden="true"></i> 打印</el-button>
           </p>
           <p v-if="order_detail.groupon_id">班级购编号：{{order_detail.groupon_id}}</p>
@@ -176,38 +176,18 @@ export default {
                 return
             }
             self.refund_loading = true
-            setTimeout(() => {
-                self.order_detail.after_sale_status = 2
+            axios.post('/v1/order/handle_after_sale',{
+                "order_id": self.order_id,
+                "refund_fee": priceInt(self.actual_refund_fee)
+            }).then(resp => {
                 self.refund_loading = false
-            },1500)
-            // var refund_data = {
-            //     id: self.after_sale_info.id,
-            //     total_fee: parseInt(self.after_sale_info.total_fee * 100),
-            //     actual_refund_fee: parseInt(self.actual_refund_fee * 100),
-            //     trade_code: self.after_sale_info.trade_code
-            // }
-            // axios.post('/v1/orders/to_refund',refund_data).then(resp => {
-            //     if (resp.data.code == '00000') {
-            //         if (resp.data.message == 'ok') {
-            //             self.$message({
-            //                 type: 'success',
-            //                 message: '操作成功'
-            //             });
-            //         } else if (resp.data.message == 'NOTENOUGH') {
-            //             self.$message({
-            //                 type: 'warning',
-            //                 message: '余额不足'
-            //             });
-            //         }else {
-            //             self.$message({
-            //                 type: 'error',
-            //                 message: '退款失败'
-            //             });
-            //         }
-            //         self.loadingOrder(self.present_order.order_id)
-            //         self.refund_loading = false
-            //     }
-            // })
+                if (resp.data.message == 'ok') {
+                    self.$message.success('退款成功！');
+                } else {
+                    self.$message.error(resp.data.message);
+                }
+                self.getOrder()
+            })
         },
         checkActualRefundFee() {
             var input = this.actual_refund_fee
@@ -407,6 +387,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.pre_page {
+    &:hover {
+        color: #20A0FF;
+        cursor: pointer;
+    }
+}
 #order_status {
     height: 100px;
     text-align: center;

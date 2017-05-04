@@ -4,21 +4,10 @@
         <h2 class="title">轮播图</h2>
     </div>
     <div class="content_inner">
-      <div v-show="show_tip" class="tip_area">
-        <div class="info_area" style="text-align:right">
-          <i style="color:#50BFFF;" class="el-notification__icon el-icon-information"></i>
-        </div>
-        <div style="margin-left:50px;">
-          <p><span class="title">点击左侧图片修改轮播图</span></p>
-          <p>1.支持 jpg、jpeg、png 格式图片；</p>
-          <p>2.建议图片尺寸 375 px X 150 px ；</p>
-          <p>3.图片大小不要超过2M</p>
-        </div>
-        <div class="delete_btn" style="text-align:right">
-          <i style="color:#97A8B1;" class="el-icon-close" @click.stop="show_tip = false"></i>
-        </div>
-      </div>
-
+      <el-alert
+      title="点击图片可修改轮播图"
+      description="1.仅支持 jpg、jpeg、png 格式的图片；2.图片尺寸 375 px X 150 px；3.图片大小不能超过2M"
+      type="info" :closable="false" show-icon></el-alert>
       <div v-for="(item,index) in circulars" class="row_area">
           <el-row v-loading="item.loading" element-loading-text="正在检索图书">
             <el-col style="width:400px;">
@@ -35,7 +24,6 @@
                   <img v-if="item.image" :src="item.image" class="avatar">
                   <i v-if="!item.image" class="el-icon-upload"></i>
                   <div v-if="!item.image" class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                  <!-- <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过2M</div> -->
                 </el-upload>
               </div>
             </el-col>
@@ -79,7 +67,6 @@ import axios from "../../../scripts/http"
 export default {
     data() {
         return {
-            show_tip: false,
             TEN: 10, // 通过参数的十位上的数获取该index
             circulars: [],
             circulars_bak: [],
@@ -150,7 +137,6 @@ export default {
                     this.getToken()
                     // 备份数据
                     this.circulars_bak = JSON.parse(JSON.stringify(this.circulars))
-                    this.show_tip = true
                 }
             })
         },
@@ -315,40 +301,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tip_area {
-    padding: 20px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    border: 1px solid #BFCBD9;
-    box-shadow: 0 0 10px rgba(0, 0, 0,.1);
-    border-radius: 4px;
-    background-color: #FFFFFF;
-    width: 300px;
-    z-index: 2;
-    p {
-        line-height: 20px;
-        color: #8391A5;
-        font-size: 14px;
-        .title {
-          line-height: 30px;
-          font-size: 16px;
-          color: #1F2D3D;
-        }
-    }
-    .info_area {
-        position: absolute;
-        left: 20px;
-        top: 20px;
-    }
-    .delete_btn {
-        position: absolute;
-        right: 20px;
-        top: 20px;
-    }
-}
 .row_area {
-    margin:20px;
+    margin:20px 0;
     padding: 10px;
     border:1px dashed #BFCBD9;
     border-radius: 4px;
