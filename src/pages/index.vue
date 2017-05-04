@@ -108,9 +108,9 @@
               <el-menu-item index="/admin/add_book/by_isbn">
                   <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
               </el-menu-item>
-              <el-menu-item index="/admin/add_book/by_excel">
+              <!-- <el-menu-item index="/admin/add_book/by_excel">
                   <i class="fa fa-file-text" aria-hidden="true"></i>批量上架
-              </el-menu-item>
+              </el-menu-item> -->
             </el-submenu>
             <el-submenu index="5">
               <template slot="title"><i class="fa fa-list-ul" aria-hidden="true"></i>库存管理</template>

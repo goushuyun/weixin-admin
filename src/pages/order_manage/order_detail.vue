@@ -71,7 +71,8 @@
         </div>
       </div>
       <div class="address_area">
-        收货人信息：{{order_detail.name}}，{{order_detail.mobile}}，{{order_detail.address}}
+        <span style="margin-right:20px">收货人信息：{{order_detail.name}}，{{order_detail.mobile}}，{{order_detail.address}}</span>
+        <span style="color:#FF4949">订单备注：{{order_detail.remark}}</span>
       </div>
     </div>
 
@@ -89,7 +90,7 @@
                     <label class="first-lable">订单总额：</label><label>￥{{order_detail.total_fee}}</label>
                 </div>
                 <div class="info_info">
-                    <label class="first-lable">申请金额：</label><label>￥{{after_sale_detail.refund_fee}}</label>
+                    <label class="first-lable">申请金额：</label><label>￥{{after_sale_detail.apply_refund_fee}}</label>
                 </div>
                 <div class="info_info">
                     <label class="first-lable">申请理由：</label><label>{{after_sale_detail.reason}}</label>
@@ -108,7 +109,7 @@
                 <div class="info_info">
                   <label class="first-lable">退款金额：</label>
                   <label v-if="order_detail.after_sale_status == 1">￥
-                    <el-input placeholder="请输入退款金额" style="width:80px" size="mini" v-model="actual_refund_fee" :maxlength="8"></el-input>
+                    <el-input placeholder="请输入退款金额" style="width:110px" size="mini" v-model="actual_refund_fee" :maxlength="8"></el-input>
                   </label>
                   <label v-else>￥{{after_sale_detail.refund_fee}}</label>
                 </div>
@@ -183,10 +184,10 @@ export default {
                 self.refund_loading = false
                 if (resp.data.message == 'ok') {
                     self.$message.success('退款成功！');
+                    self.getOrder()
                 } else {
                     self.$message.error(resp.data.message);
                 }
-                self.getOrder()
             })
         },
         checkActualRefundFee() {
@@ -280,9 +281,10 @@ export default {
                     // 售后详情
                     if (JSON.stringify(data.after_sale_detail)) {
                         data.after_sale_detail.refund_fee = priceFloat(data.after_sale_detail.refund_fee)
+                        data.after_sale_detail.apply_refund_fee = priceFloat(data.after_sale_detail.apply_refund_fee)
                         this.after_sale_detail = data.after_sale_detail
                         // 默认实际退款金额为申请金额
-                        this.actual_refund_fee = data.after_sale_detail.refund_fee
+                        this.actual_refund_fee = data.after_sale_detail.apply_refund_fee
                     }
 
                     this.operateInfo()

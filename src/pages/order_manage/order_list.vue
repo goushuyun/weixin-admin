@@ -95,12 +95,13 @@
             <p style="color:#888">（含快递￥{{order.order.freight}}）</p>
           </div>
           <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
-            <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-eye" aria-hidden="true"></i> 查看详情</el-button>
+            <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-search" aria-hidden="true"></i> 查看详情</el-button>
             <p v-if="order.order.groupon_id">班级购编号：{{order.order.groupon_id}}</p>
           </div>
         </div>
         <div class="address_area">
-          收货人信息：{{order.order.name}}，{{order.order.mobile}}，{{order.order.address}}
+          <span style="margin-right:20px;">收货人信息：{{order.order.name}}，{{order.order.mobile}}，{{order.order.address}}</span>
+          <span style="color:#FF4949;">订单备注：{{order.order.remark}}</span>
         </div>
       </div>
     </div>
@@ -173,6 +174,19 @@ export default {
         this.getOrders()
     },
     destroyed() {
+        console.log({
+            order_time: this.order_time, //时间选择器[最早时间,最晚时间]
+            order_status: this.order_status, //订单状态
+            school_id: this.school_id,
+            search_type: this.search_type,
+            search_value: this.search_value,
+            order_id: this.order_id,
+            mobile: this.mobile,
+            name: this.name,
+            isbn: this.isbn,
+            page: this.page,
+            size: this.size
+        });
         this.$store.commit('setOrderSearch', {
             order_time: this.order_time, //时间选择器[最早时间,最晚时间]
             order_status: this.order_status, //订单状态
@@ -276,6 +290,7 @@ export default {
         },
         getStoreData() {
             var order_search = this.$store.state.order_search
+            console.log(order_search);
             this.order_time = order_search.order_time ? order_search.order_time : [null, null]
             this.order_status = order_search.order_status ? order_search.order_status : 80
             this.school_id = order_search.school_id ? order_search.school_id : ''
@@ -371,7 +386,7 @@ export default {
         }
     }
     .address_area {
-        height: 30px;
+        // height: 30px;
         line-height: 30px;
         width: 100%;
         border-top: 1px solid #DFE6EC;
