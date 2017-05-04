@@ -6,7 +6,7 @@
 
       <div class="content_inner">
           <div class="add_topic">
-            <el-button id="add_topic_btn" type="primary" size="small" icon="plus" :disabled="!topics.length" @click="addTopic">添加专题</el-button>
+            <el-button id="add_topic_btn" type="primary" size="small" icon="plus" :disabled="topics.length >= 20" @click="addTopic">添加专题</el-button>
             <label for="add_topic_btn" style="margin-left:10px;">最多添加 20 个话题</label>
           </div>
           <el-table :data="topics" border stripe style="width: 100%">

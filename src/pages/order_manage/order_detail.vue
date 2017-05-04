@@ -19,8 +19,8 @@
             </el-col>
             <el-col :span="24" v-if="order_detail.after_sale_status != 0">
                 <el-steps :space="300" :active="order_detail.after_sale_status" center align-center>
-                    <el-step title="售后申请" :description="order_detail.after_sale_apply_at?order_detail.after_sale_apply_at.apply_at:''"></el-step>
-                    <el-step title="售后结束" :description="order_detail.after_sale_end_at?order_detail.after_sale_end_at.end_at:''"></el-step>
+                    <el-step title="售后申请" :description="order_detail.after_sale_apply_at?order_detail.after_sale_apply_at:''"></el-step>
+                    <el-step title="售后结束" :description="order_detail.after_sale_end_at?order_detail.after_sale_end_at:''"></el-step>
                 </el-steps>
             </el-col>
         </el-row>
@@ -31,15 +31,13 @@
            <span style="margin:0 10px;">付款时间：{{order_detail.pay_at}}</span>
            <span style="margin:0 10px;">学校：{{school_name}}</span>
            <div class="tag_area">
-              <el-tag v-if="order_detail.groupon_id" color="#13CE66">班级购</el-tag>
-              <el-tag v-if="order_detail.print_at" color="#F7BA2A">已打印</el-tag>
-
-              <el-tag v-if="order_detail.after_sale_status == 1" color="#FF4949">待处理售后</el-tag>
-              <el-tag v-if="order_detail.after_sale_status > 1" color="#20A0FF">已处理售后</el-tag>
-
-              <el-tag v-if="order_detail.order_status == 1" color="#FF4949">待发货</el-tag>
-              <el-tag v-if="order_detail.order_status == 3" color="#20A0FF">已发货</el-tag>
-              <el-tag v-if="order_detail.order_status == 7" color="#20A0FF">已完成</el-tag>
+              <el-tag v-if="order_detail.groupon_id" type="success">班级购</el-tag>
+              <el-tag v-if="order_detail.print_at" type="warning">已打印</el-tag>
+              <el-tag v-if="order_detail.after_sale_status == 1" type="danger">待处理售后</el-tag>
+              <el-tag v-if="order_detail.after_sale_status > 1" type="primary">已处理售后</el-tag>
+              <el-tag v-if="order_detail.order_status == 1" type="danger">待发货</el-tag>
+              <el-tag v-if="order_detail.order_status == 3" type="primary">已发货</el-tag>
+              <el-tag v-if="order_detail.order_status == 7" type="primary">已完成</el-tag>
            </div>
       </div>
       <div class="detail">
@@ -66,8 +64,8 @@
         </div>
         <div class="opt_area" :style="'height:' + 74 * order_items.length + 'px;'">
           <p>
-            <el-button v-if="order_detail.order_status < 3" type="primary" style="width:60px" size="mini" @click="deliver">发货</el-button>
-            <el-button type="primary" style="width:60px" size="mini">打印</el-button>
+            <el-button v-if="order_detail.order_status < 3" type="primary" style="width:60px" size="mini" @click="deliver"><i class="fa fa-truck" aria-hidden="true"></i> 发货</el-button>
+            <el-button type="primary" style="width:60px" size="mini"><i class="fa fa-print" aria-hidden="true"></i> 打印</el-button>
           </p>
           <p v-if="order_detail.groupon_id">班级购编号：{{order_detail.groupon_id}}</p>
         </div>
@@ -101,25 +99,25 @@
                 <div class="info_info">
                     <label class="first-lable">查看图片：</label>
                     <el-card :body-style="{ padding: '0px' }" class="refund_img" v-for="img in after_sale_detail.images">
-                      <img :src="'http://omwzo411k.bkt.clouddn.com/' + img" @click="picturePreview(img)" style="cursor:pointer;">
+                      <img :src="'http://onv8eua8j.bkt.clouddn.com/' + img.url" @click="picturePreview(img.url)" style="cursor:pointer;">
                     </el-card>
                     <el-dialog v-model="dialog.visible" size="tiny">
-                      <img width="100%" :src="dialog.url" alt="">
+                      <img width="100%" :src="dialog.url">
                     </el-dialog>
                 </div>
                 <div class="info_info">
                   <label class="first-lable">退款金额：</label>
-                  <label v-if="order_detail.after_sale_status == 1">
-                    <el-input placeholder="请输入退款金额" size="mini" v-model="actual_refund_fee" :maxlength="8"></el-input>
+                  <label v-if="order_detail.after_sale_status == 1">￥
+                    <el-input placeholder="请输入退款金额" style="width:80px" size="mini" v-model="actual_refund_fee" :maxlength="8"></el-input>
                   </label>
                   <label v-else>￥{{after_sale_detail.refund_fee}}</label>
                 </div>
                 <div class="info_info" v-if="order_detail.after_sale_status == 1">
                     <label class="first-lable">操作：</label>
-                    <label><el-button type="danger" size="small" @click="">退款</el-button></label>
+                    <label><el-button type="danger" style="width:60px" size="mini" @click="refund">退款</el-button></label>
                 </div>
                 <div class="info_info" v-if="order_detail.after_sale_status != 1">
-                    <label class="first-lable">操作人：</label>
+                    <label class="first-lable">操作人员：</label>
                     <label>{{order_detail.after_sale_staff_name}}</label>
                 </div>
                 <div class="info_info" v-if="order_detail.after_sale_status != 1">
@@ -172,6 +170,68 @@ export default {
         this.getOrder()
     },
     methods: {
+        refund() {
+            var self = this
+            if (!self.checkActualRefundFee()) {
+                return
+            }
+            self.refund_loading = true
+            setTimeout(() => {
+                self.order_detail.after_sale_status = 2
+                self.refund_loading = false
+            },1500)
+            // var refund_data = {
+            //     id: self.after_sale_info.id,
+            //     total_fee: parseInt(self.after_sale_info.total_fee * 100),
+            //     actual_refund_fee: parseInt(self.actual_refund_fee * 100),
+            //     trade_code: self.after_sale_info.trade_code
+            // }
+            // axios.post('/v1/orders/to_refund',refund_data).then(resp => {
+            //     if (resp.data.code == '00000') {
+            //         if (resp.data.message == 'ok') {
+            //             self.$message({
+            //                 type: 'success',
+            //                 message: '操作成功'
+            //             });
+            //         } else if (resp.data.message == 'NOTENOUGH') {
+            //             self.$message({
+            //                 type: 'warning',
+            //                 message: '余额不足'
+            //             });
+            //         }else {
+            //             self.$message({
+            //                 type: 'error',
+            //                 message: '退款失败'
+            //             });
+            //         }
+            //         self.loadingOrder(self.present_order.order_id)
+            //         self.refund_loading = false
+            //     }
+            // })
+        },
+        checkActualRefundFee() {
+            var input = this.actual_refund_fee
+            var input_num = priceInt(input)
+            var max_value = priceInt(this.after_sale_detail.total_fee)
+            var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/
+            if (!reg.test(input.toString()) || input == 0) {
+                this.actual_refund_fee = ''
+                this.$message({
+                    message: '请输入正确的退款金额',
+                    type: 'warning'
+                });
+                return false
+            }
+            if (input_num > max_value) {
+                this.$message({
+                    message: '退款金额超过了订单总额，已重置为订单总额',
+                    type: 'warning'
+                });
+                this.actual_refund_fee = priceFloat(max_value)
+                return false
+            }
+            return true
+        },
         deliver() {
             axios.post('/v1/order/deliver',{
                 id:this.order_id
@@ -186,7 +246,7 @@ export default {
             this.$router.go(-1)
         },
         picturePreview(img) {
-          this.dialog.url = img;
+          this.dialog.url = 'http://onv8eua8j.bkt.clouddn.com/' + img;
           this.dialog.visible = true;
         },
         getOrder() {
@@ -201,6 +261,9 @@ export default {
 
                     // 订单详情
                     var order = data.order
+                    if (order.order_status >= 17 && order.order_status <= 23) {
+                        order.order_status = order.order_status - 16
+                    }
                     order.order_at = order.order_at ? moment.unix(order.order_at).format('YYYY-MM-DD HH:mm:ss') : 0 //下单时间
                     order.pay_at = order.pay_at ? moment.unix(order.pay_at).format('YYYY-MM-DD HH:mm:ss') : 0 //支付时间
                     order.confirm_at = order.confirm_at ? moment.unix(order.confirm_at).format('YYYY-MM-DD HH:mm:ss') : 0 //确认收货时间
@@ -238,6 +301,8 @@ export default {
                     if (JSON.stringify(data.after_sale_detail)) {
                         data.after_sale_detail.refund_fee = priceFloat(data.after_sale_detail.refund_fee)
                         this.after_sale_detail = data.after_sale_detail
+                        // 默认实际退款金额为申请金额
+                        this.actual_refund_fee = data.after_sale_detail.refund_fee
                     }
 
                     this.operateInfo()
