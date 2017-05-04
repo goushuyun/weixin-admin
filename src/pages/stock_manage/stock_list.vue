@@ -76,13 +76,13 @@
             </el-table-column>
             <el-table-column label="位置" min-width="180">
                 <template scope="scope">
-                    <el-tooltip v-if="scope.row.has_new_book" placement="top" effect="light" :enterable="false">
+                    <el-tooltip v-if="scope.row.has_new_book && scope.row.new_book.location.length" placement="top" effect="light" :enterable="false">
                       <div slot="content"><span v-for="(item,index) in scope.row.new_book.location">{{item.location_str + (index + 1 == scope.row.new_book.location.length ? '' : '，')}}</span></div>
                       <div class="goods_item new_color ellipsis">
                         <span v-for="(item,index) in scope.row.new_book.location">{{item.location_str + (index + 1 == scope.row.new_book.location.length ? '' : '，')}}</span>
                       </div>
                     </el-tooltip>
-                    <el-tooltip v-if="scope.row.has_old_book" placement="top" effect="light" :enterable="false">
+                    <el-tooltip v-if="scope.row.has_old_book && scope.row.old_book.location.length" placement="top" effect="light" :enterable="false">
                       <div slot="content"><span v-for="(item,index) in scope.row.old_book.location">{{item.location_str + (index + 1 == scope.row.old_book.location.length ? '' : '，')}}</span></div>
                       <div class="goods_item old_color ellipsis">
                         <span v-for="(item,index) in scope.row.old_book.location">{{item.location_str + (index + 1 == scope.row.old_book.location.length ? '' : '，')}}</span>

@@ -43,6 +43,7 @@
 
 #content {
     background-image: url(http://7xvl2k.com1.z0.glb.clouddn.com/bg_3.jpg);
+    background-attachment: fixed;
     background-size: 100%, 100%;
     padding-left: 180px;
     min-height: 100%;
