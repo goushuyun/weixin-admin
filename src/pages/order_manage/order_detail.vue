@@ -72,7 +72,7 @@
       </div>
       <div class="address_area">
         <span style="margin-right:20px">收货人信息：{{order_detail.name}}，{{order_detail.mobile}}，{{order_detail.address}}</span>
-        <span style="color:#FF4949">订单备注：{{order_detail.remark}}</span>
+        <span v-if="order_detail.remark" style="color:#FF4949">订单备注：{{order_detail.remark}}</span>
       </div>
     </div>
 
@@ -166,8 +166,10 @@ export default {
         }
     },
     mounted() {
-        this.order_id = this.$route.params.order_id
-        this.school_name = this.$route.params.school_name
+        if (this.$route.params.order_id) {
+            this.order_id = this.$route.params.order_id
+            this.school_name = this.$route.params.school_name
+        }
         this.getOrder()
     },
     methods: {

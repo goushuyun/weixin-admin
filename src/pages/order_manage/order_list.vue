@@ -101,7 +101,7 @@
         </div>
         <div class="address_area">
           <span style="margin-right:20px;">收货人信息：{{order.order.name}}，{{order.order.mobile}}，{{order.order.address}}</span>
-          <span style="color:#FF4949;">订单备注：{{order.order.remark}}</span>
+          <span v-if="order.order.remark" style="color:#FF4949;">订单备注：{{order.order.remark}}</span>
         </div>
       </div>
     </div>
