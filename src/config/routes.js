@@ -31,6 +31,10 @@ const by_isbn = r => require(['../pages/add_book/by_isbn'], r)
 // ** Excel 上传
 const by_excel = r => require(['../pages/add_book/by_excel'], r)
 
+// * 统计
+// ** 销售额统计
+const salses = r => require(['../pages/statistics/sales'], r)
+
 // * 设置
 // ** 店铺信息
 const store_info = r => require(['../pages/store_info/index'], r)
@@ -145,6 +149,10 @@ export default [{
         name: 'by_isbn',
         path: 'add_book/by_isbn',
         component: by_isbn
+    }, {
+        name: 'sales',
+        path: 'statistics/sales',
+        component: salses
     }, {
         name: 'by_excel',
         path: 'add_book/by_excel',

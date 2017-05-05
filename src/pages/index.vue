@@ -119,6 +119,12 @@
               </el-menu-item>
             </el-submenu>
             <el-submenu index="6">
+              <template slot="title"><i class="fa fa-line-chart" aria-hidden="true"></i>统计管理</template>
+              <el-menu-item index="/admin/statistics/sales">
+                  <i class="fa fa-pie-chart" aria-hidden="true"></i>销售统计
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="7">
               <template slot="title"><i class="el-icon-setting"></i>设置</template>
               <el-menu-item index="/admin/store_info/cloud_store">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息

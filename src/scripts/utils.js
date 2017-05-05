@@ -36,15 +36,11 @@ function isISBNFormat (isbn){
 
 // 金额由“分”转换成“元”
 function priceFloat (price) {
-    if (price) {
-        return parseFloat(price/100).toFixed(2)
-    }
+    return parseFloat(price/100).toFixed(2)
 }
 // 金额由“元”转换成“分”
 function priceInt (price) {
-    if (price) {
-        return parseInt(price * 100)
-    }
+    return parseInt(price * 100)
 }
 
 // 判断两个对象是否相等
