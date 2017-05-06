@@ -19,6 +19,7 @@
       </el-form-item>
       <el-form-item class="btn_bottom">
         <el-button size="small" type="primary" @click="getData" icon="search">查询</el-button>
+        <el-button size="small" type="primary" @click="resetForm"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
       </el-form-item>
     </el-form>
     <el-form :inline="true" label-width="80px">
@@ -323,6 +324,16 @@ export default {
         }
     },
     methods: {
+        resetForm() {
+            this.isbn = ''
+            this.title = ''
+            this.publisher = ''
+            this.author = ''
+            this.search_type = -100
+            this.search_amount = '0'
+            this.search_picture = -100
+            this.getData()
+        },
         getLocations() {
             axios.post('/v1/location/list_children_location', {
                 "level": 3

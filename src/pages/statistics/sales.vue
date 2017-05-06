@@ -42,7 +42,7 @@
           <el-option label="新书旧书销售统计" value="new_old"></el-option>
           <el-option label="线上线下销售统计" value="online_offline"></el-option>
         </el-select>
-        <el-date-picker style="float:right;" :editable="false" v-model="date_range" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="pickerOptions" @change="getDaliySales"></el-date-picker>
+        <el-date-picker style="float:right;" :editable="false" v-model="date_range" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="dateOptions" @change="getDaliySales"></el-date-picker>
       </div>
       <div id="echart1" style="width: 100%;height:400px;margin-top:10px;" @resize="setEchart1"></div>
     </el-card>
@@ -53,12 +53,12 @@
           <el-option label="新书旧书销售统计" value="new_old"></el-option>
           <el-option label="线上线下销售统计" value="online_offline"></el-option>
         </el-select>
+        <!-- <el-date-picker style="float:right;" format="yyyy-MM" :editable="false" v-model="month_range" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="monthOptions" @change="getMonthSales"></el-date-picker> -->
         <div style="float:right;">
           <el-date-picker v-model="month_range[0]" type="month" size="small" placeholder="起始月份" @change="getMonthSales"></el-date-picker>
           <span style="margin:0 5px;">-</span>
           <el-date-picker v-model="month_range[1]" type="month" size="small" placeholder="截至月份" @change="getMonthSales"></el-date-picker>
         </div>
-        <!-- <el-date-picker style="float:right;" :editable="false" v-model="month_range" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="pickerOptions"></el-date-picker> -->
       </div>
       <div id="echart2" style="width: 100%;height:400px;margin-top:10px;"></div>
     </el-card>
@@ -82,37 +82,60 @@ export default {
             school_id: '',
             date_range: [null, null], //时间选择器[最早时间,最晚时间]
             month_range: [null, null], //时间选择器[最早时间,最晚时间]
-            pickerOptions: {
+            dateOptions: {
                 shortcuts: [{
                     text: '最近一周',
                     onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                        const end = moment();
+                        const start = moment().subtract(1, 'weeks');
                         picker.$emit('pick', [start, end]);
                     }
                 }, {
                     text: '最近两周',
                     onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 14);
+                        const end = moment();
+                        const start = moment().subtract(2, 'weeks');
                         picker.$emit('pick', [start, end]);
                     }
                 }, {
                     text: '最近一个月',
                     onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                        const end = moment();
+                        const start = moment().subtract(1, 'months');
                         picker.$emit('pick', [start, end]);
                     }
                 }],
                 disabledDate(time) {
                     return time.getTime() > Date.now()
-                    // return (time.getTime() > Date.now() || time.getTime() < Date.now() - 3600 * 1000 * 24 * 31)
                 }
             },
+            // monthOptions: {
+            //     shortcuts: [{
+            //         text: '最近一个月',
+            //         onClick(picker) {
+            //             const end = moment();
+            //             const start = moment().subtract(1, 'months');
+            //             picker.$emit('pick', [start, end]);
+            //         }
+            //     }, {
+            //         text: '最近三个月',
+            //         onClick(picker) {
+            //             const end = moment();
+            //             const start = moment().subtract(3, 'months');
+            //             picker.$emit('pick', [start, end]);
+            //         }
+            //     }, {
+            //         text: '最近六个月',
+            //         onClick(picker) {
+            //             const end = moment();
+            //             const start = moment().subtract(6, 'months');
+            //             picker.$emit('pick', [start, end]);
+            //         }
+            //     }],
+            //     disabledDate(time) {
+            //         return time.getTime() > Date.now()
+            //     }
+            // },
             today_salse: 0,
             yestoday_sales: 0,
             history_sales: {}

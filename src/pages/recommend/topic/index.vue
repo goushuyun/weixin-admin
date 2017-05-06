@@ -86,9 +86,9 @@ export default {
             let topic = this.topics[index]
             this.$router.push({
                 name: 'add_topic',
-                params: {
+                query: {
                     topic_id: topic.id,
-                    status: topic.status,
+                    // status: topic.status,
                     title: topic.title
                 }
             })

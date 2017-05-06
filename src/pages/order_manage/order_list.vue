@@ -41,14 +41,12 @@
     </div>
     <div class="row">
       <el-checkbox v-model="selected_all" style="margin:0 12px;" @change="selectedAllChange">全选</el-checkbox>
-      <el-button type="primary" @click="" size="small"><i class="fa fa-truck" aria-hidden="true"></i> 批量发货</el-button>
+      <el-button v-if="order_status == 1" type="primary" @click="" size="small"><i class="fa fa-truck" aria-hidden="true"></i> 批量发货</el-button>
       <el-button type="primary" @click="" size="small"><i class="fa fa-print" aria-hidden="true"></i> 批量打印</el-button>
     </div>
     <div class="row" v-if="!orders.length">
       <div class="order_item">
-        <div class="title" style="text-align:center">
-          暂无数据
-        </div>
+        <div class="title" style="text-align:center">暂无数据</div>
       </div>
     </div>
     <div class="row">
@@ -120,7 +118,7 @@ export default {
     data() {
         return {
             order_time: [null, null], //时间选择器[最早时间,最晚时间]
-            order_status: 80, //订单状态
+            order_status: 1, //订单状态
             school_id: '',
 
             search_type: '',
@@ -233,6 +231,8 @@ export default {
                 name: 'order_detail',
                 params: {
                     school_name,
+                },
+                query: {
                     order_id
                 }
             })
@@ -292,7 +292,7 @@ export default {
             var order_search = this.$store.state.order_search
             console.log(order_search);
             this.order_time = order_search.order_time ? order_search.order_time : [null, null]
-            this.order_status = order_search.order_status ? order_search.order_status : 80
+            this.order_status = order_search.order_status ? order_search.order_status : 1
             this.school_id = order_search.school_id ? order_search.school_id : ''
             this.search_type = order_search.search_type ? order_search.search_type : ''
             this.search_value = order_search.search_value ? order_search.search_value : ''
