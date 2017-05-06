@@ -35,6 +35,10 @@ const by_excel = r => require(['../pages/add_book/by_excel'], r)
 // ** 销售额统计
 const salses = r => require(['../pages/statistics/sales'], r)
 
+// * 资产
+// ** 线上资产
+const online_account = r => require(['../pages/account/online_account'], r)
+
 // * 设置
 // ** 店铺信息
 const store_info = r => require(['../pages/store_info/index'], r)
@@ -157,6 +161,10 @@ export default [{
         name: 'by_excel',
         path: 'add_book/by_excel',
         component: by_excel
+    }, {
+        name: 'online_account',
+        path: 'account/online',
+        component: online_account
     }, {
         name: 'weixin_setting',
         path: 'weixin_setting',

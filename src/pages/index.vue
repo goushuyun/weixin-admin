@@ -125,6 +125,12 @@
               </el-menu-item>
             </el-submenu>
             <el-submenu index="7">
+              <template slot="title"><i class="fa fa-money" aria-hidden="true"></i>资产管理</template>
+              <el-menu-item index="/admin/account/online">
+                  <i class="fa fa-hand-o-up" aria-hidden="true"></i>线上资产
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="8">
               <template slot="title"><i class="el-icon-setting"></i>设置</template>
               <el-menu-item index="/admin/store_info/cloud_store">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息
