@@ -31,6 +31,24 @@ p.text {
     }
 }
 
+ul.detail{
+    font-size: 13px;
+    li{
+        line-height: 36px;
+        color: $font_normal;
+        .key{
+            display: inline-block;
+            width: 100px;
+            text-align: right;
+            &:after{
+                content: "："
+            }
+        }
+        .val{
+            padding-left: 6px;
+        }
+    }
+}
 </style>
 
 <template lang="html">
@@ -42,11 +60,37 @@ p.text {
     <div class="content_inner">
         <el-row>
             <el-col :span="12">
-                <h3 class="title">绑定微信公众号，把店铺和微信打通</h3>
-                <p class="text">绑定后即可在这里管理您的公众号，购书云提供比微信官方后台更强大的功能！</p>
-                <el-button @click="auth" type="primary"><i class="fa fa-weixin" aria-hidden="true"></i> 我有微信公众号， 立即设置</el-button>
+                <div v-if="has_authorized==true" class="office_account_info">
+                    <ul class="detail">
+                        <li>
+                            <span class="key">公众微信号</span>
+                            <!-- <span class="val">{{office_account.wechat_id}}</span> -->
+                        </li>
+                        <li>
+                            <span class="key">公众号昵称</span>
+                            <span class="val">{{office_account.nick_name}}</span>
+                        </li>
+                        <li>
+                            <span class="key">公众号类型</span>
+                            <span class="val">{{oa_type}}</span>
+                        </li>
+                        <li>
+                            <span class="key">帐号主体</span>
+                            <span class="val">{{office_account.principal_name}}</span>
+                        </li>
+                        <li>
+                            <span class="key">云店URL</span>
+                            <span class="val">待生成策略...</span>
+                        </li>
+                    </ul>
+                </div>
+                <div v-else >
+                    <h3 class="title">绑定微信公众号，把店铺和微信打通</h3>
+                    <p class="text">绑定后即可在这里管理您的公众号，购书云提供比微信官方后台更强大的功能！</p>
+                    <el-button @click="auth" type="primary"><i class="fa fa-weixin" aria-hidden="true"></i> 我有微信公众号， 立即设置</el-button>
+                </div>
             </el-col>
-            <el-col :span="12" class="remark">
+            <el-col v-if="has_authorized == false" :span="12" class="remark">
                 <h4 class="remark_title">绑定微信公众号，把店铺和微信打通</h4>
                 <ul>
                     <li>如果您还没有微信公众号，可以
@@ -68,39 +112,79 @@ p.text {
 import axios from '../../scripts/http'
 export default {
     data() {
-            return {
-                url: ''
-            }
-        },
-        methods: {
-            auth() {
-                console.log(this.url);
-                window.open(this.url)
-                    // 弹出提示框，给用户选择是否已经授权完毕
-                this.$confirm('请在新窗口完成微信公众号授权', '提示', {
-                    confirmButtonText: '已授权成功',
-                    cancelButtonText: '授权失败，重试',
-                    type: 'warning',
-                    closeOnClickModal: false,
-                    closeOnPressEscape: false
-                }).then(() => {
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
-                });
-            }
-        },
-        created() {
-            axios.post('/v1/weixin/get_auth_url', {}).then(resp => {
-                this.url = resp.data.url
-            })
+        return {
+            url: '',
+            office_account: {},
+            has_authorized: false
+
         }
+    },
+    methods: {
+
+        get_office_account_info(){
+            // 获取 store_id 对应的 office_account 信息
+            axios.post('/v1/weixin/get_office_account_info', {}).then(res=>{
+                let resp = res.data
+                if(resp.message == 'not_found'){
+                    axios.post('/v1/weixin/get_auth_url', {}).then(resp => {
+                        this.url = resp.data.url
+                    })
+                }else if(resp.message == 'ok'){
+                    console.log('------------OK-------------');
+                    this.has_authorized = true
+                    this.office_account = resp.data
+                }
+            })
+        },
+
+        auth() {
+            console.log(this.url);
+            window.open(this.url)
+                // 弹出提示框，给用户选择是否已经授权完毕
+            this.$confirm('请在新窗口完成微信公众号授权', '提示', {
+                confirmButtonText: '已授权成功',
+                cancelButtonText: '授权失败，重试',
+                type: 'warning',
+                closeOnClickModal: false,
+                closeOnPressEscape: false
+            }).then(() => {
+                this.$message({
+                    type: 'success',
+                    message: '授权成功!'
+                })
+                this.get_office_account_info()
+            }).catch(() => {
+                this.$message({
+                    type: 'info',
+                    message: '授权失败'
+                });
+            });
+        }
+
+    },
+
+    computed:{
+        oa_type(){
+            let type = ''
+            if(office_account.verify_type_info === 0 || office_account.verify_type_info === 1 || office_account.verify_type_info === 2){
+                type += '已认证'
+            }else{
+                type += '未认证'
+            }
+
+            if(office_account.service_type_info === 2){
+                type += '服务号'
+            }else{
+                type += '订阅号'
+            }
+
+            return type
+        }
+    },
+
+    created() {
+        this.get_office_account_info()
+    }
 }
 
 </script>

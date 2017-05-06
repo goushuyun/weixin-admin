@@ -77,7 +77,7 @@
                     url: 'http://weixin-admin.goushuyun.com/v1/weixin/get_api_query_auth',
                     data: JSON.stringify({auth_code: auth_code}),
                     success: function(data){
-                        alert('data: ' + data);
+                        alert(JSON.stringify(data));
                     },
                     contentType: "application/json",
                     dataType: 'json'
