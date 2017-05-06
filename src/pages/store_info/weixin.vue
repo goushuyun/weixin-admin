@@ -64,7 +64,7 @@ ul.detail{
                     <ul class="detail">
                         <li>
                             <span class="key">公众微信号</span>
-                            <!-- <span class="val">{{office_account.wechat_id}}</span> -->
+                            <span class="val">{{office_account.wechat_id}}</span>
                         </li>
                         <li>
                             <span class="key">公众号昵称</span>
@@ -133,6 +133,8 @@ export default {
                     console.log('------------OK-------------');
                     this.has_authorized = true
                     this.office_account = resp.data
+
+                    console.log(this.office_account);
                 }
             })
         },
@@ -166,13 +168,13 @@ export default {
     computed:{
         oa_type(){
             let type = ''
-            if(office_account.verify_type_info === 0 || office_account.verify_type_info === 1 || office_account.verify_type_info === 2){
+            if(this.office_account.verify_type_info === 0 || this.office_account.verify_type_info === 1 || this.office_account.verify_type_info === 2){
                 type += '已认证'
             }else{
                 type += '未认证'
             }
 
-            if(office_account.service_type_info === 2){
+            if(this.office_account.service_type_info === 2){
                 type += '服务号'
             }else{
                 type += '订阅号'
