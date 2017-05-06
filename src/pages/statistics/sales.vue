@@ -38,25 +38,30 @@
 
     <el-card class="row">
       <div>
-        <el-select v-model="date_statistic_type" size="small">
+        <el-select v-model="date_statistic_type" size="small" @change="setEchart1">
           <el-option label="新书旧书销售统计" value="new_old"></el-option>
           <el-option label="线上线下销售统计" value="online_offline"></el-option>
         </el-select>
-        <el-date-picker style="float:right;" :editable="false" v-model="date_range" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="pickerOptions"></el-date-picker>
+        <el-date-picker style="float:right;" :editable="false" v-model="date_range" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="pickerOptions" @change="getDaliySales"></el-date-picker>
       </div>
-      <div id="echart1" style="width: 100%;height:400px;margin-top:10px;"></div>
+      <div id="echart1" style="width: 100%;height:400px;margin-top:10px;" @resize="setEchart1"></div>
     </el-card>
 
-    <!-- <el-card>
+    <el-card>
       <div>
-        <el-select v-model="a" size="small">
-          <el-option label="新书旧书销售统计" value="c"></el-option>
-          <el-option label="线上线下销售统计" value="d"></el-option>
+        <el-select v-model="month_statistic_type" size="small" @change="setEchart2">
+          <el-option label="新书旧书销售统计" value="new_old"></el-option>
+          <el-option label="线上线下销售统计" value="online_offline"></el-option>
         </el-select>
-        <el-date-picker style="float:right;" :editable="false" v-model="statistic_time1" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="pickerOptions"></el-date-picker>
+        <div style="float:right;">
+          <el-date-picker v-model="month_range[0]" type="month" size="small" placeholder="起始月份" @change="getMonthSales"></el-date-picker>
+          <span style="margin:0 5px;">-</span>
+          <el-date-picker v-model="month_range[1]" type="month" size="small" placeholder="截至月份" @change="getMonthSales"></el-date-picker>
+        </div>
+        <!-- <el-date-picker style="float:right;" :editable="false" v-model="month_range" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="pickerOptions"></el-date-picker> -->
       </div>
       <div id="echart2" style="width: 100%;height:400px;margin-top:10px;"></div>
-    </el-card> -->
+    </el-card>
   </div>
 </div>
 </template>
@@ -72,10 +77,11 @@ export default {
             date_statistic_type: 'new_old', //online_offline
             date_statistic: [],
             month_statistic_type: 'new_old', //online_offline
+            month_statistic: [],
             schools: [],
             school_id: '',
             date_range: [null, null], //时间选择器[最早时间,最晚时间]
-            statistic_time2: [null, null], //时间选择器[最早时间,最晚时间]
+            month_range: [null, null], //时间选择器[最早时间,最晚时间]
             pickerOptions: {
                 shortcuts: [{
                     text: '最近一周',
@@ -98,23 +104,27 @@ export default {
                     onClick(picker) {
                         const end = new Date();
                         const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 14);
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
                         picker.$emit('pick', [start, end]);
                     }
-                }]
+                }],
+                disabledDate(time) {
+                    return time.getTime() > Date.now()
+                    // return (time.getTime() > Date.now() || time.getTime() < Date.now() - 3600 * 1000 * 24 * 31)
+                }
             },
-
             today_salse: 0,
             yestoday_sales: 0,
             history_sales: {}
         }
     },
     mounted() {
-        this.getSchools()
-        this.getTodaySales()
-        this.getTotalSales()
-        this.getDaliySales()
-        this.getMonthSales()
+        var self = this
+        self.getSchools()
+        self.getTodaySales()
+        self.getTotalSales()
+        self.getDaliySales()
+        self.getMonthSales()
     },
     methods: {
         getTodaySales() {
@@ -147,8 +157,6 @@ export default {
             })
         },
         getDaliySales() {
-            var $echart1 = document.getElementById('echart1')
-            var echart1 = echarts.init($echart1);
             axios.post('/v1/statistic/get_daliy_sales', {
                 "school_id": this.school_id, //not required 学校id
                 "start_at": this.date_range[0] ? moment(this.date_range[0], "YYYY-MM-DD").unix() : 0, //not required 起始时间
@@ -156,13 +164,13 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var date_statistic_0 = {
-                        legend_data: ['新书销售额','旧书销售额'],
+                        legend_data: ['新书销售额', '旧书销售额'],
                         xAxis_data: [],
                         series_new_data: [],
                         series_old_data: []
                     }
                     var date_statistic_1 = {
-                        legend_data: ['线上销售额','线下销售额'],
+                        legend_data: ['线上销售额', '线下销售额'],
                         xAxis_data: [],
                         series_online_data: [],
                         series_offline_data: []
@@ -180,9 +188,14 @@ export default {
                     this.date_statistic[1] = date_statistic_1
                     console.log('>>>>>----- this.date_statistic ----->');
                     console.log(this.date_statistic);
+                    this.setEchart1()
                 }
             })
-            var option_data = this.date_statistic_type == 'new_old' ? this.date_statistic[0] : this.date_statistic[1]
+        },
+        setEchart1() {
+            var $echart1 = document.getElementById('echart1')
+            var echart1 = echarts.init($echart1);
+            var option_data = (this.date_statistic_type == 'new_old') ? this.date_statistic[0] : this.date_statistic[1]
             var option = {
                 tooltip: {
                     trigger: 'axis',
@@ -197,8 +210,8 @@ export default {
                     data: option_data.legend_data
                 },
                 grid: {
-                    left: '0',
-                    right: '2%',
+                    left: '1%',
+                    right: '4%',
                     bottom: '0',
                     containLabel: true
                 },
@@ -217,10 +230,15 @@ export default {
                         areaStyle: {
                             normal: {}
                         },
+                        itemStyle: {
+                            normal: {
+                                color: '#aed4c2'
+                            }
+                        },
                         data: option_data.series_new_data
                     },
                     {
-                        name: option_data.legend_data[0],
+                        name: option_data.legend_data[1],
                         type: 'line',
                         stack: '总量',
                         label: {
@@ -232,127 +250,123 @@ export default {
                         areaStyle: {
                             normal: {}
                         },
+                        itemStyle: {
+                            normal: {
+                                color: '#dda490'
+                            }
+                        },
                         data: option_data.series_old_data
                     }
                 ]
             };
             echart1.setOption(option);
         },
-        // getMonthSales() {
-        //     var $echart2 = document.getElementById('echart2')
-        //     var echart2 = echarts.init($echart2);
-        //     var option = {
-        //         tooltip: {
-        //             trigger: 'item',
-        //             formatter: "{a} <br/>{b}: {c} ({d}%)"
-        //         },
-        //         legend: {
-        //             orient: 'vertical',
-        //             x: 'left',
-        //             data: ['一月', '二月', '三月', '四月', '五月', '六月']
-        //         },
-        //         series: [{
-        //                 name: '访问来源',
-        //                 type: 'pie',
-        //                 selectedMode: 'single',
-        //                 radius: [0, '50%'],
-        //
-        //                 label: {
-        //                     normal: {
-        //                         position: 'inner'
-        //                     }
-        //                 },
-        //                 labelLine: {
-        //                     normal: {
-        //                         show: false
-        //                     }
-        //                 },
-        //                 data: [{
-        //                         value: 100,
-        //                         name: '一月',
-        //                         selected: true
-        //                     },
-        //                     {
-        //                         value: 100,
-        //                         name: '二月'
-        //                     },
-        //                     {
-        //                         value: 100,
-        //                         name: '三月'
-        //                     },
-        //                     {
-        //                         value: 100,
-        //                         name: '四月'
-        //                     },
-        //                     {
-        //                         value: 100,
-        //                         name: '五月'
-        //                     },
-        //                     {
-        //                         value: 100,
-        //                         name: '六月'
-        //                     }
-        //                 ]
-        //             },
-        //             {
-        //                 name: '访问来源',
-        //                 type: 'pie',
-        //                 radius: ['65%', '85%'],
-        //
-        //                 data: [{
-        //                         value: 50,
-        //                         name: '新书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '旧书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '新书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '旧书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '新书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '旧书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '新书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '旧书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '新书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '旧书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '新书'
-        //                     },
-        //                     {
-        //                         value: 50,
-        //                         name: '旧书'
-        //                     }
-        //                 ]
-        //             }
-        //         ]
-        //     };
-        //     echart2.setOption(option);
-        // },
+        getMonthSales() {
+            axios.post('/v1/statistic/get_month_sales', {
+                "school_id": this.school_id, //not required 学校id
+                "start_at": this.month_range[0] ? moment(this.month_range[0], "YYYY-MM-DD").unix() : 0, //not required 起始时间
+                "end_at": this.month_range[1] ? moment(this.month_range[1], "YYYY-MM-DD").unix() : 0 //not required 结束时间  end_at>start_at
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    var month_statistic_0 = {
+                        legend_data: [],
+                        series_month_data: [],
+                        series_data: []
+                    }
+                    var month_statistic_1 = {
+                        legend_data: [],
+                        series_month_data: [],
+                        series_data: []
+                    }
+                    resp.data.data.forEach(el => {
+                        var month_online_offline_sales = el.online_sales + el.offline_sales //等于总销售额
+                        var month_new_old_sales = el.newbook_sales + el.oldbook_sales //不等于总销售额（因为不包含运费）
+                        var month_freight = month_online_offline_sales - month_new_old_sales
+                        month_statistic_0.legend_data.push(el.month)
+                        month_statistic_0.series_month_data.push({
+                            value: priceFloat(month_online_offline_sales),
+                            name: el.month
+                        })
+
+                        month_statistic_0.series_data.push({
+                            value: priceFloat(el.newbook_sales),
+                            name: '新书'
+                        })
+                        month_statistic_0.series_data.push({
+                            value: priceFloat(el.oldbook_sales),
+                            name: '旧书'
+                        })
+                        month_statistic_0.series_data.push({
+                            value: priceFloat(month_freight),
+                            name: '运费'
+                        })
+
+                        month_statistic_1.legend_data.push(el.month)
+                        month_statistic_1.series_month_data.push({
+                            value: priceFloat(month_online_offline_sales),
+                            name: el.month
+                        })
+
+                        month_statistic_1.series_data.push({
+                            value: priceFloat(el.online_sales),
+                            name: '线上'
+                        })
+                        month_statistic_1.series_data.push({
+                            value: priceFloat(el.offline_sales),
+                            name: '线下'
+                        })
+                    })
+                    this.month_statistic[0] = month_statistic_0
+                    this.month_statistic[1] = month_statistic_1
+                    console.log('>>>>>----- this.month_statistic ----->');
+                    console.log(this.month_statistic);
+                    this.setEchart2()
+                }
+            })
+        },
+        setEchart2() {
+            var $echart2 = document.getElementById('echart2')
+            var echart2 = echarts.init($echart2);
+            var option_data = (this.month_statistic_type == 'new_old') ? this.month_statistic[0] : this.month_statistic[1]
+            var option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: 'left',
+                    data: option_data.legend_data
+                },
+                series: [{
+                        name: '月份总销售额',
+                        type: 'pie',
+                        selectedMode: 'single',
+                        radius: [0, '50%'],
+
+                        label: {
+                            normal: {
+                                position: 'inner'
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: false
+                            }
+                        },
+                        data: option_data.series_month_data
+                    },
+                    {
+                        name: '月份总销售额明细',
+                        type: 'pie',
+                        radius: ['65%', '85%'],
+
+                        data: option_data.series_data
+                    }
+                ]
+            };
+            echart2.setOption(option);
+        },
         getSchools() {
             axios.post('/v1/school/store_schools', {}).then(resp => {
                 if (resp.data.message == 'ok') {
