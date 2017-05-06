@@ -46,6 +46,7 @@ ul.detail{
         }
         .val{
             padding-left: 6px;
+            color: $font_lightest;
         }
     }
 }
