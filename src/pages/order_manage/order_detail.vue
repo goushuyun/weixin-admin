@@ -166,13 +166,28 @@ export default {
         }
     },
     mounted() {
-        if (this.$route.params.order_id) {
-            this.order_id = this.$route.params.order_id
+        if (this.$route.query.order_id) {
+            this.order_id = this.$route.query.order_id
+        }
+        if (this.$route.params.school_name) {
             this.school_name = this.$route.params.school_name
         }
         this.getOrder()
     },
     methods: {
+        getSchoolName(id) {
+            var self = this
+            axios.post('/v1/school/store_schools', {}).then(resp => {
+                if (resp.data.message == 'ok') {
+                    resp.data.data.forEach(school => {
+                        if (school.id == id) {
+                            self.school_name = school.name
+                            return
+                        }
+                    })
+                }
+            })
+        },
         refund() {
             var self = this
             if (!self.checkActualRefundFee()) {
@@ -289,6 +304,10 @@ export default {
                         this.actual_refund_fee = data.after_sale_detail.apply_refund_fee
                     }
 
+                    //主要针对由“资产管理进入该页面时获取学校名称”
+                    if (!this.school_name) {
+                        this.getSchoolName(order.school_id)
+                    }
                     this.operateInfo()
                 }
             })

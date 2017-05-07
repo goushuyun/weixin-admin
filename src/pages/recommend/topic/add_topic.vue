@@ -14,10 +14,10 @@
                 <el-button v-if="update && topic_id" type="text" style="color:#13CE66" @click="update = false">取消</el-button>
             </el-form-item>
             <el-form-item label="添加书籍" required>
-              <el-input v-if="goods.length < 15" id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
-              <label for="isbn_input" style="margin-left:10px;color:#888">每个话题最多可添加 15 本书</label>
-              <el-button style="float:right;margin:0 20px" size="small" @click="prePage">返回</el-button>
-              <el-button v-if="!topic_id" style="float:right" type="primary" size="small" @click="addTopic">提交发布</el-button>
+                <el-input v-if="goods.length < 15" id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
+                <label for="isbn_input" style="margin-left:10px;color:#888">每个话题最多可添加 15 本书</label>
+                <el-button style="float:right;margin:0 20px" size="small" @click="prePage">返回</el-button>
+                <el-button v-if="!topic_id" style="float:right" type="primary" size="small" @click="addTopic">提交发布</el-button>
             </el-form-item>
         </el-form>
 
@@ -69,8 +69,8 @@ export default {
     },
     mounted() {
         //拿到话题的ID，推荐状态
-        this.topic_id = this.$route.params.topic_id ? this.$route.params.topic_id : ''
-        this.update_title = this.$route.params.title ? this.$route.params.title : ''
+        this.topic_id = this.$route.query.topic_id ? this.$route.query.topic_id : ''
+        this.update_title = this.$route.query.title ? this.$route.query.title : ''
         if (this.topic_id) {
             this.getTopic()
             $('#isbn_input input').focus()

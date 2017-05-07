@@ -59,11 +59,13 @@
     <div id="left_bar">
         <el-row class="left_top">
             <el-col :span="10">
-                <img :src="logo" class="shop_logo">
+              <router-link :to="{name:'home'}">
+                  <img :src="shop_logo" class="shop_logo">
+              </router-link>
             </el-col>
 
             <el-col :span="14">
-                <p class="shop_name">商户名称</p>
+                <p class="shop_name">{{shop_name}}</p>
                 <p style="padding-top:8px;">
                     <router-link :to="{name:'shops'}">
                         <i class="fa fa-arrow-left icon" aria-hidden="true"></i>
@@ -75,26 +77,20 @@
             </el-col>
         </el-row>
 
-        <div class="shop">
-        </div>
-
         <el-menu theme="dark" mode="vertical" :router="true" unique-opened :default-active="menu_active">
             <el-submenu index="1">
-              <template slot="title"><i class="fa fa-delicious" aria-hidden="true"></i>订单管理</template>
+              <template slot="title"><i class="fa fa-list" aria-hidden="true"></i>订单管理</template>
               <el-menu-item index="/admin/order/list">
-                  <i class="fa fa-list" aria-hidden="true"></i></i>线上订单
+                  <i class="fa fa-delicious" aria-hidden="true"></i>线上订单
               </el-menu-item>
-            </el-submenu>
-            <el-submenu index="2">
-              <template slot="title"><i class="fa fa-life-ring" aria-hidden="true"></i></i>线下零售</template>
+              <el-menu-item index="/admin/offline/retail_list">
+                  <i class="fa fa-life-ring" aria-hidden="true"></i>线下订单
+              </el-menu-item>
               <el-menu-item index="/admin/offline/retail">
                   <i class="fa fa-balance-scale" aria-hidden="true"></i>线下零售
               </el-menu-item>
-              <el-menu-item index="/admin/offline/retail_list">
-                  <i class="fa fa-list" aria-hidden="true"></i></i>线下订单
-              </el-menu-item>
             </el-submenu>
-            <el-submenu index="3">
+            <el-submenu index="2">
               <template slot="title"><i class="fa fa-flag" aria-hidden="true"></i>推荐管理</template>
               <el-menu-item index="/admin/recommend/topic">
                   <i class="fa fa-anchor" aria-hidden="true"></i>话题推荐
@@ -103,34 +99,28 @@
                   <i class="fa fa-picture-o" aria-hidden="true"></i>轮播图
               </el-menu-item>
             </el-submenu>
-            <el-submenu index="4">
-              <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>图书上架</template>
+            <el-submenu index="3">
+              <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>库存管理</template>
               <el-menu-item index="/admin/add_book/by_isbn">
                   <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
               </el-menu-item>
               <!-- <el-menu-item index="/admin/add_book/by_excel">
                   <i class="fa fa-file-text" aria-hidden="true"></i>批量上架
               </el-menu-item> -->
-            </el-submenu>
-            <el-submenu index="5">
-              <template slot="title"><i class="fa fa-list-ul" aria-hidden="true"></i>库存管理</template>
               <el-menu-item index="/admin/stock_manage/stock_list">
                   <i class="fa fa-university" aria-hidden="true"></i>库存查看
               </el-menu-item>
             </el-submenu>
-            <el-submenu index="6">
-              <template slot="title"><i class="fa fa-line-chart" aria-hidden="true"></i>统计管理</template>
+            <el-submenu index="4">
+              <template slot="title"><i class="fa fa-line-chart" aria-hidden="true"></i>资产统计</template>
+              <el-menu-item index="/admin/account/online">
+                  <i class="fa fa-money" aria-hidden="true"></i>线上资产
+              </el-menu-item>
               <el-menu-item index="/admin/statistics/sales">
                   <i class="fa fa-pie-chart" aria-hidden="true"></i>销售统计
               </el-menu-item>
             </el-submenu>
-            <el-submenu index="7">
-              <template slot="title"><i class="fa fa-money" aria-hidden="true"></i>资产管理</template>
-              <el-menu-item index="/admin/account/online">
-                  <i class="fa fa-hand-o-up" aria-hidden="true"></i>线上资产
-              </el-menu-item>
-            </el-submenu>
-            <el-submenu index="8">
+            <el-submenu index="5">
               <template slot="title"><i class="el-icon-setting"></i>设置</template>
               <el-menu-item index="/admin/store_info/cloud_store">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息
@@ -155,17 +145,17 @@
 
 <script>
 export default {
-    data() {
-        return {
-            store_logo: '',
-            seller_name: '',
-        }
+    mounted() {
+        this.$router.push({name: 'home'})
     },
     computed: {
-        logo() {
+        shop_logo() {
             // get logo from vuex
             let logo = this.$store.state.current_store.logo
             return logo == '' ? 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png' : 'http://onv8eua8j.bkt.clouddn.com/' + logo
+        },
+        shop_name() {
+            return this.$store.state.current_store.name
         },
         menu_active() {
             return this.$store.state.menu_active

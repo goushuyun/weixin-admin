@@ -1,6 +1,9 @@
 // 将组件抽离成不同的代码块，当路由访问到的时候再去加载，实现路由懒加载
 const shops = r => require(['../pages/shops/shops'], r)
 
+// 系统概况/首页
+const home = r => require(['../pages/home'], r)
+
 // * 订单管理
 // ** 订单列表
 const order_list = r => require(['../pages/order_manage/order_list'], r)
@@ -88,6 +91,10 @@ export default [{
             path: 'real_store',
             component: real_store
         }]
+    }, {
+        path: 'home',
+        name: 'home',
+        component: home
     }, {
         path: 'order/detail',
         name: 'order_detail',

@@ -18,8 +18,8 @@
           <div class="block">
             <p style="font-size:24px"><i class="iconfont icon-moneybag moneyicon"></i>{{balance}}元</p><p>可提现金额</p>
             <div class="btn_area">
-              <el-button size="mini" type="primary" style="width:50px;">提现</el-button>
-              <el-button size="mini" type="primary" style="width:50px;">充值</el-button>
+              <el-button type="text" style="color:#E9A084">提现</el-button>
+              <el-button type="text" style="color:#FFFF1F">充值</el-button>
             </div>
           </div>
         </div>
@@ -137,12 +137,10 @@ export default {
             this.findList()
         },
         goToDetail(index) {
-            // var school_name = this.orders[index].order.school_name
             var order_id = this.account_list[index].order_id
             this.$router.push({
                 name: 'order_detail',
-                params: {
-                    // school_name,
+                query: {
                     order_id
                 }
             })
@@ -255,7 +253,6 @@ export default {
     .btn_area {
         position: absolute;
         right: 20px;
-        bottom: 10px;
     }
     width: 100%;
     height: 130px;
