@@ -104,10 +104,11 @@ export default {
                 let store = resp.data.data
                 this.$store.commit('setCurrentStore', store)
 
+                localStorage.setItem('store', JSON.stringify(store))
                 // change token
                 localStorage.setItem('token', resp.data.token)
 
-                this.$router.push("admin")
+                this.$router.push({name:"home"})
             })
         },
 

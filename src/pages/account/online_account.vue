@@ -18,53 +18,55 @@
           <div class="block">
             <p style="font-size:24px"><i class="iconfont icon-moneybag moneyicon"></i>{{balance}}元</p><p>可提现金额</p>
             <div class="btn_area">
-              <el-button type="text" style="color:#E9A084">提现</el-button>
-              <el-button type="text" style="color:#FFFF1F">充值</el-button>
+              <el-button type="primary" size="mini" style="width:40px;position:relative;top:3px;left:10px;">提现</el-button>
+              <el-button type="primary" size="mini" style="width:40px;position:relative;top:3px;left:5px;">充值</el-button>
             </div>
           </div>
         </div>
       </el-col>
     </el-row>
 
-    <div style="color:#888;margin:20px 5px">线上交易记录</div>
+    <el-card style="margin-top:15px;">
+        <div style="color:#888;position:absolute;right:40px;top:195px;">线上交易记录</div>
 
-    <el-tabs class="tabs" v-model="activeName" @tab-click="findList">
-      <el-tab-pane label="待结算" name="unsettled"></el-tab-pane>
-      <el-tab-pane label="可提现" name="balance"></el-tab-pane>
-    </el-tabs>
+        <el-tabs class="tabs" v-model="activeName" @tab-click="findList">
+          <el-tab-pane label="待结算金额记录" name="unsettled"></el-tab-pane>
+          <el-tab-pane label="可提现金额记录" name="balance"></el-tab-pane>
+        </el-tabs>
 
-    <div class="row">
-      <el-date-picker :editable="false" v-model="account_time" size="small" type="datetimerange" placeholder="选择下单时间" :picker-options="pickerOptions" @change="findList" style="width: 300px;"></el-date-picker>
-      <el-select v-model="type" size="small" style="margin:0 30px;" @change="findList" clearable placeholder="请选择交易类型">
-        <el-option v-if="activeName == 'unsettled'" label="交易完成" value="1"></el-option>
-        <el-option v-if="activeName == 'unsettled'" label="手续费" value="2"></el-option>
-        <el-option v-if="activeName == 'unsettled'" label="交易收入" value="4"></el-option>
+        <div class="row">
+          <el-date-picker :editable="false" v-model="account_time" size="small" type="datetimerange" placeholder="选择下单时间" :picker-options="pickerOptions" @change="findList" style="width: 300px;"></el-date-picker>
+          <el-select v-model="type" size="small" style="margin:0 30px;" @change="findList" clearable placeholder="请选择交易类型">
+            <el-option v-if="activeName == 'unsettled'" label="交易完成" value="1"></el-option>
+            <el-option v-if="activeName == 'unsettled'" label="手续费" value="2"></el-option>
+            <el-option v-if="activeName == 'unsettled'" label="交易收入" value="4"></el-option>
 
-        <el-option v-if="activeName == 'balance'" label="交易完成" value="17"></el-option>
-        <el-option v-if="activeName == 'balance'" label="充值" value="18"></el-option>
-        <el-option v-if="activeName == 'balance'" label="提现" value="20"></el-option>
-        <el-option v-if="activeName == 'balance'" label="售后" value="24"></el-option>
-      </el-select>
-      <label style="color:#888">本次查询合计：收入<span style="color:#008000;margin:0 5px">{{total_income}}</span>元，支出<span style="color:#FF0063;margin:0 5px">{{total_expense}}</span>元</label>
-    </div>
+            <el-option v-if="activeName == 'balance'" label="交易完成" value="17"></el-option>
+            <el-option v-if="activeName == 'balance'" label="充值" value="18"></el-option>
+            <el-option v-if="activeName == 'balance'" label="提现" value="20"></el-option>
+            <el-option v-if="activeName == 'balance'" label="售后" value="24"></el-option>
+          </el-select>
+          <label style="color:#888">本次查询合计：收入<span style="color:#008000;margin:0 5px">{{total_income}}</span>元，支出<span style="color:#FF0063;margin:0 5px">{{total_expense}}</span>元</label>
+        </div>
 
-    <el-table class="row" ref="account_list" stripe border :data="account_list" style="width: 100%">
-      <el-table-column type="index" width="60"> </el-table-column>
-      <el-table-column property="item_type" label="交易类型" width="100"></el-table-column>
-      <el-table-column property="order_id" :label="activeName == 'unsettled' ? '订单号':'订单号/交易号'" width="160"></el-table-column>
-      <el-table-column property="item_fee" label="收支金额(元)" width="130"></el-table-column>
-      <el-table-column v-if="activeName == 'unsettled'" property="account_balance" label="待结算金额(元)" width="130"></el-table-column>
-      <el-table-column v-else property="account_balance" label="可提现金额(元)" width="130"></el-table-column>
-      <el-table-column property="remark" label="交易明细" width="250"></el-table-column>
-      <el-table-column property="create_at" label="时间" width="120"></el-table-column>
-      <el-table-column label="状态">
-        <template scope="scope">
-          <el-button type="text" @click="goToDetail(scope.$index)">详情</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination :current-page="page" :total="total_count" :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
-    </el-pagination>
+        <el-table class="row" ref="account_list" stripe border :data="account_list" style="width: 100%">
+          <el-table-column type="index" width="60"> </el-table-column>
+          <el-table-column property="item_type" label="交易类型" width="100"></el-table-column>
+          <el-table-column property="order_id" :label="activeName == 'unsettled' ? '订单号':'订单号/交易号'" width="160"></el-table-column>
+          <el-table-column property="item_fee" label="收支金额(元)" width="130"></el-table-column>
+          <el-table-column v-if="activeName == 'unsettled'" property="account_balance" label="待结算金额(元)" width="130"></el-table-column>
+          <el-table-column v-else property="account_balance" label="可提现金额(元)" width="130"></el-table-column>
+          <el-table-column property="remark" label="交易明细" width="250"></el-table-column>
+          <el-table-column property="create_at" label="时间" width="120"></el-table-column>
+          <el-table-column label="状态">
+            <template scope="scope">
+              <el-button type="text" @click="goToDetail(scope.$index)">详情</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination :current-page="page" :total="total_count" :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+        </el-pagination>
+    </el-card>
   </div>
 </div>
 </template>

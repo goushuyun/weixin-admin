@@ -17,8 +17,8 @@ section {
 
     <div class="content_inner">
         <el-tabs class="tabs" v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="仓库设置" name="location"></el-tab-pane>
             <el-tab-pane label="经营学校" name="school"></el-tab-pane>
+            <el-tab-pane label="仓库设置" name="location"></el-tab-pane>
             <el-tab-pane label="人员管理" name="people"></el-tab-pane>
             <!-- <el-tab-pane label="配送费设置" name="freight"></el-tab-pane>
             <el-tab-pane label="客服、售后设置" name="service"></el-tab-pane> -->
@@ -37,7 +37,7 @@ export default {
     // 页面渲染完成后，切到 school 路由
     data() {
         return {
-            activeName: 'location'
+            activeName: 'school'
         };
     },
     mounted() {

@@ -59,7 +59,7 @@
     <div id="left_bar">
         <el-row class="left_top">
             <el-col :span="10">
-              <router-link :to="{name:'home'}">
+              <router-link :to="{name:'cloud_store'}">
                   <img :src="shop_logo" class="shop_logo">
               </router-link>
             </el-col>
@@ -78,6 +78,7 @@
         </el-row>
 
         <el-menu theme="dark" mode="vertical" :router="true" unique-opened :default-active="menu_active">
+            <el-menu-item index="/admin/home"><i class="fa fa-home" style="font-size:18px;position:relative;top:1.5px;" aria-hidden="true"></i>首页</el-menu-item>
             <el-submenu index="1">
               <template slot="title"><i class="fa fa-list" aria-hidden="true"></i>订单管理</template>
               <el-menu-item index="/admin/order/list">
@@ -145,9 +146,6 @@
 
 <script>
 export default {
-    mounted() {
-        this.$router.push({name: 'home'})
-    },
     computed: {
         shop_logo() {
             // get logo from vuex
