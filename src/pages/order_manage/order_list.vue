@@ -26,7 +26,7 @@
         </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="resetForm" size="small"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
-            <el-button type="primary" @click="test" size="small"><i class="fa fa-download" aria-hidden="true"></i> 导出</el-button>
+            <el-button type="primary" @click="exportOrder" size="small"><i class="fa fa-download" aria-hidden="true"></i> 导出</el-button>
         </el-form-item>
     </el-form>
     <div class="row">
@@ -172,19 +172,6 @@ export default {
         this.getOrders()
     },
     destroyed() {
-        console.log({
-            order_time: this.order_time, //时间选择器[最早时间,最晚时间]
-            order_status: this.order_status, //订单状态
-            school_id: this.school_id,
-            search_type: this.search_type,
-            search_value: this.search_value,
-            order_id: this.order_id,
-            mobile: this.mobile,
-            name: this.name,
-            isbn: this.isbn,
-            page: this.page,
-            size: this.size
-        });
         this.$store.commit('setOrderSearch', {
             order_time: this.order_time, //时间选择器[最早时间,最晚时间]
             order_status: this.order_status, //订单状态
@@ -200,9 +187,15 @@ export default {
         })
     },
     methods: {
-        test() {
-            this.getSelectedOrders()
-            console.log(this.selected_orders);
+        exportOrder() {
+            var store = JSON.parse(localStorage.getItem('store'))
+            var params = {
+                "store_id": store.id,
+                "school_id": this.school_id,
+                "start_at": this.order_time[0] ? moment(this.order_time[0], "YYYY-MM-DD HH:mm:ss").unix() : 0,
+                "end_at": this.order_time[1] ? moment(this.order_time[1], "YYYY-MM-DD HH:mm:ss").unix() : 0,
+            }
+            window.location.assign('http://weixin-admin.goushuyun.com/v1/order/export_order?params=' + JSON.stringify(params))
         },
         getSelectedOrders() {
             var selected_orders = []
