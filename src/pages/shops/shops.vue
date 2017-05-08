@@ -107,7 +107,7 @@ export default {
                 // change token
                 localStorage.setItem('token', resp.data.token)
 
-                this.$router.push("admin")
+                this.$router.push({name:"home"})
             })
         },
 

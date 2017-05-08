@@ -7,26 +7,45 @@
     <div class="left_part">
       <el-card style="margin-bottom: 15px;">
         <p>开店流程</p>
-        <el-steps center style="margin: 30px;">
-          <el-step title="完善店铺信息" icon="edit" @cilck="test"></el-step>
-          <el-step title="进行店铺设置" icon="setting"></el-step>
-          <el-step title="上架图书" icon="menu"></el-step>
-          <el-step title="绑定微信公众号" icon="share"></el-step>
-        </el-steps>
+        <div class="steps_area">
+          <div class="tool" @click="goToStoreInfo">
+            <div>
+              <div class="icon_area"><i class="el-icon-edit"></i></div>
+              <div class="text_area">第一步：完善店铺信息</div>
+            </div>
+          </div>
+          <div class="tool" @click="goToStoreSetting">
+            <div>
+              <div class="icon_area"><i class="el-icon-setting"></i></div>
+              <div class="text_area">第二步：进行店铺设置</div>
+            </div>
+          </div>
+          <div class="tool" @click="goToAddBook">
+            <div>
+              <div class="icon_area"><i class="el-icon-menu"></i></div>
+              <div class="text_area">第三步：上架图书</div>
+            </div>
+          </div>
+          <div class="tool" @click="goToWeixin">
+            <div>
+              <div class="icon_area"><i class="el-icon-share"></i></div>
+              <div class="text_area">第四步：绑定微信公众号</div>
+            </div>
+          </div>
+        </div>
         <div class="end_time_area">云店到期于：{{expire_at}}</div>
       </el-card>
-
       <el-card>
         <div class="tools_area">
           <div class="tool" @click="goToOrderList(1)">
             <div>
-              <div class="icon_area">12</div>
+              <div class="icon_area">{{undelivered_order_num}}</div>
               <div class="text_area">待发货</div>
             </div>
           </div>
           <div class="tool" @click="goToOrderList(77)">
             <div>
-              <div class="icon_area">12</div>
+              <div class="icon_area">{{after_sale_order_num}}</div>
               <div class="text_area">待售后</div>
             </div>
           </div>
@@ -42,7 +61,7 @@
               <div class="text_area">上架图书</div>
             </div>
           </div>
-          <div class="tool" @click="goToStorSetting">
+          <div class="tool" @click="goToStoreSetting">
             <div>
               <div class="icon_area"><i class="el-icon-setting"></i></div>
               <div class="text_area">店铺设置</div>
@@ -51,7 +70,6 @@
         </div>
       </el-card>
     </div>
-
     <div class="right_part">
       <el-card class="time_area">{{date_time.time?date_time.time:'00:00'}}</el-card>
       <el-card style="margin-bottom:15px">
@@ -61,7 +79,7 @@
         </div>
       </el-card>
       <el-card>
-        <el-select v-model="school_id" style="width: 240px;" clearable placeholder="所有学校" size="small">
+        <el-select v-model="school_id" style="width: 240px;" clearable placeholder="所有学校" size="small" @change="indexOrderNumStatistic">
           <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
         </el-select>
       </el-card>
@@ -70,13 +88,13 @@
           <div class="info_col" style="width: 55%;">
             <div>
               <div class="text_area"><i class="fa fa-asterisk icon" aria-hidden="true"></i> 今日销售额</div>
-              <div class="icon_area">12</div>
+              <div class="icon_area">{{today_data.total_sales}}</div>
             </div>
           </div>
           <div class="info_col">
             <div>
               <div class="text_area"><i class="fa fa-asterisk icon" aria-hidden="true"></i> 昨日销售额</div>
-              <div class="icon_area">12</div>
+              <div class="icon_area">{{yesterday_data.total_sales}}</div>
             </div>
           </div>
         </div>
@@ -84,13 +102,13 @@
           <div class="info_col" style="width: 55%;">
             <div>
               <div class="text_area"><i class="fa fa-asterisk icon" aria-hidden="true"></i> 今日订单量</div>
-              <div class="icon_area">12</div>
+              <div class="icon_area">{{today_data.order_num}}</div>
             </div>
           </div>
           <div class="info_col">
             <div>
               <div class="text_area"><i class="fa fa-asterisk icon" aria-hidden="true"></i> 昨日订单量</div>
-              <div class="icon_area">12</div>
+              <div class="icon_area">{{yesterday_data.order_num}}</div>
             </div>
           </div>
         </div>
@@ -98,13 +116,13 @@
           <div class="info_col" style="width: 55%;">
             <div>
               <div class="text_area"><i class="fa fa-asterisk icon" aria-hidden="true"></i> 今日处理订单</div>
-              <div class="icon_area">12</div>
+              <div class="icon_area">{{today_data.handled_order_num}}</div>
             </div>
           </div>
           <div class="info_col">
             <div>
               <div class="text_area"><i class="fa fa-asterisk icon" aria-hidden="true"></i> 昨日处理订单</div>
-              <div class="icon_area">12</div>
+              <div class="icon_area">{{yesterday_data.handled_order_num}}</div>
             </div>
           </div>
         </div>
@@ -131,6 +149,11 @@ export default {
                 week: ''
             },
 
+            undelivered_order_num: '', //待发货
+            after_sale_order_num: '', //待售后
+            today_data: {}, //今日订单统计
+            yesterday_data: {}, //昨日订单统计
+
             shop_name: '',
             school_id: '',
             schools: [],
@@ -143,14 +166,15 @@ export default {
         this.getDateTime()
         this.getSchools()
         this.getStoreInfo()
+        this.indexOrderNumStatistic()
     },
     destroyed() {
         this.exit = true
         this.getDateTime()
     },
     methods: {
-        test() {
-            console.log('..........................');
+        goToStoreInfo() {
+            this.$router.push({name: 'cloud_store'})
         },
         goToOrderList(order_status) {
             this.$store.commit('setOrderSearch', {
@@ -158,20 +182,41 @@ export default {
             })
             this.$router.push({name: 'order_list'})
         },
+        goToWeixin() {
+            this.$router.push({name: 'weixin_setting'})
+        },
         goToRetail() {
             this.$router.push({name: 'offline_retail'})
         },
         goToAddBook() {
             this.$router.push({name: 'by_isbn'})
         },
-        goToStorSetting() {
-            this.$router.push({name: 'location'})
+        goToStoreSetting() {
+            this.$router.push({name: 'school'})
         },
         getStoreInfo() {
             var self = this
             axios.post('/v1/store/store_info', {}).then(resp => {
                 if (resp.data.message == 'ok') {
                     self.expire_at = moment.unix(resp.data.data.expire_at).format('YYYY-MM-DD')
+                }
+            })
+        },
+        //店铺首页订单数量统计
+        indexOrderNumStatistic() {
+            axios.post('/v1/store/index_order_num_statistic',{
+                school_id: this.school_id
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    var data = resp.data.data
+                    this.undelivered_order_num = data.undelivered_order_num //待发货
+                    this.after_sale_order_num = data.after_sale_order_num //待售后
+
+                    data.today_data.total_sales = priceFloat(data.today_data.total_sales)
+                    this.today_data = data.today_data
+
+                    data.yesterday_data.total_sales = priceFloat(data.yesterday_data.total_sales)
+                    this.yesterday_data = data.yesterday_data //昨日订单统计
                 }
             })
         },
@@ -224,6 +269,30 @@ export default {
         right: 340px;
         top: 36px;
         color: #888;
+    }
+    .steps_area {
+        display: flex;
+        justify-content:space-between;
+        padding: 10px 0;
+        .tool {
+            padding: 20px 0;
+            display: flex;
+            justify-content: center;
+            color: #47BFBD;
+            .icon_area {
+                text-align: center;
+                font-size: 30px;
+            }
+            .text_area {
+                width: auto;
+                text-align: center;
+                margin-top: 16px;
+            }
+            &:hover {
+                cursor: pointer;
+                color: #1D8CE0;
+            }
+        }
     }
     .tools_area {
         display: flex;

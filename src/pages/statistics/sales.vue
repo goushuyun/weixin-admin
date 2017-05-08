@@ -53,14 +53,13 @@
           <el-option label="新书旧书销售统计" value="new_old"></el-option>
           <el-option label="线上线下销售统计" value="online_offline"></el-option>
         </el-select>
-        <!-- <el-date-picker style="float:right;" format="yyyy-MM" :editable="false" v-model="month_range" size="small" type="daterange" placeholder="选择日期范围" align="right" :picker-options="monthOptions" @change="getMonthSales"></el-date-picker> -->
         <div style="float:right;">
-          <el-date-picker v-model="month_range[0]" type="month" size="small" placeholder="起始月份" @change="getMonthSales"></el-date-picker>
+          <el-date-picker v-model="month_range[0]" type="month" size="small" placeholder="起始月份" :picker-options="monthOptions" @change="getMonthSales"></el-date-picker>
           <span style="margin:0 5px;">-</span>
-          <el-date-picker v-model="month_range[1]" type="month" size="small" placeholder="截至月份" @change="getMonthSales"></el-date-picker>
+          <el-date-picker v-model="month_range[1]" type="month" size="small" placeholder="截至月份" :picker-options="monthOptions" @change="getMonthSales"></el-date-picker>
         </div>
       </div>
-      <div id="echart2" style="width: 100%;height:400px;margin-top:10px;"></div>
+      <div id="echart2" style="width: 100%;height:400px;margin-top:10px;" @resize="setEchart2"></div>
     </el-card>
   </div>
 </div>
@@ -80,62 +79,40 @@ export default {
             month_statistic: [],
             schools: [],
             school_id: '',
-            date_range: [null, null], //时间选择器[最早时间,最晚时间]
-            month_range: [null, null], //时间选择器[最早时间,最晚时间]
+            date_range: [], //时间选择器[最早时间,最晚时间]
+            month_range: ['', ''], //时间选择器[最早时间,最晚时间]
             dateOptions: {
                 shortcuts: [{
-                    text: '最近一周',
+                    text: '最近 7 天',
                     onClick(picker) {
-                        const end = moment();
-                        const start = moment().subtract(1, 'weeks');
+                        const end = moment().subtract(1, 'days');
+                        const start = moment().subtract(8, 'days');
                         picker.$emit('pick', [start, end]);
                     }
                 }, {
-                    text: '最近两周',
+                    text: '最近 14 天',
                     onClick(picker) {
-                        const end = moment();
-                        const start = moment().subtract(2, 'weeks');
+                        const end = moment().subtract(1, 'days');
+                        const start = moment().subtract(15, 'days');
                         picker.$emit('pick', [start, end]);
                     }
                 }, {
                     text: '最近一个月',
                     onClick(picker) {
-                        const end = moment();
-                        const start = moment().subtract(1, 'months');
+                        const end = moment().subtract(1, 'days');
+                        const start = moment().subtract(1, 'months').subtract(1, 'days');
                         picker.$emit('pick', [start, end]);
                     }
                 }],
                 disabledDate(time) {
-                    return time.getTime() > Date.now()
+                    return time.getTime() > moment().subtract(1, 'days')
                 }
             },
-            // monthOptions: {
-            //     shortcuts: [{
-            //         text: '最近一个月',
-            //         onClick(picker) {
-            //             const end = moment();
-            //             const start = moment().subtract(1, 'months');
-            //             picker.$emit('pick', [start, end]);
-            //         }
-            //     }, {
-            //         text: '最近三个月',
-            //         onClick(picker) {
-            //             const end = moment();
-            //             const start = moment().subtract(3, 'months');
-            //             picker.$emit('pick', [start, end]);
-            //         }
-            //     }, {
-            //         text: '最近六个月',
-            //         onClick(picker) {
-            //             const end = moment();
-            //             const start = moment().subtract(6, 'months');
-            //             picker.$emit('pick', [start, end]);
-            //         }
-            //     }],
-            //     disabledDate(time) {
-            //         return time.getTime() > Date.now()
-            //     }
-            // },
+            monthOptions: {
+                disabledDate(time) {
+                    return time.getTime() > moment()
+                }
+            },
             today_salse: 0,
             yestoday_sales: 0,
             history_sales: {}
@@ -143,20 +120,32 @@ export default {
     },
     mounted() {
         var self = this
+        self.setDefaultTime()
         self.getSchools()
         self.getTodaySales()
         self.getTotalSales()
+        $(window).resize(function(e){
+          self.setEchart1();
+          self.setEchart2();
+        });
         self.getDaliySales()
         self.getMonthSales()
     },
     methods: {
+        setDefaultTime() {
+            this.date_range.push(moment().subtract(15,'days'))
+            this.date_range.push(moment().subtract(1, 'days'))
+
+            this.month_range[0] = moment().subtract(6,'months').format('YYYY-MM')
+            this.month_range[1] = moment().format('YYYY-MM')
+        },
         getTodaySales() {
             axios.post('/v1/statistic/get_today_sales', {
                 "school_id": this.school_id //not required 学校id
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
-                    console.log(data);
+                    // console.log(data);
                     this.today_salse = priceFloat(data.offline_total_sales + data.online_total_sales)
                 }
             })
@@ -167,7 +156,7 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
-                    console.log(data);
+                    // console.log(data);
                     this.yestoday_sales = priceFloat(data.yesterday_sales.offline_total_sales + data.yesterday_sales.online_total_sales)
                     this.history_sales = {
                         total_sales: priceFloat(data.total_sales.online_total_sales + data.total_sales.offline_total_sales),
@@ -189,28 +178,28 @@ export default {
                     var date_statistic_0 = {
                         legend_data: ['新书销售额', '旧书销售额'],
                         xAxis_data: [],
-                        series_new_data: [],
-                        series_old_data: []
+                        series_data_0: [],  //新书
+                        series_data_1: []  //旧书
                     }
                     var date_statistic_1 = {
                         legend_data: ['线上销售额', '线下销售额'],
                         xAxis_data: [],
-                        series_online_data: [],
-                        series_offline_data: []
+                        series_data_0: [],  //线上
+                        series_data_1: []  //线下
                     }
                     resp.data.data.forEach(el => {
                         date_statistic_0.xAxis_data.push(el.statistic_at)
-                        date_statistic_0.series_new_data.push(priceFloat(el.online_new_book_sales_fee + el.offline_new_book_sales_fee)) //新书总额
-                        date_statistic_0.series_old_data.push(priceFloat(el.online_old_book_sales_fee + el.offline_old_book_sales_fee)) //旧书总额
+                        date_statistic_0.series_data_0.push(priceFloat(el.online_new_book_sales_fee + el.offline_new_book_sales_fee)) //新书总额
+                        date_statistic_0.series_data_1.push(priceFloat(el.online_old_book_sales_fee + el.offline_old_book_sales_fee)) //旧书总额
 
                         date_statistic_1.xAxis_data.push(el.statistic_at)
-                        date_statistic_1.series_online_data.push(priceFloat(el.alipay_order_fee + el.wechat_order_fee)) //线上总额
-                        date_statistic_1.series_offline_data.push(priceFloat(el.offline_new_book_sales_fee + el.offline_old_book_sales_fee)) //先下总额
+                        date_statistic_1.series_data_0.push(priceFloat(el.alipay_order_fee + el.wechat_order_fee)) //线上总额
+                        date_statistic_1.series_data_1.push(priceFloat(el.offline_new_book_sales_fee + el.offline_old_book_sales_fee)) //先下总额
                     })
                     this.date_statistic[0] = date_statistic_0
                     this.date_statistic[1] = date_statistic_1
-                    console.log('>>>>>----- this.date_statistic ----->');
-                    console.log(this.date_statistic);
+                    // console.log('>>>>>----- this.date_statistic ----->');
+                    // console.log(this.date_statistic);
                     this.setEchart1()
                 }
             })
@@ -250,15 +239,21 @@ export default {
                         name: option_data.legend_data[0],
                         type: 'line',
                         stack: '总量',
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top'
+                            }
+                        },
                         areaStyle: {
                             normal: {}
                         },
                         itemStyle: {
                             normal: {
-                                color: '#aed4c2'
+                                color: '#dda490'
                             }
                         },
-                        data: option_data.series_new_data
+                        data: option_data.series_data_0
                     },
                     {
                         name: option_data.legend_data[1],
@@ -275,10 +270,10 @@ export default {
                         },
                         itemStyle: {
                             normal: {
-                                color: '#dda490'
+                                color: '#aed4c2'
                             }
                         },
-                        data: option_data.series_old_data
+                        data: option_data.series_data_1
                     }
                 ]
             };
@@ -339,10 +334,17 @@ export default {
                             name: '线下'
                         })
                     })
+                    month_statistic_0.legend_data.push('新书')
+                    month_statistic_0.legend_data.push('旧书')
+                    month_statistic_0.legend_data.push('运费')
+
+                    month_statistic_1.legend_data.push('线上')
+                    month_statistic_1.legend_data.push('线下')
+
                     this.month_statistic[0] = month_statistic_0
                     this.month_statistic[1] = month_statistic_1
-                    console.log('>>>>>----- this.month_statistic ----->');
-                    console.log(this.month_statistic);
+                    // console.log('>>>>>----- this.month_statistic ----->');
+                    // console.log(this.month_statistic);
                     this.setEchart2()
                 }
             })

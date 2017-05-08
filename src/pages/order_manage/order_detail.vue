@@ -115,7 +115,7 @@
                 </div>
                 <div class="info_info" v-if="order_detail.after_sale_status == 1">
                     <label class="first-lable">操作：</label>
-                    <label><el-button type="danger" style="width:60px" size="mini" @click="refund">退款</el-button></label>
+                    <label><el-button type="danger" style="width:60px" size="mini" @click="reject">拒绝退款</el-button><el-button type="danger" style="width:60px" size="mini" @click="refund">退款</el-button></label>
                 </div>
                 <div class="info_info" v-if="order_detail.after_sale_status != 1">
                     <label class="first-lable">操作人员：</label>
@@ -201,6 +201,22 @@ export default {
                 self.refund_loading = false
                 if (resp.data.message == 'ok') {
                     self.$message.success('退款成功！');
+                    self.getOrder()
+                } else {
+                    self.$message.error(resp.data.message);
+                }
+            })
+        },
+        reject() {
+            var self = this
+            self.refund_loading = true
+            axios.post('/v1/order/handle_after_sale',{
+                "order_id": self.order_id,
+                "refund_fee": 0
+            }).then(resp => {
+                self.refund_loading = false
+                if (resp.data.message == 'ok') {
+                    self.$message.success('已拒绝退款！');
                     self.getOrder()
                 } else {
                     self.$message.error(resp.data.message);
