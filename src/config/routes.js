@@ -40,7 +40,7 @@ const salses = r => require(['../pages/statistics/sales'], r)
 
 // * 资产
 // ** 线上资产
-const online_account = r => require(['../pages/account/online_account'], r)
+const online_account = r => require(['../pages/account/online_account.vue'], r)
 
 // * 设置
 // ** 店铺信息
