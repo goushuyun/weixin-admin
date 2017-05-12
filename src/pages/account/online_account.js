@@ -19,7 +19,8 @@ export default {
                     order_no: res_data.id,
                     channel: 'alipay_pc_direct',
                     success_url: 'http://weixin.goushuyun.com/#/admin/account/online',
-                    body: '商户充值'
+                    body: '商户充值',
+                    event_type: 'recharge'
                 }
                 console.log(req);
                 axios.post('/v1/payment/get_charge', req).then(res=>{
