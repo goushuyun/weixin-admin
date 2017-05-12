@@ -81,7 +81,7 @@ ul.detail{
                         </li>
                         <li>
                             <span class="key">云店URL</span>
-                            <span class="val">待生成策略...</span>
+                            <span class="val">{{store_url}}</span>
                         </li>
                     </ul>
                 </div>
@@ -182,6 +182,10 @@ export default {
             }
 
             return type
+        },
+        store_url(){
+            // url 中填入官方服务号的 appid, 商户的store_id
+            return 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx6d36779ce4dd3dfa&redirect_uri=http%3A%2F%2Fwx.goushuyun.com%2Fone%2Ftwo%2Findex.html%23%2F&response_type=code&scope=snsapi_base&state='+ this.office_account.store_id +'&component_appid=wx1c2695469ae47724#wechat_redirect'
         }
     },
 
