@@ -65,7 +65,7 @@
         <div class="opt_area" :style="'height:' + 74 * order_items.length + 'px;'">
           <p>
             <el-button v-if="order_detail.order_status < 3 && order_detail.after_sale_status == 0" type="primary" style="width:60px" size="mini" @click="deliver"><i class="fa fa-truck" aria-hidden="true"></i> 发货</el-button>
-            <el-button type="primary" style="width:60px" size="mini"><i class="fa fa-print" aria-hidden="true"></i> 打印</el-button>
+            <el-button type="primary" style="width:60px" size="mini" @click="print"><i class="fa fa-print" aria-hidden="true"></i> 打印</el-button>
           </p>
           <p v-if="order_detail.groupon_id">班级购编号：{{order_detail.groupon_id}}</p>
         </div>
@@ -159,10 +159,12 @@ export default {
             actual_refund_fee: '',
             refund_loading: false,
             dialog: {
-              visible: false,
-              url: ''
+                visible: false,
+                url: ''
             },
-            operateTable: []
+            operateTable: [],
+
+            baseJson: {} // 用于打印
         }
     },
     mounted() {
@@ -175,6 +177,83 @@ export default {
         this.getOrder()
     },
     methods: {
+        print() {
+            var self = this
+            if (!checkLodopIsInstall()) {
+                self.$confirm('您尚未安装打印插件，请先安装！','提示',{
+                    confirmButtonText: '确认安装',
+                    cancelButtonText: '取消',
+                    type: 'info'
+                }).then(() => {
+                    window.location.assign('http://okxy9gsls.bkt.clouddn.com/CLodop_Setup_for_Win32NT.exe')
+                }).catch(() => {
+                    self.$message({
+                        type: 'info',
+                        message: '已取消操作!'
+                    });
+                });
+                return
+            }
+
+            //下面一句话测试专用
+            var order = self.baseJson;
+            console.log(order);
+            //工具方法，传一个order进去 order格式具体格式查看上步骤打印出来的order
+            orderPromiseFunc(order);
+            //接下来是一个轮询任务，用于检测是否打印完成,是否打印成功,以及打印失败 打印机任务是否清理完成
+            var count = 0
+            var checkPrintOver = setInterval(function() {
+                //首先要检测打印是否完成
+                console.log("打印是否完成：" + localStorage.printOver);
+                if (localStorage.printOver == 'true') {
+                    //接下来检测打印成功还是失败
+                    console.log("打印是否成功：" + localStorage.printSuccess);
+                    if (localStorage.printSuccess == 'true') {
+                        //如果打印成功，执行打印成功的方法
+                        //eg：告知服务器打印成功 ，打印下一个 func()
+                        this.servicePrint()
+                    } else {
+                        //如果打印失败，首先检测打印任务是否清理
+                        if (localStorage.clearPrinterOk == 'true') {
+                            //如果打印清理成功，执行清理成功的方法 func()
+                            //eg 执行之后的任务
+                            self.$notify.error({
+                                title: '错误',
+                                message: '打印失败，已清除该打印任务！',
+                                duration: 0
+                            });
+                        } else {
+                            //跳出打印任务，提示连接打印机失败
+                            //func()
+                            self.$notify.error({
+                                title: '错误',
+                                message: '连接打印机失败！',
+                                duration: 0
+                            });
+                        }
+                    }
+
+                    console.log("清理任务是否完成：");
+                    clearTimeout(checkPrintOver)
+                } else if (count > 30) {
+                    //打印出现问题，跳出打印任务，提示连接打印机失败
+                    clearTimeout(checkPrintOver)
+                }
+                count++
+                console.log("打印是否完成：" + localStorage.printOver);
+                console.log(localStorage.printOver == 'true');
+            }, 500)
+        },
+        servicePrint() {
+            axios.post('/v1/order/print', {
+                id: this.order_id
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.$message.success('成功打印订单：' + this.order_id)
+                    console.log('服务器已记录此次打印，订单ID：' + this.order_id);
+                }
+            })
+        },
         getSchoolName(id) {
             var self = this
             axios.post('/v1/school/store_schools', {}).then(resp => {
@@ -194,7 +273,7 @@ export default {
                 return
             }
             self.refund_loading = true
-            axios.post('/v1/order/handle_after_sale',{
+            axios.post('/v1/order/handle_after_sale', {
                 "order_id": self.order_id,
                 "refund_fee": priceInt(self.actual_refund_fee)
             }).then(resp => {
@@ -210,7 +289,7 @@ export default {
         reject() {
             var self = this
             self.refund_loading = true
-            axios.post('/v1/order/handle_after_sale',{
+            axios.post('/v1/order/handle_after_sale', {
                 "order_id": self.order_id,
                 "refund_fee": 0
             }).then(resp => {
@@ -247,8 +326,8 @@ export default {
             return true
         },
         deliver() {
-            axios.post('/v1/order/deliver',{
-                id:this.order_id
+            axios.post('/v1/order/deliver', {
+                id: this.order_id
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.$message.success('发货成功！')
@@ -260,8 +339,8 @@ export default {
             this.$router.go(-1)
         },
         picturePreview(img) {
-          this.dialog.url = 'http://onv8eua8j.bkt.clouddn.com/' + img;
-          this.dialog.visible = true;
+            this.dialog.url = 'http://onv8eua8j.bkt.clouddn.com/' + img;
+            this.dialog.visible = true;
         },
         getOrder() {
             axios.post('/v1/order/detail', {
@@ -269,6 +348,9 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
+
+                    // 用于打印
+                    this.baseJson.order = data
 
                     // 订单操作人列表
                     this.order_staffs = data.staffs
@@ -393,7 +475,7 @@ export default {
                 })
             }
             // 按时间排序
-            operateTable.sort((a,b) => {
+            operateTable.sort((a, b) => {
                 return moment(a.time).format('X') - moment(b.time).format('X')
             })
 
@@ -485,7 +567,8 @@ export default {
         }
     }
 }
-#order_info,#refund_info{
+#order_info,
+#refund_info {
     font-size: 14px;
     line-height: 40px;
     border: 1px solid #DFE6EC;
@@ -510,8 +593,8 @@ export default {
         height: 80px;
         margin: 12px 12px 12px 0;
         img {
-          width: 80px;
-          height: 80px;
+            width: 80px;
+            height: 80px;
         }
     }
 }
