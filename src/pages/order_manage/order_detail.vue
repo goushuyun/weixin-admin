@@ -211,7 +211,7 @@ export default {
                     if (localStorage.printSuccess == 'true') {
                         //如果打印成功，执行打印成功的方法
                         //eg：告知服务器打印成功 ，打印下一个 func()
-                        this.servicePrint()
+                        self.servicePrint()
                     } else {
                         //如果打印失败，首先检测打印任务是否清理
                         if (localStorage.clearPrinterOk == 'true') {
