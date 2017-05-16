@@ -1,8 +1,4 @@
-<style lang="scss" scoped>
-
-@import "./online_account.scss";
-
-</style>
+<style lang="scss" scoped>@import "./online_account.scss";</style>
 
 <template lang="html">
 
@@ -104,13 +100,9 @@
                             <el-radio-button :label="50000">¥ 500</el-radio-button>
                             <el-radio-button :label="100000">¥ 1000</el-radio-button>
                         </el-radio-group>
-
-
-
                     </span>
                 </li>
             </ul>
-
 
             <span slot="footer" class="dialog-footer">
                 <el-button @click="recharge_dialog_show = false" size="small">取 消</el-button>
@@ -124,7 +116,6 @@
 </template>
 
 <script>
-
 import {
     priceFloat
 }
@@ -136,153 +127,176 @@ import mix from './online_account.js'
 export default {
     mixins: [mix],
     data() {
-            return {
-                // recharge data
-                recharge_dialog_show: false,
-                recharge_amount: 0,
+        return {
+            // recharge data
+            recharge_dialog_show: false,
+            recharge_amount: 0,
 
+            online_total_sales: 0, //线上总销售额
+            unsettled_balance: 0, //待结算
+            balance: 0, //可提现
 
+            activeName: 'unsettled',
 
+            account_time: [null, null], //时间选择器[最早时间,最晚时间]
+            pickerOptions: {
+                shortcuts: [{
+                    text: '最近一周',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }, {
+                    text: '最近一个月',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }, {
+                    text: '最近三个月',
+                    onClick(picker) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                        picker.$emit('pick', [start, end]);
+                    }
+                }]
+            },
+            type: '', //交易类型
 
-                online_total_sales: 0, //线上总销售额
-                unsettled_balance: 0, //待结算
-                balance: 0, //可提现
+            total_income: 0,
+            total_expense: 0,
+            account_list: [],
 
-                activeName: 'unsettled',
-
-                account_time: [null, null], //时间选择器[最早时间,最晚时间]
-                pickerOptions: {
-                    shortcuts: [{
-                        text: '最近一周',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近一个月',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近三个月',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }]
-                },
-                type: '', //交易类型
-
-                total_income: 0,
-                total_expense: 0,
-                account_list: [],
-
-                page: 1,
-                size: 10,
-                total_count: 0
-            }
+            page: 1,
+            size: 10,
+            total_count: 0
+        }
+    },
+    mounted() {
+        this.getStoreData()
+        this.getTotalSales()
+        this.sellerAccount()
+        this.findList()
+    },
+    destroyed() {
+        this.$store.commit('setAccountSearch', {
+            account_time: this.account_time, //时间选择器[最早时间,最晚时间]
+            type: this.type, //订单状态
+            activeName: this.activeName,
+            page: this.page,
+            size: this.size
+        })
+    },
+    methods: {
+        getStoreData() {
+            var account_search = this.$store.state.account_search
+            console.log(account_search);
+            this.account_time = account_search.account_time ? account_search.account_time : [null, null]
+            this.type = account_search.type ? account_search.type : ''
+            this.activeName = account_search.activeName ? account_search.activeName : 'unsettled'
+            this.page = account_search.page ? account_search.page : 1
+            this.size = account_search.size ? account_search.size : 10
         },
-        mounted() {
-            this.getTotalSales()
-            this.sellerAccount()
+        handleSizeChange(size) {
+            this.size = size
             this.findList()
         },
-        methods: {
-            handleSizeChange(size) {
-                    this.size = size
-                    this.findList()
-                },
-                handleCurrentChange(page) {
-                    this.page = page
-                    this.findList()
-                },
-                goToDetail(index) {
-                    var order_id = this.account_list[index].order_id
-                    this.$router.push({
-                        name: 'order_detail',
-                        query: {
-                            order_id
-                        }
-                    })
-                },
-                //获取账户明细列表
-                findList() {
-                    var self = this
-                    var type = ''
-                    if (self.type == '') {
-                        if (self.activeName == 'unsettled') {
-                            type = 80
-                        } else {
-                            type = 81
-                        }
-                    } else {
-                        type = self.type
-                    }
-                    axios.post('/v1/account/find_list', {
-                        "start_at": self.account_time[0] ? moment(self.account_time[0], "YYYY-MM-DD").unix() : 0,
-                        "end_at": self.account_time[1] ? moment(self.account_time[1], "YYYY-MM-DD").unix() : 0,
-                        "page": self.page,
-                        "size": self.size,
-                        "type": type
-                    }).then(resp => {
-                        if (resp.data.message == 'ok') {
-                            self.total_count = resp.data.total_count
-                            self.total_income = priceFloat(resp.data.total_income)
-                            self.total_expense = priceFloat(-resp.data.total_expense)
-                            self.account_list = resp.data.data.map(el => {
-                                el.item_type = self.getTypeName(el.item_type)
-                                el.item_fee = priceFloat(el.item_fee)
-                                el.account_balance = priceFloat(el.account_balance)
-                                el.create_at = moment.unix(el.create_at).format('YYYY-MM-DD')
-                                return el
-                            })
-                        }
-                    })
-                },
-                getTypeName(type) {
-                    switch (type) {
-                        case 1:
-                            return '交易完成'
-                        case 2:
-                            return '手续费'
-                        case 4:
-                            return '交易收入'
-                        case 17:
-                            return '交易完成'
-                        case 18:
-                            return '充值'
-                        case 20:
-                            return '提现'
-                        case 24:
-                            return '售后'
-                    }
-                },
-                //获取历史销售额（昨日销售额和历史总销售额）
-                getTotalSales() {
-                    axios.post('/v1/statistic/get_total_sales', {}).then(resp => {
-                        if (resp.data.message == 'ok') {
-                            var data = resp.data.data
-                            this.online_total_sales = priceFloat(data.total_sales.online_total_sales)
-                        }
-                    })
-                },
-                //获取商家账户余额（可提现+待结算）
-                sellerAccount() {
-                    axios.post('/v1/account/seller_account', {}).then(resp => {
-                        if (resp.data.message == 'ok') {
-                            this.unsettled_balance = priceFloat(resp.data.data.unsettled_balance)
-                            this.balance = priceFloat(resp.data.data.balance)
-                        }
+        handleCurrentChange(page) {
+            this.page = page
+            this.findList()
+        },
+        goToDetail(index) {
+            var order_id = this.account_list[index].order_id
+            this.$router.push({
+                name: 'order_detail',
+                query: {
+                    order_id
+                }
+            })
+        },
+        //获取账户明细列表
+        findList() {
+            var self = this
+            var type = ''
+            if (self.type == '') {
+                if (self.activeName == 'unsettled') {
+                    type = 80
+                } else {
+                    type = 81
+                }
+            } else {
+                type = self.type
+            }
+            console.log(self.account_time);
+            axios.post('/v1/account/find_list', {
+                "start_at": self.account_time ? moment(self.account_time[0], "YYYY-MM-DD").unix() : 0,
+                "end_at": self.account_time ? moment(self.account_time[1], "YYYY-MM-DD").unix() : 0,
+                "page": self.page,
+                "size": self.size,
+                "type": type
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    self.total_count = resp.data.total_count
+                    self.total_income = priceFloat(resp.data.total_income)
+                    self.total_expense = priceFloat(-resp.data.total_expense)
+                    self.account_list = resp.data.data.map(el => {
+                        el.item_type = self.getTypeName(el.item_type)
+                        el.item_fee = priceFloat(el.item_fee)
+                        el.account_balance = priceFloat(el.account_balance)
+                        el.create_at = moment.unix(el.create_at).format('YYYY-MM-DD')
+                        return el
                     })
                 }
+            })
+        },
+        getTypeName(type) {
+            switch (type) {
+                case 1:
+                case "1":
+                    return '交易完成'
+                case 2:
+                case "2":
+                    return '手续费'
+                case 4:
+                case "4":
+                    return '交易收入'
+                case 17:
+                case "17":
+                    return '交易完成'
+                case 18:
+                case "18":
+                    return '充值'
+                case 20:
+                case "20":
+                    return '提现'
+                case 24:
+                case "24":
+                    return '售后'
+            }
+        },
+        //获取历史销售额（昨日销售额和历史总销售额）
+        getTotalSales() {
+            axios.post('/v1/statistic/get_total_sales', {}).then(resp => {
+                if (resp.data.message == 'ok') {
+                    var data = resp.data.data
+                    this.online_total_sales = priceFloat(data.total_sales.online_total_sales)
+                }
+            })
+        },
+        //获取商家账户余额（可提现+待结算）
+        sellerAccount() {
+            axios.post('/v1/account/seller_account', {}).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.unsettled_balance = priceFloat(resp.data.data.unsettled_balance)
+                    this.balance = priceFloat(resp.data.data.balance)
+                }
+            })
         }
+    }
 }
-
 </script>

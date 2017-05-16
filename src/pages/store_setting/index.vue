@@ -19,7 +19,7 @@ section {
         <el-tabs class="tabs" v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="经营学校" name="school"></el-tab-pane>
             <el-tab-pane label="仓库设置" name="location"></el-tab-pane>
-            <el-tab-pane label="人员管理" name="people"></el-tab-pane>
+            <!-- <el-tab-pane label="人员管理" name="people"></el-tab-pane> -->
             <!-- <el-tab-pane label="配送费设置" name="freight"></el-tab-pane>
             <el-tab-pane label="客服、售后设置" name="service"></el-tab-pane> -->
         </el-tabs>
@@ -49,15 +49,15 @@ export default {
         handleClick(tab, event) {
             this.activeName = tab.name
             switch (tab.name) {
-                case 'people':
-                    this.$router.push({name:'people'})
-                    break;
                 case 'school':
                     this.$router.push({name:'school'})
                     break;
                 case 'location':
                     this.$router.push({name:'location'})
                     break;
+                // case 'people':
+                //     this.$router.push({name:'people'})
+                //     break;
                 // case 'freight':
                 //     this.$router.push('freight')
                 //     break;
@@ -65,7 +65,7 @@ export default {
                 //     this.$router.push('service')
                 //     break;
                 default:
-                    this.$router.push('location')
+                    this.$router.push({name:'school'})
             }
         }
     }

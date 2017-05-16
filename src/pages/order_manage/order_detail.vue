@@ -423,7 +423,7 @@ export default {
                 operateTable.unshift({
                     time: this.order_detail.pay_at,
                     name: '买家',
-                    info: '买家付款，支付方式：' + this.order_detail.pay_channel + '。钱款扣除手续费 ' + this.order_detail.service_fee + ' 元，进入待结算金额。'
+                    info: '买家付款，支付方式：' + this.order_detail.pay_channel + '。钱款已进入待结算金额。'
                 })
             }
             // 发货

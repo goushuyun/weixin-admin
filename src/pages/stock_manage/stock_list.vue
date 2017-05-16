@@ -4,7 +4,7 @@
       <h2 class="title">库存查看</h2>
   </div>
   <div class="content_inner">
-    <el-form :inline="true" label-width="80px">
+    <el-form :inline="true" label-width="80px" class="search_area">
       <el-form-item label="ISBN">
         <el-input size="small" v-model="isbn"></el-input>
       </el-form-item>
@@ -77,13 +77,13 @@
             </el-table-column>
             <el-table-column label="位置" min-width="180">
                 <template scope="scope">
-                    <el-tooltip v-if="scope.row.has_new_book && scope.row.new_book.location.length" placement="top" effect="light" :enterable="false">
+                    <el-tooltip v-if="scope.row.has_new_book && scope.row.new_book.location.length" placement="top" effect="dark" :enterable="false">
                       <div slot="content"><span v-for="(item,index) in scope.row.new_book.location">{{item.location_str + (index + 1 == scope.row.new_book.location.length ? '' : '，')}}</span></div>
                       <div class="goods_item new_color ellipsis">
                         <span v-for="(item,index) in scope.row.new_book.location">{{item.location_str + (index + 1 == scope.row.new_book.location.length ? '' : '，')}}</span>
                       </div>
                     </el-tooltip>
-                    <el-tooltip v-if="scope.row.has_old_book && scope.row.old_book.location.length" placement="top" effect="light" :enterable="false">
+                    <el-tooltip v-if="scope.row.has_old_book && scope.row.old_book.location.length" placement="top" effect="dark" :enterable="false">
                       <div slot="content"><span v-for="(item,index) in scope.row.old_book.location">{{item.location_str + (index + 1 == scope.row.old_book.location.length ? '' : '，')}}</span></div>
                       <div class="goods_item old_color ellipsis">
                         <span v-for="(item,index) in scope.row.old_book.location">{{item.location_str + (index + 1 == scope.row.old_book.location.length ? '' : '，')}}</span>
@@ -749,8 +749,10 @@ export default {
 .old_color {
     color: #1AAD19;
 }
-.el-input {
-    width: 140px;
+.search_area {
+    .el-input {
+      width: 203px;
+    }
 }
 .pagination {
     margin-top: 12px;

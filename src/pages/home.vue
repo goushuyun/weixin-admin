@@ -302,7 +302,7 @@ export default {
         .tool {
             width: 124px;
             height: 124px;
-            margin: 20px;
+            margin: 20px 23.4px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -349,7 +349,8 @@ export default {
                 color: #4EC089;
             }
             .icon_area {
-                text-align: center;
+                text-align: left;
+                padding-left: 15px;
                 height: 50px;
                 line-height: 50px;
                 font-size: 16px;

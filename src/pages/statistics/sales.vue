@@ -2,7 +2,7 @@
 <div class="container">
   <div class="top_bar">
       <h2 class="title">销售统计</h2>
-      <el-select v-model="school_id" style="width: 240px;line-height: 48px;margin-left:20px;" clearable placeholder="学校" size="small">
+      <el-select v-model="school_id" style="width: 240px;line-height: 48px;margin-left:20px;" clearable placeholder="学校" size="small" @change="schoolChange">
           <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
       </el-select>
   </div>
@@ -125,13 +125,15 @@ export default {
         self.getTodaySales()
         self.getTotalSales()
         $(window).resize(function(e){
-          self.setEchart1();
-          self.setEchart2();
+            self.getDaliySales()
+            self.getMonthSales()
         });
-        self.getDaliySales()
-        self.getMonthSales()
     },
     methods: {
+        schoolChange() {
+            this.getDaliySales();
+            this.getMonthSales();
+        },
         setDefaultTime() {
             this.date_range.push(moment().subtract(15,'days'))
             this.date_range.push(moment().subtract(1, 'days'))
@@ -200,7 +202,9 @@ export default {
                     this.date_statistic[1] = date_statistic_1
                     // console.log('>>>>>----- this.date_statistic ----->');
                     // console.log(this.date_statistic);
-                    this.setEchart1()
+                    if (resp.data.data.length > 0) {
+                        this.setEchart1()
+                    }
                 }
             })
         },
@@ -345,7 +349,9 @@ export default {
                     this.month_statistic[1] = month_statistic_1
                     // console.log('>>>>>----- this.month_statistic ----->');
                     // console.log(this.month_statistic);
-                    this.setEchart2()
+                    if (resp.data.data.length > 0) {
+                        this.setEchart2()
+                    }
                 }
             })
         },

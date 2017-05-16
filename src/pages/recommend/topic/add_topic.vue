@@ -14,14 +14,13 @@
                 <el-button v-if="update && topic_id" type="text" style="color:#13CE66" @click="update = false">取消</el-button>
             </el-form-item>
             <el-form-item label="添加书籍" required>
-                <el-input v-if="goods.length < 15" id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
-                <label for="isbn_input" style="margin-left:10px;color:#888">每个话题最多可添加 15 本书</label>
+                <el-input id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
                 <el-button style="float:right;margin:0 20px" size="small" @click="prePage">返回</el-button>
                 <el-button v-if="!topic_id" style="float:right" type="primary" size="small" @click="addTopic">提交发布</el-button>
             </el-form-item>
         </el-form>
 
-        <el-table style="width: 100%" :data="goods" v-loading.body="loading">
+        <el-table style="width: 100%;margin-bottom: 15px;" :data="goods" v-loading.body="loading">
             <el-table-column label="ISBN" width="150" prop="isbn">
             </el-table-column>
             <el-table-column label="书名" width="200" prop="title">
@@ -40,6 +39,9 @@
                 </template>
             </el-table-column>
         </el-table>
+
+        <el-pagination :current-page="page" :total="total_count" :page-sizes="[15, 30, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+        </el-pagination>
     </div>
   </div>
 </template>
@@ -64,7 +66,11 @@ export default {
 
             goods: [],
 
-            loading: false
+            loading: false,
+
+            page: 1,
+            size: 15,
+            total_count: 0
         }
     },
     mounted() {
@@ -81,6 +87,14 @@ export default {
         }
     },
     methods: {
+        handleSizeChange(size) {
+            this.size = size
+            this.getTopic()
+        },
+        handleCurrentChange(page) {
+            this.page = page
+            this.getTopic()
+        },
         prePage() {
             this.$router.go('-1')
         },
@@ -111,10 +125,13 @@ export default {
         },
         getTopic() {
             axios.post('/v1/topic/topics_info', {
-                "id": this.topic_id
+                "id": this.topic_id,
+                "page": this.page,
+                "size": this.size
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data[0]
+                    this.total_count = resp.data.totalCount
                     console.log(data.items);
                     this.goods = data.items.map(el => {
                         el.price = priceFloat(el.book_price)
