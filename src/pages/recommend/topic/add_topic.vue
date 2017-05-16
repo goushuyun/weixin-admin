@@ -40,7 +40,7 @@
             </el-table-column>
         </el-table>
 
-        <el-pagination :current-page="page" :total="total_count" :page-sizes="[15, 30, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+        <el-pagination  v-if="topic_id" :current-page="page" :total="total_count" :page-sizes="[15, 30, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
         </el-pagination>
     </div>
   </div>

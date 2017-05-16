@@ -26,7 +26,7 @@
         </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="resetForm" size="small"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
-            <el-button type="primary" @click="exportOrder" size="small"><i class="fa fa-download" aria-hidden="true"></i> 导出</el-button>
+            <el-button type="primary" @click="preExportOrder" size="small"><i class="fa fa-download" aria-hidden="true"></i> 导出</el-button>
         </el-form-item>
     </el-form>
     <div class="row">
@@ -41,8 +41,8 @@
     </div>
     <div class="row">
       <el-checkbox v-model="selected_all" style="margin:0 12px;" @change="selectedAllChange">全选</el-checkbox>
-      <el-button v-if="order_status == 1" type="primary" @click="" size="small"><i class="fa fa-truck" aria-hidden="true"></i> 批量发货</el-button>
-      <el-button type="primary" @click="" size="small" @click="selectedPrint"><i class="fa fa-print" aria-hidden="true"></i> 批量打印</el-button>
+      <el-button v-if="order_status == 1" type="primary" @click="preSelectedDeliver" size="small"><i class="fa fa-truck" aria-hidden="true"></i> 批量发货</el-button>
+      <el-button type="primary" @click="" size="small" @click="preSelectedPrint"><i class="fa fa-print" aria-hidden="true"></i> 批量打印</el-button>
     </div>
     <div class="row" v-if="!orders.length">
       <div class="order_item">
@@ -105,6 +105,47 @@
     </div>
     <el-pagination :current-page="page" :total="total_count" :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
     </el-pagination>
+
+    <!-- 批量打印 -->
+    <el-dialog title="批量打印" :visible.sync="print_dialog.visible" size="small" :close-on-click-modal="false" :close-on-press-escape="false" @close="getOrders">
+      <div class="print_dialog">
+          <p class="desc">已选中 {{print_dialog.selected_count}} 条订单，有 {{print_dialog.printed_count}} 条已经打印过了</p>
+          <p><el-radio class="radio" v-model="print_dialog.radio" label="0">打印发货详情</el-radio></p>
+          <p><el-radio class="radio" disabled v-model="print_dialog.radio" label="1">打印快递单（此功能暂未开放）</el-radio></p>
+          <div class="footer1" v-if="order_status == 1">
+            <el-checkbox v-model="checked">打印成功后，直接将订单置为发货状态（不建议勾选）</el-checkbox>
+            <el-button style="float:right" type="primary" size="small" @click="confirmSelectedPrint">打印</el-button>
+          </div>
+          <div class="footer2" v-else>
+            <el-button type="primary" size="small" @click="confirmSelectedPrint">打印</el-button>
+          </div>
+      </div>
+    </el-dialog>
+
+    <!-- 导出 -->
+    <el-dialog title="批量导出" :visible.sync="export_dialog.visible" size="small" :close-on-click-modal="false" :close-on-press-escape="false">
+      <div class="export_dialog">
+          <p><el-radio class="radio" v-model="export_dialog.radio" label="0">导出报订单</el-radio></p>
+          <p class="desc">报订单会将待发货订单中的新书整理出来，以便于向上一级书商订书</p>
+          <p><el-radio class="radio" v-model="export_dialog.radio" label="1">导出发货单</el-radio></p>
+          <p class="desc">发货单会将待发货订单整理出来，你可以配合"快递助手"使用，直接打印快递单</p>
+          <p class="desc">选择时间：<el-date-picker :editable="false" v-model="export_dialog.time_range" size="small" type="datetimerange" placeholder="选择时间" :picker-options="pickerOptions" style="width: 300px;"></el-date-picker></p>
+          <div class="footer">
+            <el-button type="primary" size="small" @click="confirmExportOrder">导出</el-button>
+          </div>
+      </div>
+    </el-dialog>
+
+    <!-- 批量发货 -->
+    <el-dialog title="批量发货" :visible.sync="deliver_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false" @close="getOrders">
+      <div class="deliver_dialog">
+          <p class="desc">已选中 {{deliver_dialog.selected_count}} 条订单</p>
+          <p class="desc">请确认这些订单已经发货，再将订单置为发货状态</p>
+          <div class="footer">
+            <el-button type="primary" size="small" @click="confirmSelectedDeliver">发货</el-button>
+          </div>
+      </div>
+    </el-dialog>
   </div>
 </div>
 </template>
@@ -117,7 +158,23 @@ import axios from "../../scripts/http"
 export default {
     data() {
         return {
-            order_time: [null, null], //时间选择器[最早时间,最晚时间]
+            print_dialog: {
+                visible: false,
+                selected_count: 0,
+                printed_count: 0,
+                radio: '0',
+                checked: false
+            },
+            export_dialog: {
+                visible: false,
+                time_range: [],
+                radio: '0'
+            },
+            deliver_dialog: {
+                selected_count: 0,
+                visible: false
+            },
+            order_time: [], //时间选择器[最早时间,最晚时间]
             order_status: 1, //订单状态
             school_id: '',
 
@@ -187,11 +244,8 @@ export default {
         })
     },
     methods: {
-        selectedPrint() {
+        preSelectedPrint() {
             var self = this
-            self.getSelectedOrders()
-            console.log('已下是全部选中的订单：');
-            console.log(self.selected_orders);
             if (!checkLodopIsInstall()) {
                 self.$confirm('您尚未安装打印插件，请先安装！', '提示', {
                     confirmButtonText: '确认安装',
@@ -207,16 +261,25 @@ export default {
                 });
                 return
             }
-            var selected_orders = self.selected_orders
+            var selected_orders = this.getSelectedOrders()
             if (selected_orders.length <= 0) {
                 self.$message.warning('您尚未勾选任何订单！')
                 return
             }
-            for (var i = 0; i < selected_orders.length; i++) {
-                self.print(i)
+            this.print_dialog.selected_count = selected_orders.length
+            this.print_dialog.visible = true
+        },
+        confirmSelectedPrint() {
+            var selected_orders = this.selected_orders
+            if (this.print_dialog.radio == '0') {
+                for (var i = 0; i < selected_orders.length; i++) {
+                  this.realityPrint(i)
+                }
+            } else {
+                // 打印快递单（此功能暂未开放）
             }
         },
-        print(index) {
+        realityPrint(index) {
             var self = this
 
             //下面一句话测试专用
@@ -236,6 +299,11 @@ export default {
                         //如果打印成功，执行打印成功的方法
                         //eg：告知服务器打印成功 ，打印下一个 func()
                         self.servicePrint(order.order.id)
+
+                        // 如果选中了发货，则打印后发货
+                        if (self.print_dialog.checked) {
+                            self.deliver(order.order.id)
+                        }
                     } else {
                         //如果打印失败，首先检测打印任务是否清理
                         if (localStorage.clearPrinterOk == 'true') {
@@ -243,7 +311,7 @@ export default {
                             //eg 执行之后的任务
                             self.$notify.error({
                                 title: '错误',
-                                message: '打印失败，已清除该打印任务！',
+                                message: '订单：' + order.order.id + ' 打印失败，已清除该打印任务！',
                                 duration: 0
                             });
                         } else {
@@ -265,7 +333,6 @@ export default {
                 }
                 count++
                 console.log("打印是否完成：" + localStorage.printOver);
-                console.log(localStorage.printOver == 'true');
             }, 500)
         },
         servicePrint(order_id) {
@@ -273,23 +340,71 @@ export default {
                 id: order_id
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    this.$message.success('成功打印订单：' + this.order_id)
-                    console.log('服务器已记录此次打印，订单ID：' + this.order_id);
+                    if (this.print_dialog.printed_count < this.print_dialog.selected_count) {
+                        this.print_dialog.printed_count ++
+                    } else {
+                        this.getOrders()
+                        this.print_dialog.visible = false
+                    }
+                    console.log('服务器已记录订单：' + order_id + ' 的此次打印！');
                 }
             })
         },
-        exportOrder() {
+        deliver(order_id) {
+            axios.post('/v1/order/deliver', {
+                id: order_id
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    console.log('订单：' + order_id + ' 已发货！');
+                }
+            })
+        },
+        preExportOrder() {
+            this.export_dialog.time_range = this.order_time
+            this.export_dialog.visible = true
+        },
+        confirmExportOrder() {
+            if (!this.export_dialog.time_range[0]) {
+                this.$message.warning('请选择时间范围！')
+                return
+            }
             var store = JSON.parse(localStorage.getItem('store'))
             var params = {
                 "store_id": store.id,
                 "school_id": this.school_id,
-                "start_at": this.order_time[0] ? moment(this.order_time[0], "YYYY-MM-DD HH:mm:ss").unix() : 0,
-                "end_at": this.order_time[1] ? moment(this.order_time[1], "YYYY-MM-DD HH:mm:ss").unix() : 0,
+                "start_at": this.export_dialog.time_range[0] ? moment(this.export_dialog.time_range[0], "YYYY-MM-DD HH:mm:ss").unix() : 0,
+                "end_at": this.export_dialog.time_range[1] ? moment(this.export_dialog.time_range[1], "YYYY-MM-DD HH:mm:ss").unix() : 0,
             }
-            window.location.assign('http://weixin-admin.goushuyun.com/v1/order/export_order?params=' + JSON.stringify(params))
+            if (this.export_dialog.radio == '0') {
+                window.location.assign('http://weixin-admin.goushuyun.com/v1/order/export_order?params=' + JSON.stringify(params))
+            } else {
+                // 导出发货单
+            }
+            setTimeout(() => {
+                this.export_dialog.visible = false
+            },1500)
+        },
+        preSelectedDeliver() {
+            var selected_orders = this.getSelectedOrders()
+            if (selected_orders.length <= 0) {
+                this.$message.warning('您尚未勾选任何订单！')
+                return
+            }
+            this.deliver_dialog.selected_count = selected_orders.length
+            this.deliver_dialog.visible = true
+        },
+        confirmSelectedDeliver() {
+            var selected_orders = this.selected_orders
+            for (var i = 0; i < selected_orders.length; i++) {
+                var order_id = selected_orders[i].order.id
+                this.deliver(order_id)
+            }
+            this.getOrders()
+            this.deliver_dialog.visible = false
         },
         getSelectedOrders() {
             var selected_orders = []
+            var printed_count = 0
             this.orders.forEach(el => {
                 if (el.order.selected) {
                     selected_orders.push(el)
@@ -388,6 +503,7 @@ export default {
             this.size = order_search.size ? order_search.size : 10
         },
         getOrders() {
+            this.selected_all = false
             if (this.search_value && !this.search_type) {
                 this.$message.warning('请选择检索类型！')
                 return
@@ -400,8 +516,8 @@ export default {
                 "isbn": self.isbn,
                 "order_status": self.order_status,
                 "school_id": self.school_id.trim(),
-                "start_at": self.order_time[0] ? moment(self.order_time[0], "YYYY-MM-DD HH:mm:ss").unix() : 0,
-                "end_at": self.order_time[1] ? moment(self.order_time[1], "YYYY-MM-DD HH:mm:ss").unix() : 0,
+                "start_at": self.order_time ? moment(self.order_time[0], "YYYY-MM-DD HH:mm:ss").unix() : 0,
+                "end_at": self.order_time ? moment(self.order_time[1], "YYYY-MM-DD HH:mm:ss").unix() : 0,
                 "page": self.page,
                 "size": self.size
             }
@@ -448,6 +564,47 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.print_dialog {
+    p {
+        line-height: 44px;
+    }
+    .desc {
+        color: #888;
+    }
+    .footer1 {
+        line-height: 28px;
+        margin-top: 50px;
+    }
+    .footer2 {
+        margin-top: 50px;
+        text-align: right;
+    }
+}
+.export_dialog {
+    p {
+        line-height: 44px;
+    }
+    .desc {
+        color: #888;
+        padding-left: 24px;
+    }
+    .footer {
+        margin-top: 50px;
+        text-align: right;
+    }
+}
+.deliver_dialog {
+    p {
+        line-height: 44px;
+    }
+    .desc {
+        color: #888;
+    }
+    .footer {
+        margin-top: 50px;
+        text-align: right;
+    }
+}
 .order_item {
     border: 1px solid #DFE6EC;
     margin-bottom: 15px;

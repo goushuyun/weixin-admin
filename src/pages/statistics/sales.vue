@@ -131,8 +131,12 @@ export default {
     },
     methods: {
         schoolChange() {
-            this.getDaliySales();
-            this.getMonthSales();
+            $('#echart1').empty()
+            $('#echart2').empty()
+            this.getTodaySales()
+            this.getTotalSales()
+            this.getDaliySales()
+            this.getMonthSales()
         },
         setDefaultTime() {
             this.date_range.push(moment().subtract(15,'days'))
