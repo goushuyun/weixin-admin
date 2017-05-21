@@ -112,6 +112,9 @@
           <p class="desc">已选中 {{print_dialog.selected_count}} 条订单，有 {{print_dialog.printed_count}} 条已经打印过了</p>
           <p><el-radio class="radio" v-model="print_dialog.radio" label="0">打印发货详情</el-radio></p>
           <p><el-radio class="radio" disabled v-model="print_dialog.radio" label="1">打印快递单（此功能暂未开放）</el-radio></p>
+          <p>默认打印机：<span style="color:#FF4949">{{print_dialog.printer}}</span></p>
+          <div class="desc" style="line-height:24px;">请务必确保打印机正确，否则会造成错误。</div>
+          <div class="desc" style="line-height:24px;">您可以在“控制面板-设备和打印机”中修改默认打印机。</div>
           <div class="footer1" v-if="order_status == 1">
             <el-checkbox v-model="checked">打印成功后，直接将订单置为发货状态（不建议勾选）</el-checkbox>
             <el-button style="float:right" type="primary" size="small" @click="confirmSelectedPrint">打印</el-button>
@@ -122,14 +125,51 @@
       </div>
     </el-dialog>
 
+    <!-- 打印过程 -->
+    <el-dialog class="printing_dialog" title="正在批量打印并发货，请耐心等待......" :visible.sync="printing_dialog.visible" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+      <div class="printProgress">
+        <el-progress v-if="printing_dialog.percentage != 100" type="circle" :percentage="printing_dialog.percentage"></el-progress>
+        <el-progress v-else type="circle" :percentage="100" status="success"></el-progress>
+      </div>
+
+      <div class="printResult">
+        <el-alert style="margin:30px auto;" title="请确保当前打印机无其他打印任务！" type="warning" :closable="false"></el-alert>
+        <el-collapse v-model="printing_dialog.active_names">
+          <el-collapse-item v-if="printing_dialog.fail_orders.length" name="fail">
+            <template slot="title">
+              <span class="fail">{{printing_dialog.fail_orders.length}} 条订单打印失败！ <i class="header-icon el-icon-information"></i></span>
+            </template>
+            <p v-for="(order_id, index) in printing_dialog.fail_orders">{{(index + 1) + '. 订单 ' + order_id + ' 打印失败！'}}</p>
+          </el-collapse-item>
+          <el-collapse-item v-if="printing_dialog.success_orders.length">
+            <template slot="title">
+              <span class="success">{{printing_dialog.success_orders.length}} 条订单打印成功！ <i class="header-icon el-icon-circle-check"></i></span>
+            </template>
+            <p v-for="(order_id, index) in printing_dialog.success_orders">{{(index + 1) + '. 订单 ' + order_id + ' 打印成功！'}}</p>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
+
+      <div class="footer">
+        <el-button type="primary" size="small" :disabled="printing_dialog.disabled_btn" @click="completeSelectedPrint">完成</el-button>
+      </div>
+    </el-dialog>
+
     <!-- 导出 -->
     <el-dialog title="批量导出" :visible.sync="export_dialog.visible" size="small" :close-on-click-modal="false" :close-on-press-escape="false">
       <div class="export_dialog">
-          <p><el-radio class="radio" v-model="export_dialog.radio" label="0">导出报订单</el-radio></p>
+          <p><el-radio class="radio" disabled v-model="export_dialog.radio" label="0">导出报订单（此功能暂未开放）</el-radio></p>
           <p class="desc">报订单会将待发货订单中的新书整理出来，以便于向上一级书商订书</p>
           <p><el-radio class="radio" v-model="export_dialog.radio" label="1">导出发货单</el-radio></p>
           <p class="desc">发货单会将待发货订单整理出来，你可以配合"快递助手"使用，直接打印快递单</p>
-          <p class="desc">选择时间：<el-date-picker :editable="false" v-model="export_dialog.time_range" size="small" type="datetimerange" placeholder="选择时间" :picker-options="pickerOptions" style="width: 300px;"></el-date-picker></p>
+          <p class="desc">选择学校：
+            <el-select v-model="export_dialog.school_id" style="width: 300px;" clearable placeholder="学校" size="small">
+              <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
+            </el-select>
+          </p>
+          <p class="desc">选择时间：
+            <el-date-picker :editable="false" v-model="export_dialog.time_range" size="small" type="datetimerange" placeholder="选择时间" :picker-options="pickerOptions" style="width: 300px;"></el-date-picker>
+          </p>
           <div class="footer">
             <el-button type="primary" size="small" @click="confirmExportOrder">导出</el-button>
           </div>
@@ -163,12 +203,22 @@ export default {
                 selected_count: 0,
                 printed_count: 0,
                 radio: '0',
+                printer: '',
                 checked: false
+            },
+            printing_dialog: {
+                visible: false,
+                active_names: ['fail'],
+                percentage: 0,
+                success_orders: [],
+                fail_orders: [],
+                disabled_btn: true
             },
             export_dialog: {
                 visible: false,
+                school_id: '',
                 time_range: [],
-                radio: '0'
+                radio: '1'
             },
             deliver_dialog: {
                 selected_count: 0,
@@ -267,85 +317,82 @@ export default {
                 return
             }
             this.print_dialog.selected_count = selected_orders.length
+            this.print_dialog.printer = getPrinterName()
             this.print_dialog.visible = true
         },
         confirmSelectedPrint() {
-            var selected_orders = this.selected_orders
+            this.print_dialog.visible = false
+            this.printing_dialog.visible = true
             if (this.print_dialog.radio == '0') {
-                for (var i = 0; i < selected_orders.length; i++) {
-                  this.realityPrint(i)
-                }
+                this.realityPrint()
             } else {
                 // 打印快递单（此功能暂未开放）
             }
         },
+        completeSelectedPrint() {
+            this.printing_dialog = {
+                visible: false,
+                active_names: ['fail'],
+                percentage: 0,
+                success_orders: [],
+                fail_orders: [],
+                disabled_btn: true
+            },
+            this.getOrders()
+        },
         realityPrint(index) {
             var self = this
-
-            //下面一句话测试专用
-            var order = self.selected_orders[index];
-            console.log(order);
-            //工具方法，传一个order进去 order格式具体格式查看上步骤打印出来的order
-            orderPromiseFunc(order);
-            //接下来是一个轮询任务，用于检测是否打印完成,是否打印成功,以及打印失败 打印机任务是否清理完成
-            var count = 0
-            var checkPrintOver = setInterval(function() {
-                //首先要检测打印是否完成
-                console.log("打印是否完成：" + localStorage.printOver);
-                if (localStorage.printOver == 'true') {
-                    //接下来检测打印成功还是失败
-                    console.log("打印是否成功：" + localStorage.printSuccess);
-                    if (localStorage.printSuccess == 'true') {
-                        //如果打印成功，执行打印成功的方法
-                        //eg：告知服务器打印成功 ，打印下一个 func()
-                        self.servicePrint(order.order.id)
-
-                        // 如果选中了发货，则打印后发货
-                        if (self.print_dialog.checked) {
-                            self.deliver(order.order.id)
-                        }
-                    } else {
-                        //如果打印失败，首先检测打印任务是否清理
-                        if (localStorage.clearPrinterOk == 'true') {
-                            //如果打印清理成功，执行清理成功的方法 func()
-                            //eg 执行之后的任务
-                            self.$notify.error({
-                                title: '错误',
-                                message: '订单：' + order.order.id + ' 打印失败，已清除该打印任务！',
-                                duration: 0
-                            });
-                        } else {
-                            //跳出打印任务，提示连接打印机失败
-                            //func()
-                            self.$notify.error({
-                                title: '错误',
-                                message: '连接打印机失败！',
-                                duration: 0
-                            });
-                        }
+            var selected_orders = self.selected_orders
+            for (var i = 0; i < selected_orders.length; i++) {
+                (function(order) {
+                    var baseJson = {
+                        "order": order
                     }
-
-                    console.log("清理任务是否完成：");
-                    clearTimeout(checkPrintOver)
-                } else if (count > 30) {
-                    //打印出现问题，跳出打印任务，提示连接打印机失败
-                    clearTimeout(checkPrintOver)
-                }
-                count++
-                console.log("打印是否完成：" + localStorage.printOver);
-            }, 500)
+                    var unit = 100 / selected_orders.length
+                    orderPromiseFunc(baseJson);
+                    var count = 0
+                    var checkPrintOver = setInterval(function() {
+                        if (localStorage.printOver == 'true') {
+                            console.log('打印完成！');
+                            var percentage = self.printing_dialog.percentage + unit
+                            if (percentage < 100) {
+                                self.printing_dialog.percentage = percentage
+                            } else {
+                                self.printing_dialog.percentage = 100
+                                self.printing_dialog.disabled_btn = false
+                            }
+                            if (localStorage.printSuccess == 'true') {
+                                console.log('打印成功！');
+                                self.servicePrint(order.order.id)
+                                self.printing_dialog.success_orders.push(order.order.id)
+                                if (self.print_dialog.checked) {
+                                    self.deliver(order.order.id)
+                                }
+                            } else {
+                                console.log('打印失败！');
+                                self.printing_dialog.fail_orders.push(order.order.id)
+                                if (localStorage.clearPrinterOk == 'true') {} else {
+                                    self.$notify.error({
+                                        title: '错误',
+                                        message: '连接打印机失败！',
+                                        duration: 0
+                                    });
+                                }
+                            }
+                            clearTimeout(checkPrintOver)
+                        } else if (count > 30) {
+                            clearTimeout(checkPrintOver)
+                        }
+                        count++
+                    }, 500)
+                })(selected_orders[i])
+            }
         },
         servicePrint(order_id) {
             axios.post('/v1/order/print', {
                 id: order_id
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    if (this.print_dialog.printed_count < this.print_dialog.selected_count) {
-                        this.print_dialog.printed_count ++
-                    } else {
-                        this.getOrders()
-                        this.print_dialog.visible = false
-                    }
                     console.log('服务器已记录订单：' + order_id + ' 的此次打印！');
                 }
             })
@@ -360,10 +407,15 @@ export default {
             })
         },
         preExportOrder() {
+            this.export_dialog.school_id = this.school_id
             this.export_dialog.time_range = this.order_time
             this.export_dialog.visible = true
         },
         confirmExportOrder() {
+            if (!this.export_dialog.school_id) {
+                this.$message.warning('请选择学校！')
+                return
+            }
             if (!this.export_dialog.time_range[0]) {
                 this.$message.warning('请选择时间范围！')
                 return
@@ -371,18 +423,18 @@ export default {
             var store = JSON.parse(localStorage.getItem('store'))
             var params = {
                 "store_id": store.id,
-                "school_id": this.school_id,
+                "school_id": this.export_dialog.school_id,
                 "start_at": this.export_dialog.time_range[0] ? moment(this.export_dialog.time_range[0], "YYYY-MM-DD HH:mm:ss").unix() : 0,
                 "end_at": this.export_dialog.time_range[1] ? moment(this.export_dialog.time_range[1], "YYYY-MM-DD HH:mm:ss").unix() : 0,
             }
             if (this.export_dialog.radio == '0') {
-                window.location.assign('http://weixin-admin.goushuyun.com/v1/order/export_order?params=' + JSON.stringify(params))
+                // 导出报订单（此功能暂未开放）
             } else {
-                // 导出发货单
+                window.location.assign('http://weixin-admin.goushuyun.com/v1/order/export_order?params=' + JSON.stringify(params))
             }
             setTimeout(() => {
                 this.export_dialog.visible = false
-            },1500)
+            }, 1500)
         },
         preSelectedDeliver() {
             var selected_orders = this.getSelectedOrders()
@@ -395,11 +447,14 @@ export default {
         },
         confirmSelectedDeliver() {
             var selected_orders = this.selected_orders
-            for (var i = 0; i < selected_orders.length; i++) {
-                var order_id = selected_orders[i].order.id
-                this.deliver(order_id)
+            for (var i = 0; i <= selected_orders.length; i++) {
+                if (i < selected_orders.length) {
+                    var order_id = selected_orders[i].order.id
+                    this.deliver(order_id)
+                } else {
+                    this.getOrders()
+                }
             }
-            this.getOrders()
             this.deliver_dialog.visible = false
         },
         getSelectedOrders() {
@@ -409,7 +464,11 @@ export default {
                 if (el.order.selected) {
                     selected_orders.push(el)
                 }
+                if (el.order.print_at) {
+                    printed_count++
+                }
             })
+            this.print_dialog.printed_count = printed_count
             this.selected_orders = selected_orders
             return selected_orders
         },
@@ -565,6 +624,7 @@ export default {
 
 <style lang="scss" scoped>
 .print_dialog {
+    padding-left: 50px;
     p {
         line-height: 44px;
     }
@@ -580,7 +640,26 @@ export default {
         text-align: right;
     }
 }
+.printing_dialog {
+    .printProgress {
+        text-align: center;
+    }
+    .printResult {
+        padding: 0 40px;
+    }
+    .fail {
+        color: #FF4949;
+    }
+    .success {
+        color: #13CE66;
+    }
+    .footer {
+        margin-top: 50px;
+        text-align: right;
+    }
+}
 .export_dialog {
+    padding-left: 50px;
     p {
         line-height: 44px;
     }
@@ -594,6 +673,7 @@ export default {
     }
 }
 .deliver_dialog {
+    padding-left: 20px;
     p {
         line-height: 44px;
     }
