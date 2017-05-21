@@ -178,25 +178,25 @@ export default {
 
         computed: {
             oa_type() {
-                    let type = ''
-                    if (this.office_account.verify_type_info === 0 || this.office_account.verify_type_info === 1 || this.office_account.verify_type_info === 2) {
-                        type += '已认证'
-                    } else {
-                        type += '未认证'
-                    }
-
-                    if (this.office_account.service_type_info === 2) {
-                        type += '服务号'
-                    } else {
-                        type += '订阅号'
-                    }
-
-                    return type
-                },
-                store_url() {
-                    // url 中填入官方服务号的 appid, 商户的store_id
-                    return 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx6d36779ce4dd3dfa&redirect_uri=http%3A%2F%2Fwx.goushuyun.com%2Fone%2Ftwo%2Findex.html%23%2F&response_type=code&scope=snsapi_base&state=' + this.office_account.store_id + '&component_appid=wx1c2695469ae47724#wechat_redirect'
+                let type = ''
+                if (this.office_account.verify_type_info === 0 || this.office_account.verify_type_info === 1 || this.office_account.verify_type_info === 2) {
+                    type += '已认证'
+                } else {
+                    type += '未认证'
                 }
+
+                if (this.office_account.service_type_info === 2) {
+                    type += '服务号'
+                } else {
+                    type += '订阅号'
+                }
+
+                return type
+            },
+            store_url() {
+                // url 中填入官方服务号的 appid, 商户的store_id
+                return 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx6d36779ce4dd3dfa&redirect_uri=https%3A%2F%2Fapp.goushuyun.com%2Fone%2Ftwo%2Findex.html%23%2F&response_type=code&scope=snsapi_base&state=' + this.office_account.store_id + '&component_appid=wx1c2695469ae47724#wechat_redirect'
+            }
         },
 
         created() {
