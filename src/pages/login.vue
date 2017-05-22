@@ -288,7 +288,7 @@ export default {
                         username: this.sign.username
                     }).then(resp => {
                         if (resp.data.message == 'ok') {
-                            this.signIn()
+                            this.signIn(formName)
                         } else if (resp.data.message == 'exist') {
                             this.$message.info("用户名已存在！")
                         } else if (resp.data.message == 'codeErr') {
