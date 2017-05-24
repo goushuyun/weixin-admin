@@ -430,7 +430,7 @@ export default {
             if (this.export_dialog.radio == '0') {
                 // 导出报订单（此功能暂未开放）
             } else {
-                window.location.assign('http://weixin-admin.goushuyun.com/v1/order/export_order?params=' + JSON.stringify(params))
+                window.location.assign('http://admin.goushuyun.com/v1/order/export_order?params=' + JSON.stringify(params))
             }
             setTimeout(() => {
                 this.export_dialog.visible = false
