@@ -1,5 +1,16 @@
 @import "../../common/_color.scss";
-
+.setting_account_dialog {
+    padding-left: 20px;
+    .el-input {
+        width: 300px;
+    }
+}
+.withdraw_dialog {
+    padding-left: 20px;
+    .el-input {
+        width: 100px;
+    }
+}
 .row {
     margin-bottom: 15px;
 }
