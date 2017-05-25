@@ -27,7 +27,7 @@ buildfile() {
 
 upload_test() {
     rsync -e ssh -r ./build/* --progress -cv 'root@115.28.109.6:/home/weixin-admin'
-    # rsync -e ssh -r ./static/* --progress -cv 'root@115.28.109.6:/home/weixin-admin/static'
+    rsync -e ssh -r ./static/* --progress -cv 'root@115.28.109.6:/home/weixin-admin/static/'
 }
 
 upload_production() {
@@ -35,7 +35,7 @@ upload_production() {
     buildfile
 
     rsync -e ssh -r ./build/* --progress -cv 'root@139.129.227.229:/home/web/admin'
-
+    rsync -e ssh -r ./static/* --progress -cv 'root@139.129.227.229:/home/web/admin/static/'
     date
 }
 

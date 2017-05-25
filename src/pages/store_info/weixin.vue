@@ -38,10 +38,12 @@ ul.detail {
         // line-height: 36px;
         padding-bottom: 22px;
         color: $font_normal;
+        display: flex;
+        justify-content: flex-start;
         .key {
             vertical-align: top;
-            display: inline-block;
-            width: 100px;
+            display: block;
+            min-width: 100px;
             text-align: right;
             &:after {
                 content: "："
@@ -51,8 +53,26 @@ ul.detail {
             display: inline-block;
             padding-left: 6px;
             color: $font_lightest;
-            width: 400px;
+            max-width: 270px;
+            word-wrap: break-word;
         }
+        .url {
+            padding: 4px 6px;
+            box-sizing: border-box;
+            line-height: 18px;
+            background-color: #F6F8FA;
+        }
+    }
+}
+#copy_btn{
+    outline: none;
+    background-color: #F6F8FA;
+    border: 0;
+    color: #20A0FF;
+
+    &:hover{
+        cursor: pointer;
+        background-color: #E9ECEF;
     }
 }
 
@@ -66,31 +86,47 @@ ul.detail {
     </div>
     <div class="content_inner">
         <div v-if="has_authorized==true" class="office_account_info">
-            <ul class="detail">
-                <li>
-                    <span class="key">公众微信号</span>
-                    <span class="val">{{office_account.wechat_id === ''? '未填写':office_account.wechat_id}}</span>
-                </li>
-                <li>
-                    <span class="key">公众号昵称</span>
-                    <span class="val">{{office_account.nick_name}}</span>
-                </li>
-                <li>
-                    <span class="key">公众号类型</span>
-                    <span class="val">{{oa_type}}</span>
-                </li>
-                <li>
-                    <span class="key">帐号主体</span>
-                    <span class="val">{{office_account.principal_name}}</span>
-                </li>
-                <li>
-                    <span class="key">云店URL</span>
-                    <span class="val">
-                        <el-input resize="none" type="textarea" :disabled="true" :rows="6" placeholder="请输入内容" v-model="store_url">
-                        </el-input>
-                    </span>
-                </li>
-            </ul>
+            <el-row>
+                <el-col :span="12">
+                    <ul class="detail">
+                        <li>
+                            <span class="key">公众号昵称</span>
+                            <span class="val">{{office_account.nick_name}}</span>
+                        </li>
+                        <li>
+                            <span class="key">公众微信号</span>
+                            <span class="val">{{office_account.wechat_id === ''? '未填写':office_account.wechat_id}}</span>
+                        </li>
+                        <li>
+                            <span class="key">公众号类型</span>
+                            <span class="val">{{oa_type}}</span>
+                        </li>
+                        <li>
+                            <span class="key">帐号主体</span>
+                            <span class="val">{{office_account.principal_name}}</span>
+                        </li>
+                        <li>
+                            <span class="key">云店URL</span>
+                            <span class="val url">
+                                <span id="store_url">{{store_url}}</span>
+                                <button id="copy_btn" type="button" name="button" data-clipboard-target="#store_url"><i class="fa fa-clipboard" aria-hidden="true"></i> 复制URL</button>
+                            </span>
+                        </li>
+                    </ul>
+                </el-col>
+
+                <el-col :span="12" class="remark">
+                    <h4 class="remark_title">温馨提示</h4>
+                    <ul>
+                        <li>您需要将您的的云店URL绑定到微信公众号的菜单栏</li>
+
+                        <li>步骤1：点此<el-button size="small" type="text" @click="openInNewTab('https://mp.weixin.qq.com/')">登录微信服务号</el-button></li>
+                        <li>步骤2：进入“自定义菜单”</li>
+                        <li>步骤3：选择“跳转网页”并将左侧URL粘贴到页面地址中</li>
+
+                    </ul>
+                </el-col>
+            </el-row>
         </div>
 
         <el-row  v-else>
@@ -102,13 +138,12 @@ ul.detail {
                 </div>
             </el-col>
             <el-col v-if="has_authorized == false" :span="12" class="remark">
-                <h4 class="remark_title">绑定微信公众号，把店铺和微信打通</h4>
+                <h4 class="remark_title">温馨提示</h4>
                 <ul>
                     <li>如果您还没有微信公众号，可以
-                        <el-button size="small" type="text" href="https://mp.weixin.qq.com/cgi-bin/readtemplate?t=register/step1_tmpl&lang=zh_CN">点此注册</el-button>
+                        <el-button id="copy_btn" size="small" type="text" @click="openInNewTab('https://mp.weixin.qq.com/cgi-bin/readtemplate?t=register/step1_tmpl&lang=zh_CN')">点此注册</el-button>
                     </li>
-                    <li>一个微信公众号只能和一个店铺绑定</a>
-                    </li>
+                    <li>一个微信公众号只能和一个店铺绑定</li>
                 </ul>
             </el-col>
         </el-row>
@@ -131,7 +166,10 @@ export default {
             }
         },
         methods: {
-
+            openInNewTab(url) {
+                var win = window.open(url, '_blank');
+                win.focus();
+            },
             get_office_account_info() {
                     // 获取 store_id 对应的 office_account 信息
                     axios.post('/v1/weixin/get_office_account_info', {}).then(res => {
@@ -198,7 +236,10 @@ export default {
                 return 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx6d36779ce4dd3dfa&redirect_uri=https%3A%2F%2Fapp.goushuyun.com%2Fone%2Ftwo%2Findex.html%23%2F&response_type=code&scope=snsapi_base&state=' + this.office_account.store_id + '&component_appid=wx1c2695469ae47724#wechat_redirect'
             }
         },
-
+        mounted(){
+            // set up Clipboard
+            new Clipboard('#copy_btn')
+        },
         created() {
             this.get_office_account_info()
         }
