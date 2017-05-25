@@ -296,11 +296,11 @@ export default {
             var self = this
             axios.post('/v1/store/store_info', {}).then(resp => {
                 if (resp.data.message == 'ok') {
-                    self.form.logo = resp.data.data.logo,
-                        self.form.shop_name = resp.data.data.name,
-                        self.form.creat_date = stamp2date(resp.data.data.create_at, 'YYYY-MM-DD HH : mm : ss'),
-                        self.form.profile = resp.data.data.profile,
-                        self.form.mobile = resp.data.data.admin_mobile
+                    self.form.logo = resp.data.data.logo
+                    self.form.shop_name = resp.data.data.name
+                    self.form.creat_date = stamp2date(resp.data.data.create_at, 'YYYY-MM-DD HH : mm : ss')
+                    self.form.profile = resp.data.data.profile
+                    self.form.mobile = resp.data.data.admin_mobile
                 }
             })
         },
