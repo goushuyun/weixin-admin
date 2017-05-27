@@ -115,7 +115,7 @@
                 </div>
                 <div class="info_info" v-if="order_detail.after_sale_status == 1">
                     <label class="first-lable">操作：</label>
-                    <label><el-button type="danger" style="width:60px" size="mini" @click="reject">拒绝退款</el-button><el-button type="danger" style="width:60px" size="mini" @click="refund">退款</el-button></label>
+                    <label><el-button type="danger" style="width:60px" size="mini" @click="refund">退款</el-button><el-button style="width:60px;background-color:#8492A6;color:#FFFFFF" size="mini" @click="reject">拒绝退款</el-button></label>
                 </div>
                 <div class="info_info" v-if="order_detail.after_sale_status != 1">
                     <label class="first-lable">操作人员：</label>

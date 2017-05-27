@@ -6,14 +6,13 @@
     <div class="content_inner">
       <el-alert
       title="点击图片可修改轮播图"
-      description="1.仅支持 jpg、jpeg、png 格式的图片；2.图片尺寸 375 px X 150 px；3.图片大小不能超过2M"
+      description="1.仅支持 jpg、jpeg、png 格式的图片；2.图片尺寸 375 px X 180 px；3.图片大小不能超过2M"
       type="info" :closable="false" show-icon></el-alert>
       <div v-for="(item,index) in circulars" class="row_area">
           <el-row v-loading="item.loading" element-loading-text="正在检索图书">
             <el-col style="width:400px;">
               <div style="width:360px;" @click.stop="getIndex(index)">
                 <el-upload
-                  drag
                   action="http://upload.qiniu.com/"
                   :data="imagesFormData"
                   :show-file-list="false"
@@ -311,9 +310,13 @@ export default {
     height: 50px;
     line-height: 50px;
 }
+.el-upload {
+    height: 180px;
+    width: 375px;
+}
 .avatar {
-    width: 100%;
-    height: 100%;
+    height: 180px;
+    width: 375px;
 }
 .el-input,
 .el-select {

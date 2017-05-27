@@ -306,10 +306,10 @@ export default {
         }
     },
     created() {
-        this.getLocations()
     },
     mounted() {
-        this.getData()
+        this.getLocations()
+        // this.getData()
     },
     computed: {
         old_book_discount() {
@@ -340,6 +340,7 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.locations = handleLocation(resp.data.data)
+                    this.getData()
                 }
             })
         },
@@ -359,7 +360,7 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
-                    self.total_count = resp.data.total_count
+                    self.total_count = resp.data.totalCount
                     self.tableData = data.map(item => {
                         item.book.image = item.book.image
                         item.book.price = priceFloat(item.book.price)
@@ -751,7 +752,7 @@ export default {
 }
 .search_area {
     .el-input {
-      width: 203px;
+      width: 215px;
     }
 }
 .pagination {

@@ -2,9 +2,9 @@
 #login_box {
     background-color: white;
     text-align: center;
-    width: 300px;
+    width: 260px;
     margin: 0 auto;
-    padding: 22px 24px 32px;
+    padding: 22px 24px 0 24px;
     border-radius: 4px;
     box-shadow: 0 0 10px rgba(0, 0, 0, .1);
 
@@ -25,18 +25,17 @@
     bottom: 0;
     width: 100%;
     text-align: center;
-    height: 128px;
+    height: 50px;
     color: #888;
     font-size: 13px;
-    line-height: 128px;
+    line-height: 50px;
 }
 </style>
 
 <template lang="html">
 
 <div class="container">
-    <div style="height:20%;"></div>
-
+    <div style="height:10%"></div>
     <div id="login_box">
         <img class="logo" src="../images/logo.png" alt="logo">
 
@@ -56,10 +55,10 @@
                 <el-form :model="sign" :rules="rules" ref="sign">
                     <div v-if="activeName=='sign_up'">
                       <el-form-item prop="mobile">
-                          <el-input class="mobile" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
+                          <el-input class="mobile" size="small" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
                       </el-form-item>
                       <el-form-item prop="message_code">
-                          <el-input placeholder="短信验证码" v-model="sign.message_code">
+                          <el-input placeholder="短信验证码" size="small" v-model="sign.message_code">
                             <el-button slot="append" style="width:100px" @click="getMessageCode('register')" :disabled="registe_timer_disabled">
                               <span v-show="!registe_timer_disabled">获取验证码</span>
                               <span v-show="registe_timer_disabled">（{{register_timer_second}}s）</span>
@@ -67,25 +66,25 @@
                           </el-input>
                       </el-form-item>
                       <el-form-item prop="username">
-                          <el-input placeholder="姓名" v-model="sign.username"></el-input>
+                          <el-input placeholder="姓名" size="small" v-model="sign.username"></el-input>
                       </el-form-item>
                       <el-form-item prop="password">
-                          <el-input placeholder="设置密码" type="password" v-model="sign.password" @keyup.enter.native="signUp('sign')"></el-input>
+                          <el-input placeholder="设置密码" size="small" type="password" v-model="sign.password" @keyup.enter.native="signUp('sign')"></el-input>
                       </el-form-item>
                       <el-form-item>
-                          <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signUp('sign')">立即注册</el-button>
+                          <el-button style="width: 100%;" size="small" type="primary" :loading="btn_loading" @click="signUp('sign')">立即注册</el-button>
                       </el-form-item>
                     </div>
 
                     <div v-if="activeName=='sign_in'">
                       <el-form-item prop="mobile">
-                          <el-input class="mobile" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
+                          <el-input class="mobile" size="small" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
                       </el-form-item>
                       <el-form-item prop="password" v-show="!forgetPwd">
-                          <el-input placeholder="登录密码" type="password" v-model="sign.password" @keyup.enter.native="signIn('sign')"></el-input>
+                          <el-input placeholder="登录密码" size="small" type="password" v-model="sign.password" @keyup.enter.native="signIn('sign')"></el-input>
                       </el-form-item>
                       <el-form-item prop="message_code" v-if="forgetPwd">
-                          <el-input placeholder="短信验证码" v-model="sign.message_code">
+                          <el-input placeholder="短信验证码" size="small" v-model="sign.message_code">
                             <el-button slot="append" style="width:100px" @click="getMessageCode('update_pwd')" :disabled="update_pwd_timer_disabled">
                               <span v-show="!update_pwd_timer_disabled">获取验证码</span>
                               <span v-show="update_pwd_timer_disabled">（{{update_pwd_timer_second}}s）</span>
@@ -93,18 +92,19 @@
                           </el-input>
                       </el-form-item>
                       <el-form-item prop="password" v-if="forgetPwd">
-                          <el-input placeholder="新密码" type="password" v-model="sign.password" @keyup.enter.native="signIn('sign')"></el-input>
+                          <el-input placeholder="新密码" size="small" type="password" v-model="sign.password" @keyup.enter.native="signIn('sign')"></el-input>
                       </el-form-item>
                       <el-form-item style="text-align:left">
-                          <el-button style="width: 100%;" type="primary" :loading="btn_loading" @click="signIn('sign')">立即登录</el-button>
-                          <el-button v-show="!forgetPwd" type="text" @click="forgetPwd=true;sign.password=''">忘记密码？</el-button>
-                          <el-button v-show="forgetPwd" type="text" @click="forgetPwd=false">密码登录</el-button>
+                          <el-button style="width: 100%;" size="small" type="primary" :loading="btn_loading" @click="signIn('sign')">立即登录</el-button>
+                          <el-button v-show="!forgetPwd" size="small" type="text" @click="forgetPwd=true;sign.password=''">忘记密码？</el-button>
+                          <el-button v-show="forgetPwd" size="small" type="text" @click="forgetPwd=false">密码登录</el-button>
                       </el-form-item>
                     </div>
                 </el-form>
             </el-col>
         </el-row>
     </div>
+    <div style="height:15%"></div>
     <!-- 底部信息条 -->
     <el-row class="bottom_bar">
         <el-col :span="24">© 2017 购书云 版权所有 沪ICP备15022838号-2 </el-col>

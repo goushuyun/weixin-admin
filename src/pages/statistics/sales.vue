@@ -214,6 +214,9 @@ export default {
         },
         setEchart1() {
             var $echart1 = document.getElementById('echart1')
+            if ($echart1 == null || $echart1 == undefined) {
+                return
+            }
             var echart1 = echarts.init($echart1);
             var option_data = (this.date_statistic_type == 'new_old') ? this.date_statistic[0] : this.date_statistic[1]
             var option = {
@@ -361,6 +364,9 @@ export default {
         },
         setEchart2() {
             var $echart2 = document.getElementById('echart2')
+            if ($echart2 == null || $echart2 == undefined) {
+                return
+            }
             var echart2 = echarts.init($echart2);
             var option_data = (this.month_statistic_type == 'new_old') ? this.month_statistic[0] : this.month_statistic[1]
             var option = {

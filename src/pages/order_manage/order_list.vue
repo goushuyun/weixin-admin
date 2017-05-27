@@ -107,7 +107,7 @@
     </el-pagination>
 
     <!-- 批量打印 -->
-    <el-dialog title="批量打印" :visible.sync="print_dialog.visible" size="small" :close-on-click-modal="false" :close-on-press-escape="false" @close="getOrders">
+    <el-dialog title="批量打印" :visible.sync="print_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false" @close="getOrders">
       <div class="print_dialog">
           <p class="desc">已选中 {{print_dialog.selected_count}} 条订单，有 {{print_dialog.printed_count}} 条已经打印过了</p>
           <p><el-radio class="radio" v-model="print_dialog.radio" label="0">打印发货详情</el-radio></p>
@@ -116,7 +116,7 @@
           <div class="desc" style="line-height:24px;">请务必确保打印机正确，否则会造成错误。</div>
           <div class="desc" style="line-height:24px;">您可以在“控制面板-设备和打印机”中修改默认打印机。</div>
           <div class="footer1" v-if="order_status == 1">
-            <el-checkbox v-model="checked">打印成功后，直接将订单置为发货状态（不建议勾选）</el-checkbox>
+            <el-checkbox v-model="checked">打印并发货（不建议勾选）</el-checkbox>
             <el-button style="float:right" type="primary" size="small" @click="confirmSelectedPrint">打印</el-button>
           </div>
           <div class="footer2" v-else>
@@ -156,18 +156,18 @@
     </el-dialog>
 
     <!-- 导出 -->
-    <el-dialog title="批量导出" :visible.sync="export_dialog.visible" size="small" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-dialog title="批量导出" :visible.sync="export_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false">
       <div class="export_dialog">
-          <p><el-radio class="radio" disabled v-model="export_dialog.radio" label="0">导出报订单（此功能暂未开放）</el-radio></p>
-          <p class="desc">报订单会将待发货订单中的新书整理出来，以便于向上一级书商订书</p>
           <p><el-radio class="radio" v-model="export_dialog.radio" label="1">导出发货单</el-radio></p>
           <p class="desc">发货单会将待发货订单整理出来，你可以配合"快递助手"使用，直接打印快递单</p>
-          <p class="desc">选择学校：
+          <p><el-radio class="radio" disabled v-model="export_dialog.radio" label="0">导出报订单（此功能暂未开放）</el-radio></p>
+          <p class="desc">报订单会将待发货订单中的新书整理出来，以便于向上一级书商订书</p>
+          <p>学校：
             <el-select v-model="export_dialog.school_id" style="width: 300px;" clearable placeholder="学校" size="small">
               <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
             </el-select>
           </p>
-          <p class="desc">选择时间：
+          <p>时间：
             <el-date-picker :editable="false" v-model="export_dialog.time_range" size="small" type="datetimerange" placeholder="选择时间" :picker-options="pickerOptions" style="width: 300px;"></el-date-picker>
           </p>
           <div class="footer">
@@ -624,19 +624,19 @@ export default {
 
 <style lang="scss" scoped>
 .print_dialog {
-    padding-left: 50px;
+    padding-left: 12px;
     p {
-        line-height: 44px;
+        line-height: 34px;
     }
     .desc {
         color: #888;
     }
     .footer1 {
         line-height: 28px;
-        margin-top: 50px;
+        margin-top: 20px;
     }
     .footer2 {
-        margin-top: 50px;
+        margin-top: 20px;
         text-align: right;
     }
 }
@@ -654,34 +654,34 @@ export default {
         color: #13CE66;
     }
     .footer {
-        margin-top: 50px;
+        margin-top: 20px;
         text-align: right;
     }
 }
 .export_dialog {
-    padding-left: 50px;
+    padding-left: 12px;
     p {
-        line-height: 44px;
+        line-height: 34px;
     }
     .desc {
         color: #888;
         padding-left: 24px;
     }
     .footer {
-        margin-top: 50px;
+        margin-top: 20px;
         text-align: right;
     }
 }
 .deliver_dialog {
-    padding-left: 20px;
+    padding-left: 12px;
     p {
-        line-height: 44px;
+        line-height: 34px;
     }
     .desc {
         color: #888;
     }
     .footer {
-        margin-top: 50px;
+        // margin-top: 50px;
         text-align: right;
     }
 }

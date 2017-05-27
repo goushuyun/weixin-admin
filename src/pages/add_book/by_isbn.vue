@@ -217,6 +217,7 @@ export default {
             this.inputDiscount(1)
         },
         inputDiscount(type) {
+            console.log('000000000000000000000000');
             if (type) {
                 if (this.old_book.discount < 0) {
                     this.old_book.discount = 0
@@ -336,9 +337,6 @@ export default {
                             this.new_book.price = priceFloat(data.new_book.price)
                             this.new_book.discount = parseFloat(this.new_book.price / this.book_info.price * 10).toFixed(1)
                             if (data.new_book.location.length > 0) {
-                                // var new_location = data.new_book.location[0]
-                                // console.log([new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]);
-                                // this.new_book.location = [new_location.storehouse_id, new_location.shelf_id, new_location.floor_id]
                                 this.handleGoodsLocations(data.new_book.location, 0)
                             }
                         }
@@ -348,9 +346,6 @@ export default {
                             this.old_book.price = priceFloat(data.old_book.price)
                             this.old_book.discount = parseFloat(this.old_book.price / this.book_info.price * 10).toFixed(1)
                             if (data.old_book.location.length > 0) {
-                                // var old_location = data.old_book.location[0]
-                                // console.log([old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]);
-                                // this.old_book.location = [old_location.storehouse_id, old_location.shelf_id, old_location.floor_id]
                                 this.handleGoodsLocations(data.old_book.location, 1)
                             }
                         }
@@ -411,9 +406,16 @@ export default {
                 }
                 temp_locations.push(temp)
                 this.new_book.locations = temp_locations
+                var new_book_location_bak = []
+                new_book_location_bak = this.new_book.location //备份新书货架位
                 this.new_book.location = [book_location.storehouse_id, book_location.shelf_id, book_location.floor_id]
-                console.log(this.new_book.locations);
-                console.log(this.new_book.location);
+                if(new_book_location_bak.length > 0 && !isObjectValueEqual(new_book_location_bak,this.new_book.location)) {
+                    this.$notify.warning({
+                      title: '新书货架位已被更改',
+                      message: '新书货架位已被更改为原来的货架位',
+                      duration: 10000
+                    });
+                }
             }
             if (type == 1) {
                 var temp = {
@@ -422,9 +424,19 @@ export default {
                 }
                 temp_locations.push(temp)
                 this.old_book.locations = temp_locations
+                var old_book_location_bak = []
+                old_book_location_bak = this.old_book.location //备份旧书货架位
                 this.old_book.location = [book_location.storehouse_id, book_location.shelf_id, book_location.floor_id]
-                console.log(this.old_book.locations);
-                console.log(this.old_book.location);
+                if(old_book_location_bak.length > 0 && !isObjectValueEqual(old_book_location_bak,this.old_book.location)) {
+                    var self = this
+                    setTimeout(() => {
+                        self.$notify.warning({
+                          title: '旧书货架位已被更改',
+                          message: '旧书货架位已被更改为原来的货架位',
+                          duration: 10000
+                        });
+                    },100)
+                }
             }
         },
         insertLocations(locations, location) {
@@ -467,7 +479,12 @@ export default {
                         this.$alert('请移步“仓库设置”添加仓库和货架位', '提示', {
                             confirmButtonText: '确定',
                             callback: action => {
-                                this.$router.push('/admin/store_setting/location')
+                                this.$router.push({
+                                    name: 'location',
+                                    params: {
+                                        activeName: 'location'
+                                    }
+                                })
                             }
                         });
                     }

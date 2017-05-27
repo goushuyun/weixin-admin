@@ -39,7 +39,7 @@
         <el-card style="margin-top:15px;">
             <div style="color:#888;position:absolute;right:40px;top:195px;">线上交易记录</div>
 
-            <el-tabs class="tabs" v-model="activeName" @tab-click="findList">
+            <el-tabs class="tabs" v-model="activeName" @tab-click="tabChange">
                 <el-tab-pane label="待结算金额记录" name="unsettled"></el-tab-pane>
                 <el-tab-pane label="可提现金额记录" name="balance"></el-tab-pane>
             </el-tabs>
@@ -61,16 +61,39 @@
 
             <el-table class="row" ref="account_list" stripe border :data="account_list" style="width: 100%">
                 <el-table-column type="index" width="60"> </el-table-column>
-                <el-table-column property="item_type" label="交易类型" width="100"></el-table-column>
-                <el-table-column property="order_id" :label="activeName == 'unsettled' ? '订单号':'订单号/交易号'" width="160"></el-table-column>
-                <el-table-column property="item_fee" label="收支金额(元)" width="130"></el-table-column>
+                <el-table-column property="item_type" label="交易类型" width="100">
+                  <template scope="scope">
+                      <span v-if="scope.row.item_type == 1">交易完成</span>
+                      <span v-if="scope.row.item_type == 2">手续费</span>
+                      <span v-if="scope.row.item_type == 4">交易收入</span>
+                      <span v-if="scope.row.item_type == 17">交易完成</span>
+                      <span v-if="scope.row.item_type == 18">充值</span>
+                      <span v-if="scope.row.item_type == 20">提现</span>
+                      <span v-if="scope.row.item_type == 24">售后</span>
+                  </template>
+                </el-table-column>
+                <el-table-column property="order_id" :label="activeName == 'unsettled' ? '订单号':'订单号/交易号'" width="170"></el-table-column>
+                <el-table-column property="item_fee" label="收支金额(元)" width="130">
+                  <template scope="scope">
+                    <span v-if="scope.row.item_fee > 0" style="color:#13CE66">{{'+' + scope.row.item_fee}}</span>
+                    <span v-else-if="scope.row.item_fee < 0" style="color:#FF4949">{{scope.row.item_fee}}</span>
+                    <span v-else style="color:#FF4949">{{'-' + scope.row.item_fee}}</span>
+                  </template>
+                </el-table-column>
                 <el-table-column v-if="activeName == 'unsettled'" property="account_balance" label="待结算金额(元)" width="130"></el-table-column>
                 <el-table-column v-else property="account_balance" label="可提现金额(元)" width="130"></el-table-column>
                 <el-table-column property="remark" label="交易明细" width="250"></el-table-column>
                 <el-table-column property="create_at" label="时间" width="120"></el-table-column>
                 <el-table-column label="状态">
                     <template scope="scope">
-                        <el-button type="text" @click="goToDetail(scope.$index)">详情</el-button>
+                        <span v-if="scope.row.item_type == 18">充值成功</span>
+                        <div v-else-if="scope.row.item_type == 20">
+                          <span v-if="scope.row.status == 0" style="color:#FF4949">提现异常</span>
+                          <span v-if="scope.row.status == 1" style="color:#F7BA2A">即将处理</span>
+                          <span v-if="scope.row.status == 2" style="color:#20A0FF">正在处理</span>
+                          <span v-if="scope.row.status == 3" style="color:#13CE66">提现成功</span>
+                        </div>
+                        <el-button v-else type="text" @click="goToDetail(scope.$index)">详情</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -121,6 +144,9 @@
                     <el-radio-button label="0">对私银行账户（提现至个人账户）</el-radio-button>
                     <el-radio-button label="1">对公银行账户（提现至公司账户）</el-radio-button>
                   </el-radio-group>
+                </el-form-item>
+                <el-form-item prop="card_name" label="开户银行：">
+                  <el-input v-model="setting_account_dialog.card_name" size="small" placeholder="请输入银行支行"></el-input>
                 </el-form-item>
                 <el-form-item prop="card_no" :label="setting_account_dialog.type == '0' ? '银行卡卡号：' : '公司账户：'">
                   <el-input v-model="setting_account_dialog.card_no" size="small"></el-input>
@@ -216,6 +242,7 @@ export default {
                 creat_date: '',
                 mobile: '',
                 type: '0',
+                card_name: '',
                 card_no: '',
                 username: '',
                 code: '',
@@ -227,6 +254,11 @@ export default {
                 timer_disabled: false
             },
             account_rules: {
+                card_name: [{
+                    required: true,
+                    message: '银行名称不能为空',
+                    trigger: 'blur'
+                }],
                 card_no: [{
                     required: true,
                     message: '银行账号不能为空',
@@ -339,6 +371,10 @@ export default {
         })
     },
     methods: {
+        tabChange() {
+            this.type = ''
+            this.findList()
+        },
         withdrawApply(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
@@ -410,7 +446,7 @@ export default {
         addAccount(formName) {
             axios.post('/v1/store/save_card', {
                 "type": this.setting_account_dialog.type, //required 0:对私账户 1对公账户
-                "card_name": "购书云人民银行",
+                "card_name": this.setting_account_dialog.card_name,
                 "card_no": this.setting_account_dialog.card_no, //required 银行卡号
                 "username": this.setting_account_dialog.username, //required  银行卡所属人姓名
                 "code": this.setting_account_dialog.code //required  短信验证码
@@ -512,7 +548,7 @@ export default {
                     self.total_income = priceFloat(resp.data.total_income)
                     self.total_expense = priceFloat(-resp.data.total_expense)
                     self.account_list = resp.data.data.map(el => {
-                        el.item_type = self.getTypeName(el.item_type)
+                        // el.item_type = self.getTypeName(el.item_type)
                         el.item_fee = priceFloat(el.item_fee)
                         el.account_balance = priceFloat(el.account_balance)
                         el.create_at = moment.unix(el.create_at).format('YYYY-MM-DD')
