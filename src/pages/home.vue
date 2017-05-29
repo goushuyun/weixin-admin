@@ -174,24 +174,36 @@ export default {
     },
     methods: {
         goToStoreInfo() {
+            this.$store.commit('setMenuActive', '5-1')
+            localStorage.setItem('menu_active', '5-1')
             this.$router.push({name: 'cloud_store'})
         },
         goToOrderList(order_status) {
             this.$store.commit('setOrderSearch', {
                 order_status: order_status
             })
+            this.$store.commit('setMenuActive', '1-1')
+            localStorage.setItem('menu_active', '1-1')
             this.$router.push({name: 'order_list'})
         },
         goToWeixin() {
+            this.$store.commit('setMenuActive', '5-3')
+            localStorage.setItem('menu_active', '5-3')
             this.$router.push({name: 'weixin_setting'})
         },
         goToRetail() {
+            this.$store.commit('setMenuActive', '1-3')
+            localStorage.setItem('menu_active', '1-3')
             this.$router.push({name: 'offline_retail'})
         },
         goToAddBook() {
+            this.$store.commit('setMenuActive', '3-1')
+            localStorage.setItem('menu_active', '3-1')
             this.$router.push({name: 'by_isbn'})
         },
         goToStoreSetting() {
+            this.$store.commit('setMenuActive', '5-2')
+            localStorage.setItem('menu_active', '5-2')
             this.$router.push({name: 'school'})
         },
         getStoreInfo() {

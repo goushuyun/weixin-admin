@@ -23,6 +23,11 @@ div.top_bar {
             margin-left: 18px;
         }
     }
+    .menu_content {
+        position: absolute;
+        right: 100px;
+        top: 20px;
+    }
 }
 
 </style>
@@ -35,6 +40,14 @@ div.top_bar {
         <div class="top_content">
             <img class="logo" src="../../images/logo.png">
             <h4 class="title">购书云</h4>
+        </div>
+        <div class="menu_content">
+          <el-dropdown split-button type="text" size="large" @command="handleCommand">
+            {{user_name}}
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="signOut">退出</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
     </div>
 
@@ -69,6 +82,7 @@ export default {
     data(){
         return {
             active: false,
+            user_name: '',
             stores: []
         }
     },
@@ -79,6 +93,7 @@ export default {
     },
 
     mounted(){
+        this.user_name = JSON.parse(localStorage.getItem('adminInfo')).username
         // get seller's stores
         axios.post('/v1/seller/self_stores', {}).then(resp=>{
             this.stores = resp.data.data.map(val=>{
@@ -97,6 +112,25 @@ export default {
 
         },
 
+        handleCommand(command) {
+            if (command == 'signOut') {
+                this.signOut()
+            }
+        },
+        signOut() {
+            this.$confirm('确定要退出吗？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                localStorage.clear()
+                this.$store.commit('reset', {})
+                this.$router.push({
+                    name: 'login'
+                })
+            }).catch(() => {
+            });
+        },
         // go into shop
         into_store(id){
             // put store info into localstorage

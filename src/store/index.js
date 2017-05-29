@@ -5,7 +5,6 @@ export default {
         current_store: {},
         store_logo: '',     // 云店logo
         store_name: '',     // 云店name
-        menu_active: '',    // 默认打开的菜单
         order_search: {},   //线上订单搜索条件
         account_search: {}, //线上资产页面搜索条件
         menu_active: ''     //菜单的默认选中项（页面未通过菜单跳转则，跳转后菜单项未“高亮”）
@@ -31,6 +30,9 @@ export default {
         },
         setMenuActice(state, menu_active) {
             state.menu_active = menu_active
+        },
+        reset(state, new_state) {
+            state.menu_active = '0'
         }
     }
 }

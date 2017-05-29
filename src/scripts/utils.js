@@ -26,7 +26,7 @@ function stamp2date(dt, fmt) {
     }
 }
 
-function isISBNFormat (value){
+function isISBNFormat (isbn){
     if(isbn.length === 13){
         return /^978\d{10}$/.test(isbn)
     } else {

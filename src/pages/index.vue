@@ -42,7 +42,7 @@
 }
 
 #content {
-    background-image: url(http://7xvl2k.com1.z0.glb.clouddn.com/bg_3.jpg);
+    background-image: url("http://7xvl2k.com1.z0.glb.clouddn.com/bg_3.jpg");
     background-attachment: fixed;
     background-size: 100%, 100%;
     padding-left: 180px;
@@ -59,26 +59,20 @@
     <div id="left_bar">
         <el-row class="left_top">
             <el-col :span="10">
-              <router-link :to="{name:'cloud_store'}">
-                  <img :src="store_logo" class="shop_logo">
-              </router-link>
+              <img :src="store_logo" class="shop_logo" @click="goToCloudStore">
             </el-col>
 
             <el-col :span="14">
                 <p class="shop_name">{{store_name}}</p>
                 <p style="padding-top:8px;">
-                    <router-link :to="{name:'shops'}">
-                        <i class="fa fa-arrow-left icon" aria-hidden="true"></i>
-                    </router-link>
-                    <router-link :to="{name:'login'}">
-                        <i class="fa fa-power-off icon" aria-hidden="true"></i>
-                    </router-link>
+                    <i class="fa fa-arrow-left icon" aria-hidden="true" @click="goToshops"></i>
+                    <i class="fa fa-power-off icon" aria-hidden="true" @click="signOut"></i>
                 </p>
             </el-col>
         </el-row>
 
         <el-menu theme="dark" mode="vertical" :router="true" unique-opened :default-active="menu_active" @select="menuSelect">
-            <el-menu-item index="/admin/home"><i class="fa fa-home" style="font-size:18px;position:relative;top:1.5px;" aria-hidden="true"></i>首页</el-menu-item>
+            <el-menu-item index="0" :route="{path:'/admin/home'}"><i class="fa fa-home" style="font-size:18px;position:relative;top:1.5px;" aria-hidden="true"></i>首页</el-menu-item>
             <el-submenu index="1">
               <template slot="title"><i class="fa fa-list" aria-hidden="true"></i>订单管理</template>
               <el-menu-item index="1-1" :route="{path:'/admin/order/list'}">
@@ -150,6 +144,35 @@ export default {
         menuSelect(index) {
             this.$store.commit('setMenuActive', index)
             localStorage.setItem('menu_active', index)
+        },
+        goToCloudStore() {
+            this.$store.commit('setMenuActive', '5-1')
+            localStorage.setItem('menu_active', '5-1')
+            this.$router.push({
+                name: 'cloud_store'
+            })
+        },
+        goToshops() {
+            this.$store.commit('setMenuActive', '0')
+            localStorage.setItem('menu_active', '0')
+            this.$router.push({
+                name: 'shops'
+            })
+        },
+        signOut() {
+            this.$confirm('确定要退出吗？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'info'
+            }).then(() => {
+                localStorage.clear()
+                this.$store.commit('reset', {})
+                this.$router.push({
+                    name: 'login'
+                })
+            }).catch(() => {
+
+            });
         }
     },
     computed: {
@@ -183,7 +206,7 @@ export default {
             } else if (local_active) {
                 return local_active
             } else {
-                return ''
+                return '0'
             }
         }
     }
