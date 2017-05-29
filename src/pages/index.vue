@@ -60,12 +60,12 @@
         <el-row class="left_top">
             <el-col :span="10">
               <router-link :to="{name:'cloud_store'}">
-                  <img :src="shop_logo" class="shop_logo">
+                  <img :src="store_logo" class="shop_logo">
               </router-link>
             </el-col>
 
             <el-col :span="14">
-                <p class="shop_name">{{shop_name}}</p>
+                <p class="shop_name">{{store_name}}</p>
                 <p style="padding-top:8px;">
                     <router-link :to="{name:'shops'}">
                         <i class="fa fa-arrow-left icon" aria-hidden="true"></i>
@@ -77,59 +77,59 @@
             </el-col>
         </el-row>
 
-        <el-menu theme="dark" mode="vertical" :router="true" unique-opened :default-active="menu_active">
+        <el-menu theme="dark" mode="vertical" :router="true" unique-opened :default-active="menu_active" @select="menuSelect">
             <el-menu-item index="/admin/home"><i class="fa fa-home" style="font-size:18px;position:relative;top:1.5px;" aria-hidden="true"></i>首页</el-menu-item>
             <el-submenu index="1">
               <template slot="title"><i class="fa fa-list" aria-hidden="true"></i>订单管理</template>
-              <el-menu-item index="/admin/order/list">
+              <el-menu-item index="1-1" :route="{path:'/admin/order/list'}">
                   <i class="fa fa-delicious" aria-hidden="true"></i>线上订单
               </el-menu-item>
-              <el-menu-item index="/admin/offline/retail_list">
+              <el-menu-item index="1-2" :route="{path:'/admin/offline/retail_list'}">
                   <i class="fa fa-life-ring" aria-hidden="true"></i>线下订单
               </el-menu-item>
-              <el-menu-item index="/admin/offline/retail">
+              <el-menu-item index="1-3" :route="{path:'/admin/offline/retail'}">
                   <i class="fa fa-balance-scale" aria-hidden="true"></i>线下零售
               </el-menu-item>
             </el-submenu>
             <el-submenu index="2">
               <template slot="title"><i class="fa fa-flag" aria-hidden="true"></i>推荐管理</template>
-              <el-menu-item index="/admin/recommend/topic">
+              <el-menu-item index="2-1" :route="{path:'/admin/recommend/topic'}">
                   <i class="fa fa-anchor" aria-hidden="true"></i>话题推荐
               </el-menu-item>
-              <el-menu-item index="/admin/recommend/carousel">
+              <el-menu-item index="2-2" :route="{path:'/admin/recommend/carousel'}">
                   <i class="fa fa-picture-o" aria-hidden="true"></i>轮播图
               </el-menu-item>
             </el-submenu>
             <el-submenu index="3">
               <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>库存管理</template>
-              <el-menu-item index="/admin/add_book/by_isbn">
+              <el-menu-item index="3-1" :route="{path:'/admin/add_book/by_isbn'}">
                   <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
               </el-menu-item>
-              <!-- <el-menu-item index="/admin/add_book/by_excel">
+              <!-- <el-menu-item index="3-2" route="/admin/add_book/by_excel">
                   <i class="fa fa-file-text" aria-hidden="true"></i>批量上架
               </el-menu-item> -->
-              <el-menu-item index="/admin/stock_manage/stock_list">
+              <el-menu-item index="3-3" :route="{path:'/admin/stock_manage/stock_list'}">
                   <i class="fa fa-university" aria-hidden="true"></i>库存查看
               </el-menu-item>
             </el-submenu>
             <el-submenu index="4">
               <template slot="title"><i class="fa fa-line-chart" aria-hidden="true"></i>资产统计</template>
-              <el-menu-item index="/admin/account/online">
+              <el-menu-item index="4-1" :route="{path:'/admin/account/online'}">
                   <i class="fa fa-money" aria-hidden="true"></i>线上资产
               </el-menu-item>
-              <el-menu-item index="/admin/statistics/sales">
+              <el-menu-item index="4-2" :route="{path:'/admin/statistics/sales'}">
                   <i class="fa fa-pie-chart" aria-hidden="true"></i>销售统计
               </el-menu-item>
             </el-submenu>
             <el-submenu index="5">
               <template slot="title"><i class="el-icon-setting"></i>设置</template>
-              <el-menu-item index="/admin/store_info/cloud_store">
+              <el-menu-item index="5-1" :route="{path:'/admin/store_info/cloud_store'}">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息
               </el-menu-item>
-              <el-menu-item index="/admin/store_setting/school">
+              <el-menu-item index="5-2" :route="{path:'/admin/store_setting/school'}">
                   <i class="fa fa-cog" aria-hidden="true"></i>店铺设置
               </el-menu-item>
-              <el-menu-item index="/admin/weixin_setting/">
+              <el-menu-item index="5-3" :route="{path:'/admin/weixin_setting/'}">
                   <i class="fa fa-weixin" aria-hidden="true"></i></i>微信设置
               </el-menu-item>
             </el-submenu>
@@ -146,17 +146,45 @@
 
 <script>
 export default {
+    methods: {
+        menuSelect(index) {
+            this.$store.commit('setMenuActive', index)
+            localStorage.setItem('menu_active', index)
+        }
+    },
     computed: {
-        shop_logo() {
-            // get logo from vuex
-            let logo = this.$store.state.current_store.logo
-            return logo == '' ? 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png' : 'http://onv8eua8j.bkt.clouddn.com/' + logo
+        store_logo() {
+            let vuex_logo = this.$store.state.store_logo
+            let local_logo = localStorage.getItem('store_logo')
+            if (vuex_logo) {
+                return 'http://onv8eua8j.bkt.clouddn.com/' + vuex_logo
+            } else if (local_logo) {
+                return 'http://onv8eua8j.bkt.clouddn.com/' + local_logo
+            } else {
+                return 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png'
+            }
         },
-        shop_name() {
-            return this.$store.state.current_store.name
+        store_name() {
+            let vuex_name = this.$store.state.store_name
+            let local_name = localStorage.getItem('store_name')
+            if (vuex_name) {
+                return vuex_name
+            } else if (local_name) {
+                return local_name
+            } else {
+                return '购书云'
+            }
         },
         menu_active() {
-            return this.$store.state.menu_active
+            let vuex_active = this.$store.state.menu_active
+            let local_active = localStorage.getItem('menu_active')
+            if (vuex_active) {
+                return vuex_active
+            } else if (local_active) {
+                return local_active
+            } else {
+                return ''
+            }
         }
     }
 }

@@ -104,7 +104,16 @@ export default {
                 let store = resp.data.data
                 this.$store.commit('setCurrentStore', store)
 
+                // 将云店logo和云店名称保存到vuex中
+                this.$store.commit('setStoreLogo', store.logo)
+                this.$store.commit('setStoreName', store.name)
+
                 localStorage.setItem('store', JSON.stringify(store))
+
+                // 将云店logo和云店名称保存到缓存中
+                localStorage.setItem('store_logo', store.logo)
+                localStorage.setItem('store_name', store.name)
+
                 // change token
                 localStorage.setItem('token', resp.data.token)
 

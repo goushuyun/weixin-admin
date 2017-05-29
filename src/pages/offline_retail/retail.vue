@@ -149,7 +149,8 @@ export default {
                         this.$alert('请移步“经营学校”添加学校', '提示', {
                             confirmButtonText: '确定',
                             callback: action => {
-                                this.$store.commit('setMenuActice','/admin/store_setting/location')
+                                this.$store.commit('setMenuActive','5-2')
+                                localStorage.setItem('menu_active', '5-2')
                                 console.log(this.$store.state.menu_active);
                                 this.$router.push({
                                     name: 'school',

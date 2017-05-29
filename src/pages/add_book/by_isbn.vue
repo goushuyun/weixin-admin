@@ -70,7 +70,7 @@
       </el-upload>
       <el-form ref="book_info" :model="book_info" :rules="rules" label-width="80px">
           <el-form-item label="ISBN" prop="isbn">
-              <el-input id="isbn" :autofocus="true" :maxlength="13" v-model.trim="book_info.isbn" v-on:keyup.enter.native="search">
+              <el-input id="isbn" :autofocus="true" v-model.trim="book_info.isbn" v-on:keyup.enter.native="search">
                   <el-button slot="append" icon="search" @click="search"></el-button>
               </el-input>
           </el-form-item>
@@ -126,6 +126,15 @@ import {
 } from "../../scripts/utils"
 export default {
     data() {
+        var checkIsbn = (rule, value, callback) => {
+            var isbn = value.match(/\d/g).join('')
+            let isbnReg = /^978\d{10}$/
+            if (!isbnReg.test(isbn)) {
+                callback(new Error('请输正确的ISBN'));
+            } else {
+                this.book_info.isbn = isbn
+            }
+        };
         return {
             loading: false,
             store_id: '',
@@ -143,6 +152,9 @@ export default {
                 isbn: [{
                     required: true,
                     message: '请填写ISBN',
+                    trigger: 'blur'
+                }, {
+                    validator: checkIsbn,
                     trigger: 'blur'
                 }],
                 title: [{
@@ -217,7 +229,6 @@ export default {
             this.inputDiscount(1)
         },
         inputDiscount(type) {
-            console.log('000000000000000000000000');
             if (type) {
                 if (this.old_book.discount < 0) {
                     this.old_book.discount = 0
@@ -479,6 +490,9 @@ export default {
                         this.$alert('请移步“仓库设置”添加仓库和货架位', '提示', {
                             confirmButtonText: '确定',
                             callback: action => {
+                                // '5-2'是菜单项'店铺设置'的唯一索引
+                                this.$store.commit('setMenuActive', '5-2')
+                                localStorage.setItem('menu_active', '5-2')
                                 this.$router.push({
                                     name: 'location',
                                     params: {

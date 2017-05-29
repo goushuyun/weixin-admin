@@ -1,8 +1,8 @@
 <template lang="html">
   <div class="body">
     <div v-for="(store,index) in real_stores" class="box-card" @click="preUpdateRealStore(index)" @mouseover="store.active = true" @mouseleave="store.active = false">
-      <div class="item">实体店名：{{store.name}}</div>
-      <div class="item">店铺地址：{{store.address}}</div>
+      <div class="item">实体店名称：{{store.name}}</div>
+      <div class="item">实体店地址：{{store.address}}</div>
       <div class="delete_btn" style="text-align:right">
         <!-- <el-button v-show="store.active" style="color:#FF4949;" type="text" @click.stop="deleteRealStore">删除</el-button> -->
         <i v-show="store.active" style="color:#FF4949;" class="el-icon-delete2" @click.stop="deleteRealStore(index)"></i>
@@ -10,15 +10,15 @@
     </div>
 
     <div class="box-card" @click="preAddRealStore">
-      <el-button style="width:100%" type="text">新增店铺</el-button>
+      <el-button style="width:100%" type="text">新增实体店</el-button>
     </div>
 
     <el-dialog title="实体店信息" @close="closeDialog" v-model="dialogFormVisible">
       <el-form ref="form" :model="form" :rules="rules" label-width="110px">
-          <el-form-item prop="name" label="店铺名称：">
+          <el-form-item prop="name" label="实体店名称：">
             <el-input size="small" v-model="form.name"></el-input>
           </el-form-item>
-          <el-form-item prop="address_detail" label="店铺地址：">
+          <el-form-item prop="address_detail" label="实体店地址：">
             <div id="distpicker" data-toggle="distpicker">
               <select id="province" class="distpicker"></select>
               <select id="city" class="distpicker"></select>
@@ -27,7 +27,7 @@
             </div>
           </el-form-item>
           <!-- :file-list="fileList" -->
-          <el-form-item label="店铺头像：">
+          <el-form-item prop="images" label="实体店图片：">
             <el-upload
               action="http://upload.qiniu.com/"
               :data="imagesFormData"
@@ -95,7 +95,7 @@ export default {
                     message: '请输入详细地址',
                     trigger: 'blur'
                 }],
-                shop_name: [{
+                name: [{
                         required: true,
                         message: '请输入实体店名称',
                         trigger: 'blur'
@@ -105,7 +105,12 @@ export default {
                         message: '长度在 1 到 20 个字符',
                         trigger: 'blur'
                     }
-                ]
+                ],
+                images: [{
+                    required: true,
+                    message: '请选择至少一张照片',
+                    trigger: 'blur'
+                }]
             },
 
             /* 上传图片的数据 */
@@ -137,40 +142,39 @@ export default {
                 self.getToken()
             })
         },
-        confirmUpdateRealStore() {
+        confirmUpdateRealStore(formName) {
             var self = this
             self.getDistpickerValue()
-            if (!self.form.province_code) {
-                self.$message.warning("请选择省份")
-                return
-            }
-            if (!self.form.city_code) {
-                self.$message.warning("请选择城市")
-                return
-            }
-            if (!self.form.scope_code) {
-                self.$message.warning("请选择县区")
-                return
-            }
-            if (!self.form.address_detail) {
-                self.$message.warning("请输入详细地址")
-                return
-            }
-            if (self.form.imagesArray.length == 0) {
-                self.$message.warning("请上传至少一张图片")
-                return
-            }
-            self.btn_loading = true
-            self.getAddress2String()
             self.getImages2String()
-            axios.post('/v1/store/update_real_store', self.form).then(resp => {
-                if (resp.data.message == 'ok') {
-                    self.$message.success('实体店更新成功')
+            self.$refs[formName].validate((valid) => {
+                if (valid) {
+                    if (!self.form.province_code) {
+                        self.$message.warning("请选择省份")
+                        return
+                    }
+                    if (!self.form.city_code) {
+                        self.$message.warning("请选择城市")
+                        return
+                    }
+                    if (!self.form.scope_code) {
+                        self.$message.warning("请选择县区")
+                        return
+                    }
+                    self.btn_loading = true
+                    self.getAddress2String()
+                    axios.post('/v1/store/update_real_store', self.form).then(resp => {
+                        if (resp.data.message == 'ok') {
+                            self.$message.success('实体店更新成功')
+                        }
+                        self.dialogFormVisible = false
+                        self.getRealStores()
+                    }).catch(() => {
+                        return false
+                    });
+                } else {
+                    console.log('error submit!!');
+                    return false;
                 }
-                self.dialogFormVisible = false
-                self.getRealStores()
-            }).catch(() => {
-                return false
             });
         },
         getRealStores() {
@@ -255,29 +259,24 @@ export default {
         confirmAddRealStore(formName) {
             var self = this
             self.getDistpickerValue()
-            if (!self.form.province_code) {
-                self.$message.warning("请选择省份")
-                return
-            }
-            if (!self.form.city_code) {
-                self.$message.warning("请选择城市")
-                return
-            }
-            if (!self.form.scope_code) {
-                self.$message.warning("请选择县区")
-                return
-            }
-            if (self.form.imagesArray.length == 0) {
-                self.$message.warning("请上传至少一张图片")
-                return
-            }
+            self.getImages2String()
             self.$refs[formName].validate((valid) => {
                 if (valid) {
+                    if (!self.form.province_code) {
+                        self.$message.warning("请选择省份")
+                        return
+                    }
+                    if (!self.form.city_code) {
+                        self.$message.warning("请选择城市")
+                        return
+                    }
+                    if (!self.form.scope_code) {
+                        self.$message.warning("请选择县区")
+                        return
+                    }
                     self.btn_loading = true
                     self.getAddress2String()
-                    self.getImages2String()
-                    var data = self.form
-                    axios.post('/v1/store/add_real_store', data).then(resp => {
+                    axios.post('/v1/store/add_real_store', self.form).then(resp => {
                         if (resp.data.message == 'ok') {
                             self.$message.success('实体店创建成功')
                         }

@@ -26,14 +26,13 @@ function stamp2date(dt, fmt) {
     }
 }
 
-function isISBNFormat (isbn){
+function isISBNFormat (value){
     if(isbn.length === 13){
-        //判断是否以 ‘978开头’
-        return isbn.indexOf('978') === 0
+        return /^978\d{10}$/.test(isbn)
+    } else {
+        return /^\d{10}$/.test(isbn)
     }
-    return /^\d{10}$/.test(isbn)
 }
-
 // 金额由“分”转换成“元”
 function priceFloat (price) {
     return parseFloat(price/100).toFixed(2)

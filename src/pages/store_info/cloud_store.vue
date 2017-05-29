@@ -37,7 +37,7 @@
 
 <div class="body">
     <el-form ref="form" :model="form" label-width="110px">
-        <el-form-item label="店铺头像：">
+        <el-form-item label="云店头像：">
           <div>
             <el-upload class="avatar-uploader"
             action="http://upload.qiniu.com/"
@@ -90,12 +90,12 @@
           </div>
         </el-dialog>
 
-        <el-form-item label="店铺名称：">
+        <el-form-item label="云店名称：">
           <label v-if="!update_flag" style="margin-right:10px;">{{form.shop_name}}</label>
           <el-input v-else size="small" v-model="form_submit.shop_name"></el-input>
         </el-form-item>
 
-        <el-form-item label="店铺介绍：">
+        <el-form-item label="云店介绍：">
           <div v-if="!update_flag" style="line-height:20px;width: 300px;">{{form.profile}}</div>
           <el-input v-else type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" :maxlength="300" v-model="form_submit.profile"></el-input>
         </el-form-item>
@@ -242,7 +242,10 @@ export default {
                 message_code: self.form_submit.message_code
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    self.cancelTransfer()
+                    self.$message.success('店铺已成功转让！')
+                    self.$router.push({
+                        name: 'shops'
+                    })
                 }
             })
         },
@@ -273,15 +276,17 @@ export default {
         },
         handleAvatarSuccess(res, file, fileList) {
             this.updateLogo(res.key)
-            this.getStoreInfo()
-            this.getToken()
         },
         updateLogo(logo_key) {
             axios.post('/v1/store/change_logo', {
                 logo: logo_key
             }).then(resp => {
                 if (resp.data.message == 'ok') {
+                    this.$store.commit('setStoreLogo', logo_key)
+                    localStorage.setItem('store_logo', logo_key)
                     this.$message.success('logo修改成功')
+                    this.getStoreInfo()
+                    this.getToken()
                 }
                 return true
             }).catch(() => {
@@ -332,6 +337,8 @@ export default {
                 profile: this.form_submit.profile
             }).then(resp => {
                 if (resp.data.message == 'ok') {
+                    this.$store.commit('setStoreName', this.form_submit.shop_name)
+                    localStorage.setItem('store_name', this.form_submit.shop_name)
                     this.$message.success('修改成功')
                     this.update_flag = false
                     this.getStoreInfo()

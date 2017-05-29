@@ -19,7 +19,6 @@
       </el-form-item>
       <el-form-item class="btn_bottom">
         <el-button size="small" type="primary" @click="getData" icon="search">查询</el-button>
-        <el-button size="small" type="primary" @click="resetForm"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
       </el-form-item>
     </el-form>
     <el-form :inline="true" label-width="80px">
@@ -43,6 +42,9 @@
           <el-option label="有图片" :value="0"></el-option>
           <el-option label="无图片" :value="1"></el-option>
         </el-select>
+      </el-form-item>
+      <el-form-item class="btn_bottom">
+        <el-button size="small" type="primary" @click="resetForm"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
       </el-form-item>
     </el-form>
     <div class="data_table" v-loading="loading" element-loading-text="拼命加载中">
