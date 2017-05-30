@@ -127,10 +127,10 @@ export default {
                         el.update_isbn = ''
                         el.topic_flag = false
                         el.topic = ''
-                        el.source_id = ''
                         el.topics = topics
                         return el
                     })
+                    console.log(this.circulars);
                     this.checkType()
                     // 在此第一次获取token，因为可以取到store_id
                     this.getToken()
@@ -154,7 +154,13 @@ export default {
         // type 为 2 时，用 goods_id 获取 isbn，用于展示
         getGoodsIsbn(index) {
             var id = this.circulars[index].source_id
-            axios.post('/v1/goods/search',{id}).then(resp => {
+            console.log('getGoodsIsbn->source_id:'+id);
+            axios.post('/v1/goods/search',{
+              "id": id,
+              "search_amount": 0,
+              "search_type": -100,
+              "search_picture": -100
+            }).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.circulars[index].isbn = resp.data.data[0].book.isbn
                 }
@@ -163,6 +169,7 @@ export default {
         // type 为 3 时，用 topic_id 获取 title，用于展示
         getTopicTitle(index) {
             var id = this.circulars[index].source_id
+            console.log('getTopicTitle->source_id:'+id);
             axios.post('/v1/topic/topics_info',{id}).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.circulars[index].topic = resp.data.data[0].title

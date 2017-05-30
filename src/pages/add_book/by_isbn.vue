@@ -327,6 +327,7 @@ export default {
                     }
                     this.book_info_bak = JSON.parse(JSON.stringify(book))
                     this.book_info = JSON.parse(JSON.stringify(book))
+                    this.inputBook()
                     this.getGoodsInfo()
                     this.loading = false
                 }
@@ -571,76 +572,77 @@ export default {
         addBook(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    if (!parseInt(this.new_book.amount) && !parseInt(this.old_book.amount)) {
-                        this.$message.warning('请输入图书数量')
-                        return
-                    }
-                    var data = {
-                        "book_id": this.book_info.id, //标准图书id编号
-                        "isbn": this.book_info.isbn, //图书isbn
-                        "location": []
-                    }
-                    if (this.new_book.amount) {
-                        if (!this.new_book.price) {
-                            this.$message.warning('请填写新书价格')
-                            return
-                        }
-                        if (this.new_book.location.length < 3) {
-                            this.$message.warning('请选择新书货架层')
-                            return
-                        }
-                        var new_book = {
-                            "type": "0", //0 代表新书 1 旧书
-                            "storehouse_id": this.new_book.location[0], //仓库id
-                            "shelf_id": this.new_book.location[1], //货架id
-                            "floor_id": this.new_book.location[2], //货架层id
-                            "amount": this.new_book.amount, //上传的书的数量
-                            "price": priceInt(this.new_book.price) //上传的书的价格 以分为单位 1元=100分
-                        }
-                        data.location.push(new_book)
-                    }
-                    if (this.old_book.amount) {
-                        if (!this.old_book.price) {
-                            this.$message.warning('请填写二手书价格')
-                            return
-                        }
-                        if (this.old_book.location.length < 3) {
-                            this.$message.warning('请选择二手书货架层')
-                            return
-                        }
-                        var old_book = {
-                            "type": "1",
-                            "storehouse_id": this.old_book.location[0],
-                            "shelf_id": this.old_book.location[1],
-                            "floor_id": this.old_book.location[2],
-                            "amount": this.old_book.amount,
-                            "price": priceInt(this.old_book.price)
-                        }
-                        data.location.push(old_book)
-                    }
-                    if (isObjectValueEqual(this.book_info_bak, this.book_info)) {
-                        this.confirmAddBook(data)
-                    } else {
-                        axios.post('/v1/books/modify_book_info', {
-                            "id":this.book_info.id,
-                            "isbn":this.book_info.isbn,
-                            "title":this.book_info.title,
-                            "publisher":this.book_info.publisher,
-                            "author":this.book_info.author,
-                            "price":priceInt(this.book_info.price),
-                            "image":this.book_info.image
-                        }).then(resp => {
-                            if (resp.data.message == 'ok') {
-                                data.book_id = resp.data.data.id
-                                this.confirmAddBook(data)
-                            }
-                        })
-                    }
-                } else {
+                }
+                else {
                     console.log('error submit!!');
                     return false;
                 }
             });
+            if (!parseInt(this.new_book.amount) && !parseInt(this.old_book.amount)) {
+                this.$message.warning('请输入图书数量')
+                return
+            }
+            var data = {
+                "book_id": this.book_info.id, //标准图书id编号
+                "isbn": this.book_info.isbn, //图书isbn
+                "location": []
+            }
+            if (this.new_book.amount) {
+                if (!this.new_book.price) {
+                    this.$message.warning('请填写新书价格')
+                    return
+                }
+                if (this.new_book.location.length < 3) {
+                    this.$message.warning('请选择新书货架层')
+                    return
+                }
+                var new_book = {
+                    "type": "0", //0 代表新书 1 旧书
+                    "storehouse_id": this.new_book.location[0], //仓库id
+                    "shelf_id": this.new_book.location[1], //货架id
+                    "floor_id": this.new_book.location[2], //货架层id
+                    "amount": this.new_book.amount, //上传的书的数量
+                    "price": priceInt(this.new_book.price) //上传的书的价格 以分为单位 1元=100分
+                }
+                data.location.push(new_book)
+            }
+            if (this.old_book.amount) {
+                if (!this.old_book.price) {
+                    this.$message.warning('请填写二手书价格')
+                    return
+                }
+                if (this.old_book.location.length < 3) {
+                    this.$message.warning('请选择二手书货架层')
+                    return
+                }
+                var old_book = {
+                    "type": "1",
+                    "storehouse_id": this.old_book.location[0],
+                    "shelf_id": this.old_book.location[1],
+                    "floor_id": this.old_book.location[2],
+                    "amount": this.old_book.amount,
+                    "price": priceInt(this.old_book.price)
+                }
+                data.location.push(old_book)
+            }
+            if (isObjectValueEqual(this.book_info_bak, this.book_info)) {
+                this.confirmAddBook(data)
+            } else {
+                axios.post('/v1/books/modify_book_info', {
+                    "id":this.book_info.id,
+                    "isbn":this.book_info.isbn,
+                    "title":this.book_info.title,
+                    "publisher":this.book_info.publisher,
+                    "author":this.book_info.author,
+                    "price":priceInt(this.book_info.price),
+                    "image":this.book_info.image
+                }).then(resp => {
+                    if (resp.data.message == 'ok') {
+                        data.book_id = resp.data.data.id
+                        this.confirmAddBook(data)
+                    }
+                })
+            }
         },
         confirmAddBook(data) {
             axios.post('/v1/goods/add', data).then(resp => {

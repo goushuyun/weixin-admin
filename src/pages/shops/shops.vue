@@ -9,8 +9,7 @@ div.top_bar {
     background-color: white;
     border-bottom: 3px solid $blue;
     .top_content {
-        width: 700px;
-        margin: 0 auto;
+        margin-left: 70px;
         padding: 12px 0;
         display: flex;
         align-items: center;
@@ -26,7 +25,12 @@ div.top_bar {
     .menu_content {
         position: absolute;
         right: 100px;
-        top: 20px;
+        top: 26px;
+        span {
+            font-size: 16px;
+            color: #20A0FF;
+            cursor: pointer;
+        }
     }
 }
 
@@ -42,8 +46,8 @@ div.top_bar {
             <h4 class="title">购书云</h4>
         </div>
         <div class="menu_content">
-          <el-dropdown split-button type="text" size="large" @command="handleCommand">
-            {{user_name}}
+          <el-dropdown @command="handleCommand">
+            <span class="el-dropdown-link">{{user_name}}<i class="el-icon-caret-bottom el-icon--right"></i></span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="signOut">退出</el-dropdown-item>
             </el-dropdown-menu>
