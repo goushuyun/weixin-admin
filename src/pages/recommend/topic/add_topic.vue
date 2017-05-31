@@ -21,6 +21,8 @@
         </el-form>
 
         <el-table style="width: 100%;margin-bottom: 15px;" :data="goods" v-loading.body="loading">
+            <el-table-column width="60" type="index">
+            </el-table-column>
             <el-table-column label="ISBN" width="150" prop="isbn">
             </el-table-column>
             <el-table-column label="书名" width="200" prop="title">
@@ -131,7 +133,7 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data[0]
-                    this.total_count = resp.data.totalCount
+                    this.total_count = data.item_count
                     console.log(data.items);
                     this.goods = data.items.map(el => {
                         el.price = priceFloat(el.book_price)
@@ -176,9 +178,8 @@ export default {
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    if (this.goods.length > 1) {
-                        this.deleteTopicItem(this.goods[index].id)
-                        this.goods.splice(index, 1)
+                    if (this.total_count > 1) {
+                        this.deleteTopicItem(index)
                     } else {
                         this.$confirm('话题至少有一个商品被推荐，继续操作将删除该话题', '提示', {
                             confirmButtonText: '继续删除',
@@ -186,7 +187,6 @@ export default {
                             type: 'warning'
                         }).then(() => {
                             this.deleteTopic()
-                            this.$router.push('topic')
                         }).catch(() => {
                             this.$message.info('已取消删除');
                         });
@@ -198,12 +198,15 @@ export default {
                 this.goods.splice(index, 1)
             }
         },
-        deleteTopicItem(id) {
+        deleteTopicItem(index) {
+            var id = this.goods[index].id
             axios.post('/v1/topic/del_item', {
                 "topic_id": this.topic_id, //话题id
                 "id": id //关联的商品id
             }).then(resp => {
                 if (resp.data.message == 'ok') {
+                    this.goods.splice(index, 1)
+                    this.total_count -= 1
                     this.$message.info('已删除！')
                 }
             })
@@ -214,21 +217,18 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.$message.info('已删除！')
+                    this.$router.push('topic')
                 }
             })
         },
         search() {
-            //一个话题内商品数量限制在15本内
-            if (this.goods.length > 15) {
-                this.$message.warning('一个话题内的书本数量不能超过 15 本')
-                return
-            }
             //isbn为空
             if (!isISBNFormat(this.isbn)) {
                 this.$message.warning('请填写正确的 ISBN 码')
                 return
             }
-            if (this.goods.length > 0) {
+            // 如果是添加话题，则每次添加话题项之前判断列表中又没有这本书
+            if (!this.topic_id && this.goods.length > 0) {
                 for (var i = 0; i < this.goods.length; i++) {
                     if (this.goods[i].isbn == this.isbn) {
                         this.$message.warning('该商品已在推荐列表中')
@@ -238,8 +238,8 @@ export default {
                     }
                 }
             }
+            // 检查仓库中又没有这本书
             this.loading = true
-
             axios.post("/v1/goods/search", {
                 "isbn": this.isbn, //not required 书本的isbn
                 "search_amount": -100, //required -100 过滤这个线索 ;除了-100 的num 查找库存为num的数据
@@ -249,12 +249,13 @@ export default {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
                     console.log(data);
+                    // 如果没有找到，则直接返回
                     if (data.length == 0) {
-                        //没有找到
                         this.$message.warning('没有在仓库找到这本书')
                         this.loading = false
                         return
                     }
+                    // 否则继续进行如下操作
                     let goods = data[0]
                     //检查商品库存数量，小于0 则提示不能推荐
                     var amount = 0
@@ -274,15 +275,20 @@ export default {
                         this.loading = false
                         return
                     }
-                    goods.book.price = priceFloat(goods.book.price)
-                    goods.book.stock = amount
-                    goods.book.goods_id = goods_id
-                    this.goods.unshift(goods.book)
                     if (this.topic_id != '') {
-                        //已有话题，添加话题项
+                        // 如果是修改话题，则直接添加话题项
                         this.addTopicItem(goods_id)
+                    } else {
+                        // 如果是添加话题，则先加入到goods中，最后统一提交
+                        goods.book.price = priceFloat(goods.book.price)
+                        goods.book.stock = amount
+                        goods.book.goods_id = goods_id
+                        this.goods.unshift(goods.book)
                     }
                     this.loading = false
+                    this.isbn = ''
+                    $('#isbn_input input').focus()
+                } else {
                     this.isbn = ''
                     $('#isbn_input input').focus()
                 }
@@ -295,6 +301,7 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.$message.info('加入成功！')
+                    this.getTopic()
                 }
             })
         }
