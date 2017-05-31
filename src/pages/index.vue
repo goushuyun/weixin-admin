@@ -71,59 +71,59 @@
             </el-col>
         </el-row>
 
-        <el-menu theme="dark" mode="vertical" :router="true" unique-opened :default-active="menu_active" @select="menuSelect">
-            <el-menu-item index="0" :route="{path:'/admin/home'}"><i class="fa fa-home" style="font-size:18px;position:relative;top:1.5px;" aria-hidden="true"></i>首页</el-menu-item>
+        <el-menu theme="dark" :default-openeds="submenu_openeds" mode="vertical" :router="true" unique-opened :default-active="menu_active" @select="menuSelect">
+            <el-menu-item index="0" :route="{name:'home'}"><i class="fa fa-home" style="font-size:18px;position:relative;top:1.5px;" aria-hidden="true"></i>首页</el-menu-item>
             <el-submenu index="1">
               <template slot="title"><i class="fa fa-list" aria-hidden="true"></i>订单管理</template>
-              <el-menu-item index="1-1" :route="{path:'/admin/order/list'}">
+              <el-menu-item index="1-1" :route="{name:'order_list'}">
                   <i class="fa fa-delicious" aria-hidden="true"></i>线上订单
               </el-menu-item>
-              <el-menu-item index="1-2" :route="{path:'/admin/offline/retail_list'}">
+              <el-menu-item index="1-2" :route="{name:'retail_list'}">
                   <i class="fa fa-life-ring" aria-hidden="true"></i>线下订单
               </el-menu-item>
-              <el-menu-item index="1-3" :route="{path:'/admin/offline/retail'}">
+              <el-menu-item index="1-3" :route="{name:'offline_retail'}">
                   <i class="fa fa-balance-scale" aria-hidden="true"></i>线下零售
               </el-menu-item>
             </el-submenu>
             <el-submenu index="2">
               <template slot="title"><i class="fa fa-flag" aria-hidden="true"></i>推荐管理</template>
-              <el-menu-item index="2-1" :route="{path:'/admin/recommend/topic'}">
+              <el-menu-item index="2-1" :route="{name:'topic'}">
                   <i class="fa fa-anchor" aria-hidden="true"></i>话题推荐
               </el-menu-item>
-              <el-menu-item index="2-2" :route="{path:'/admin/recommend/carousel'}">
+              <el-menu-item index="2-2" :route="{name:'carousel'}">
                   <i class="fa fa-picture-o" aria-hidden="true"></i>轮播图
               </el-menu-item>
             </el-submenu>
             <el-submenu index="3">
               <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>库存管理</template>
-              <el-menu-item index="3-1" :route="{path:'/admin/add_book/by_isbn'}">
+              <el-menu-item index="3-1" :route="{name:'by_isbn'}">
                   <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
               </el-menu-item>
-              <!-- <el-menu-item index="3-2" route="/admin/add_book/by_excel">
+              <!-- <el-menu-item index="3-2" :route="{name:'by_excel'}">
                   <i class="fa fa-file-text" aria-hidden="true"></i>批量上架
               </el-menu-item> -->
-              <el-menu-item index="3-3" :route="{path:'/admin/stock_manage/stock_list'}">
+              <el-menu-item index="3-3" :route="{name:'stock_list'}">
                   <i class="fa fa-university" aria-hidden="true"></i>库存查看
               </el-menu-item>
             </el-submenu>
             <el-submenu index="4">
               <template slot="title"><i class="fa fa-line-chart" aria-hidden="true"></i>资产统计</template>
-              <el-menu-item index="4-1" :route="{path:'/admin/account/online'}">
+              <el-menu-item index="4-1" :route="{name:'online_account'}">
                   <i class="fa fa-money" aria-hidden="true"></i>线上资产
               </el-menu-item>
-              <el-menu-item index="4-2" :route="{path:'/admin/statistics/sales'}">
+              <el-menu-item index="4-2" :route="{name:'sales'}">
                   <i class="fa fa-pie-chart" aria-hidden="true"></i>销售统计
               </el-menu-item>
             </el-submenu>
             <el-submenu index="5">
               <template slot="title"><i class="el-icon-setting"></i>设置</template>
-              <el-menu-item index="5-1" :route="{path:'/admin/store_info/cloud_store'}">
+              <el-menu-item index="5-1" :route="{name:'cloud_store'}">
                 <i class="fa fa-info-circle" aria-hidden="true"></i>店铺信息
               </el-menu-item>
-              <el-menu-item index="5-2" :route="{path:'/admin/store_setting/school'}">
+              <el-menu-item index="5-2" :route="{name:'school'}">
                   <i class="fa fa-cog" aria-hidden="true"></i>店铺设置
               </el-menu-item>
-              <el-menu-item index="5-3" :route="{path:'/admin/weixin_setting/'}">
+              <el-menu-item index="5-3" :route="{name:'weixin_setting'}">
                   <i class="fa fa-weixin" aria-hidden="true"></i></i>微信设置
               </el-menu-item>
             </el-submenu>
@@ -140,10 +140,19 @@
 
 <script>
 export default {
+    data() {
+        return {
+            submenu_openeds: []
+        }
+    },
     methods: {
         menuSelect(index) {
             this.$store.commit('setMenuActive', index)
             localStorage.setItem('menu_active', index)
+            // 点击首页时，关闭原页面导航栏
+            if (index == '0') {
+                this.submenu_openeds = []
+            }
         },
         goToCloudStore() {
             this.$store.commit('setMenuActive', '5-1')

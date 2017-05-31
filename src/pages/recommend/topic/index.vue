@@ -10,6 +10,8 @@
             <label for="add_topic_btn" style="margin-left:10px;color:#888">最多添加 20 个话题</label>
           </div>
           <el-table :data="topics" border stripe style="width: 100%">
+            <el-table-column width="60" type="index">
+            </el-table-column>
             <el-table-column prop="sort" label="优先级" width="180">
                 <template scope="scope">
                     <el-rate v-model="scope.row.sort" :max="3" show-text :texts="['低','中','高']" @change="updateTopicSort(scope.row.id,scope.row.sort)"></el-rate>

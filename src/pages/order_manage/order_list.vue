@@ -270,13 +270,23 @@ export default {
 
             page: 1,
             size: 10,
-            total_count: 0
+            total_count: 0,
+
+            refresh_flag: false
         }
     },
     mounted() {
         this.getStoreData()
         this.getSchools()
         this.getOrders()
+    },
+    watch: {
+        refresh_flag(flag) {
+            if (flag) {
+                this.getOrders()
+                this.refresh_flag = false
+            }
+        }
     },
     destroyed() {
         this.$store.commit('setOrderSearch', {
@@ -340,7 +350,7 @@ export default {
             },
             this.getOrders()
         },
-        realityPrint(index) {
+        realityPrint() {
             var self = this
             var selected_orders = self.selected_orders
             for (var i = 0; i < selected_orders.length; i++) {
@@ -397,12 +407,16 @@ export default {
                 }
             })
         },
-        deliver(order_id) {
+        deliver(order_id, refresh_flag) {
             axios.post('/v1/order/deliver', {
                 id: order_id
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     console.log('订单：' + order_id + ' 已发货！');
+                    console.log('refresh_flag:' + typeof(refresh_flag) + ',' + refresh_flag);
+                    if (refresh_flag) {
+                        this.refresh_flag = refresh_flag
+                    }
                 }
             })
         },
@@ -447,12 +461,12 @@ export default {
         },
         confirmSelectedDeliver() {
             var selected_orders = this.selected_orders
-            for (var i = 0; i <= selected_orders.length; i++) {
-                if (i < selected_orders.length) {
-                    var order_id = selected_orders[i].order.id
-                    this.deliver(order_id)
+            for (var i = 0; i < selected_orders.length; i++) {
+                var order_id = selected_orders[i].order.id
+                if (i < selected_orders.length - 1) {
+                    this.deliver(order_id,false)
                 } else {
-                    this.getOrders()
+                    this.deliver(order_id,true)
                 }
             }
             this.deliver_dialog.visible = false

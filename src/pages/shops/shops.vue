@@ -59,7 +59,8 @@ div.top_bar {
         <ul class="shops">
             <li v-for="store in stores" class="shop" @click="into_store(store.id)" @mouseover="store.active = true" @mouseleave="store.active = false">
                 <h3 class="shop_name">{{store.name}}</h3>
-                <p class="create_at">到期于：{{store.expire_at}}</p>
+                <p v-if="!store.is_expire" class="create_at">到期于：{{store.expire_at}}</p>
+                <p v-else class="create_at" style="color:#FF4949">云店已到期</p>
                 <p class="operate" v-show="store.active">
                     <el-button style="font-size: 12px;" type="text">删除</el-button>
                 </p>
@@ -98,13 +99,21 @@ export default {
 
     mounted(){
         this.user_name = JSON.parse(localStorage.getItem('adminInfo')).username
+        var today = moment().format('YYYY-MM-DD');
         // get seller's stores
         axios.post('/v1/seller/self_stores', {}).then(resp=>{
             this.stores = resp.data.data.map(val=>{
                 val.active = false
 
-                val.create_at = moment.unix(val.create_at).format('YYYY-MM-DD')
+                // val.create_at = moment.unix(val.create_at).format('YYYY-MM-DD')
                 val.expire_at = moment.unix(val.expire_at).format('YYYY-MM-DD')
+
+                // 判断店铺是否已过期，以截止日期的24点为准
+                if (val.expire_at < today) {
+                    val.is_expire = true
+                } else {
+                    val.is_expire = false
+                }
                 return val
             })
         })
