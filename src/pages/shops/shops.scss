@@ -16,26 +16,32 @@ section.main{
             border-radius: 4px;
             &:hover{
                 cursor: pointer;
-                box-shadow: 0 0 10px rgba(0, 0, 0,.1);
+                box-shadow: 0 0 10px rgba(0, 0, 0,.3);
             }
         }
 
         li.shop{
-            padding: 12px 12px 0;
-            // width: 200px;
+            padding: 0 15px;
             height: 114px;
             box-sizing: border-box;
             min-width: 180px;
-
-            h3.shop_name{
+            position: relative;
+            .shop_name{
+                position: absolute;
+                top: 20px;
                 font-size: 16px;
-                line-height: 48px;
                 color: $font_normal;
             }
+            .shop_id {
+                position: absolute;
+                top: 40px;
+                color: $font_lightest;
+            }
             p.create_at{
+                position: absolute;
+                bottom: 20px;
                 font-size: 12px;
                 color: $font_light;
-                line-height: 22px;
             }
             p.operate{
                 text-align: right;
