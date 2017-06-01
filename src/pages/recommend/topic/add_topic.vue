@@ -110,7 +110,7 @@ export default {
         },
         confirmUpdate() {
             if (this.title == '') {
-                this.$message.info('请填写专题名称')
+                this.$message.info('请填写话题名称')
                 $('#title_input input').focus()
                 return
             }
@@ -145,12 +145,12 @@ export default {
         addTopic() {
             //检查话题名称、书本数量
             if (this.title == '') {
-                this.$message.info('请填写专题名称')
+                this.$message.info('请填写话题名称')
                 $('#title_input input').focus()
                 return
             }
             if (this.goods.length == 0) {
-                this.$message.info('请添加专题所要包含的书籍')
+                this.$message.info('请添加话题所要包含的书籍')
                 $('#isbn_input input').focus()
                 return
             }

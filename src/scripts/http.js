@@ -1,8 +1,9 @@
 // create axios instance
 import Axios from 'axios'
 import Vue from 'vue'
+import conf from '../config/conf.js'
 const axios = Axios.create({
-    baseURL: 'http://admin.goushuyun.com/',   //购书云
+    baseURL: conf.base_url,   //购书云
     headers: {
         'Content-Type': 'application/json'
     }
@@ -33,7 +34,7 @@ axios.interceptors.response.use(function(response) {
     // }
     // relogin
     if(response.data.code == '11014'){
-        window.location.href = "http://weixin.goushuyun.com/#"
+        window.location.href = conf.home_href
     }
     //handler error
     if(response.data.code != '00000'){

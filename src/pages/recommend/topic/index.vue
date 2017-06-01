@@ -6,7 +6,7 @@
 
       <div class="content_inner">
           <div class="add_topic">
-            <el-button id="add_topic_btn" type="primary" size="small" icon="plus" :disabled="topics.length >= 20" @click="addTopic">添加专题</el-button>
+            <el-button id="add_topic_btn" type="primary" size="small" icon="plus" :disabled="topics.length >= 20" @click="addTopic">添加话题</el-button>
             <label for="add_topic_btn" style="margin-left:10px;color:#888">最多添加 20 个话题</label>
           </div>
           <el-table :data="topics" border stripe style="width: 100%">
@@ -17,7 +17,7 @@
                     <el-rate v-model="scope.row.sort" :max="3" show-text :texts="['低','中','高']" @change="updateTopicSort(scope.row.id,scope.row.sort)"></el-rate>
                 </template>
             </el-table-column>
-            <el-table-column prop="title" label="专题名" width="180">
+            <el-table-column prop="title" label="话题名" width="180">
             </el-table-column>
             <el-table-column prop="item_count" label="书籍数量" width="180">
             </el-table-column>

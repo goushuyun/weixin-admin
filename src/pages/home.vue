@@ -1,7 +1,7 @@
 <template lang="html">
 <div class="container">
   <div class="top_bar">
-      <h2 class="title">{{shop_name}}</h2>
+      <h2 class="title">{{store_info.name}}</h2>
   </div>
   <div class="content_inner">
     <div class="left_part">
@@ -33,7 +33,8 @@
             </div>
           </div>
         </div>
-        <div class="end_time_area">云店到期于：{{expire_at}}</div>
+        <div v-if="!store_info.is_expire" class="end_time_area">云店到期于：{{store_info.expire_at}}</div>
+        <p v-else class="end_time_area" style="color:#FF4949">云店到期于：{{store_info.expire_at}}（已到期）</p>
       </el-card>
       <el-card>
         <div class="tools_area">
@@ -141,7 +142,12 @@ import axios from "../scripts/http"
 export default {
     data() {
         return {
-            expire_at: '',
+            store_info: {
+                name: '',
+                id: '',
+                expire_at: '',
+                is_expire: ''
+            },
 
             date_time: {
                 date: '',
@@ -154,7 +160,6 @@ export default {
             today_data: {}, //今日订单统计
             yesterday_data: {}, //昨日订单统计
 
-            shop_name: '',
             school_id: '',
             schools: [],
 
@@ -162,7 +167,6 @@ export default {
         }
     },
     mounted() {
-        this.shop_name = this.$store.state.current_store.name
         this.getDateTime()
         this.getSchools()
         this.getStoreInfo()
@@ -208,9 +212,18 @@ export default {
         },
         getStoreInfo() {
             var self = this
+            var today = moment().format('YYYY-MM-DD');
             axios.post('/v1/store/store_info', {}).then(resp => {
                 if (resp.data.message == 'ok') {
-                    self.expire_at = moment.unix(resp.data.data.expire_at).format('YYYY-MM-DD')
+                    var data = resp.data.data
+                    self.store_info.id = data.id
+                    self.store_info.name = data.name
+                    self.store_info.expire_at = moment.unix(data.expire_at).format('YYYY-MM-DD')
+                    if (self.store_info.expire_at < today) {
+                        self.store_info.is_expire = true
+                    } else {
+                        self.store_info.is_expire = false
+                    }
                 }
             })
         },

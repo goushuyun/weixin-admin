@@ -58,12 +58,13 @@ div.top_bar {
     <section class="main">
         <ul class="shops">
             <li v-for="store in stores" class="shop" @click="into_store(store.id)" @mouseover="store.active = true" @mouseleave="store.active = false">
-                <h3 class="shop_name">{{store.name}}</h3>
+                <p class="shop_name">{{store.name}}</p>
+                <p class="shop_id">ID：{{store.id}}</p>
                 <p v-if="!store.is_expire" class="create_at">到期于：{{store.expire_at}}</p>
-                <p v-else class="create_at" style="color:#FF4949">云店已到期</p>
-                <p class="operate" v-show="store.active">
+                <p v-else class="create_at" style="color:#FF4949">已到期：{{store.expire_at}}</p>
+                <!-- <p class="operate" v-show="store.active">
                     <el-button style="font-size: 12px;" type="text">删除</el-button>
-                </p>
+                </p> -->
             </li>
             <li class="add_btn" @click="add_shop">
                 <i class="fa fa-plus" aria-hidden="true"></i>
