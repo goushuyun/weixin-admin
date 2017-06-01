@@ -26,7 +26,6 @@
         </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="resetForm" size="small"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
-            <el-button type="primary" @click="preExportOrder" size="small"><i class="fa fa-download" aria-hidden="true"></i> 导出</el-button>
         </el-form-item>
     </el-form>
     <div class="row">
@@ -41,8 +40,9 @@
     </div>
     <div class="row">
       <el-checkbox v-model="selected_all" style="margin:0 12px;" @change="selectedAllChange">全选</el-checkbox>
+      <el-button type="primary" @click="preExportOrder" size="small"><i class="fa fa-download" aria-hidden="true"></i> 批量导出</el-button>
+      <el-button type="primary" size="small" @click="preSelectedPrint"><i class="fa fa-print" aria-hidden="true"></i> 批量打印</el-button>
       <el-button v-if="order_status == 1" type="primary" @click="preSelectedDeliver" size="small"><i class="fa fa-truck" aria-hidden="true"></i> 批量发货</el-button>
-      <el-button type="primary" @click="" size="small" @click="preSelectedPrint"><i class="fa fa-print" aria-hidden="true"></i> 批量打印</el-button>
     </div>
     <div class="row" v-if="!orders.length">
       <div class="order_item">
@@ -107,16 +107,16 @@
     </el-pagination>
 
     <!-- 批量打印 -->
-    <el-dialog title="批量打印" :visible.sync="print_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false" @close="getOrders">
+    <el-dialog title="批量打印" :visible.sync="print_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false" @close="unSelectedAllChange">
       <div class="print_dialog">
           <p class="desc">已选中 {{print_dialog.selected_count}} 条订单，有 {{print_dialog.printed_count}} 条已经打印过了</p>
-          <p><el-radio class="radio" v-model="print_dialog.radio" label="0">打印发货详情</el-radio></p>
+          <p><el-radio class="radio" v-model="print_dialog.radio" label="0">打印发货详情（需热敏纸打印机）</el-radio></p>
           <p><el-radio class="radio" disabled v-model="print_dialog.radio" label="1">打印快递单（此功能暂未开放）</el-radio></p>
           <p>默认打印机：<span style="color:#FF4949">{{print_dialog.printer}}</span></p>
           <div class="desc" style="line-height:24px;">请务必确保打印机正确，否则会造成错误。</div>
           <div class="desc" style="line-height:24px;">您可以在“控制面板-设备和打印机”中修改默认打印机。</div>
           <div class="footer1" v-if="order_status == 1">
-            <el-checkbox v-model="checked">打印并发货（不建议勾选）</el-checkbox>
+            <el-checkbox v-model="print_dialog.checked">打印并发货（不建议勾选）</el-checkbox>
             <el-button style="float:right" type="primary" size="small" @click="confirmSelectedPrint">打印</el-button>
           </div>
           <div class="footer2" v-else>
@@ -126,7 +126,7 @@
     </el-dialog>
 
     <!-- 打印过程 -->
-    <el-dialog class="printing_dialog" title="正在批量打印并发货，请耐心等待......" :visible.sync="printing_dialog.visible" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+    <el-dialog class="printing_dialog" :title="(printing_dialog.percentage == 100) ? '打印结束' : ('正在批量打印' + (print_dialog.checked ? '并发货' : '') + '，请耐心等待......')" :visible.sync="printing_dialog.visible" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
       <div class="printProgress">
         <el-progress v-if="printing_dialog.percentage != 100" type="circle" :percentage="printing_dialog.percentage"></el-progress>
         <el-progress v-else type="circle" :percentage="100" status="success"></el-progress>
@@ -156,20 +156,13 @@
     </el-dialog>
 
     <!-- 导出 -->
-    <el-dialog title="批量导出" :visible.sync="export_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-dialog title="批量导出" :visible.sync="export_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false" @close="unSelectedAllChange">
       <div class="export_dialog">
+          <p class="desc">已选中 {{export_dialog.selected_count}} 条订单</p>
+          <p><el-radio class="radio" v-model="export_dialog.radio" label="0">导出配货单</el-radio></p>
+          <p class="desc">配货单将选中的待发货订单中所需要配送的书籍统一整理出来，方便在高峰期配书</p>
           <p><el-radio class="radio" v-model="export_dialog.radio" label="1">导出发货单</el-radio></p>
-          <p class="desc">发货单会将待发货订单整理出来，你可以配合"快递助手"使用，直接打印快递单</p>
-          <p><el-radio class="radio" disabled v-model="export_dialog.radio" label="0">导出报订单（此功能暂未开放）</el-radio></p>
-          <p class="desc">报订单会将待发货订单中的新书整理出来，以便于向上一级书商订书</p>
-          <p>学校：
-            <el-select v-model="export_dialog.school_id" style="width: 300px;" clearable placeholder="学校" size="small">
-              <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
-            </el-select>
-          </p>
-          <p>时间：
-            <el-date-picker :editable="false" v-model="export_dialog.time_range" size="small" type="datetimerange" placeholder="选择时间" :picker-options="pickerOptions" style="width: 300px;"></el-date-picker>
-          </p>
+          <p class="desc">发货单会将待发货订单整理出来，你可以配合“快递助手”使用，直接打印快递单</p>
           <div class="footer">
             <el-button type="primary" size="small" @click="confirmExportOrder">导出</el-button>
           </div>
@@ -177,7 +170,7 @@
     </el-dialog>
 
     <!-- 批量发货 -->
-    <el-dialog title="批量发货" :visible.sync="deliver_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false" @close="getOrders">
+    <el-dialog title="批量发货" :visible.sync="deliver_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false" @close="unSelectedAllChange">
       <div class="deliver_dialog">
           <p class="desc">已选中 {{deliver_dialog.selected_count}} 条订单</p>
           <p class="desc">请确认这些订单已经发货，再将订单置为发货状态</p>
@@ -195,6 +188,7 @@ import {
     priceInt
 } from '../../scripts/utils'
 import axios from "../../scripts/http"
+import conf from '../../config/conf.js'
 export default {
     data() {
         return {
@@ -209,6 +203,7 @@ export default {
             printing_dialog: {
                 visible: false,
                 active_names: ['fail'],
+                temp_percentage: 0,
                 percentage: 0,
                 success_orders: [],
                 fail_orders: [],
@@ -216,9 +211,9 @@ export default {
             },
             export_dialog: {
                 visible: false,
-                school_id: '',
-                time_range: [],
-                radio: '1'
+                selected_count: 0,
+                ids: '',
+                radio: '0'
             },
             deliver_dialog: {
                 selected_count: 0,
@@ -343,6 +338,7 @@ export default {
             this.printing_dialog = {
                 visible: false,
                 active_names: ['fail'],
+                temp_percentage: 0,
                 percentage: 0,
                 success_orders: [],
                 fail_orders: [],
@@ -364,9 +360,9 @@ export default {
                     var checkPrintOver = setInterval(function() {
                         if (localStorage.printOver == 'true') {
                             console.log('打印完成！');
-                            var percentage = self.printing_dialog.percentage + unit
-                            if (percentage < 100) {
-                                self.printing_dialog.percentage = percentage
+                            self.printing_dialog.temp_percentage += unit
+                            if (self.printing_dialog.temp_percentage < 100) {
+                                self.printing_dialog.percentage = parseInt(self.printing_dialog.temp_percentage)
                             } else {
                                 self.printing_dialog.percentage = 100
                                 self.printing_dialog.disabled_btn = false
@@ -421,30 +417,29 @@ export default {
             })
         },
         preExportOrder() {
-            this.export_dialog.school_id = this.school_id
-            this.export_dialog.time_range = this.order_time
+            var selected_orders = this.getSelectedOrders()
+            if (selected_orders.length <= 0) {
+                this.$message.warning('您尚未勾选任何订单！')
+                return
+            }
+            var ids = []
+            selected_orders.forEach(el => {
+                ids.push(el.order.id)
+            })
+            this.export_dialog.selected_count = selected_orders.length
+            this.export_dialog.ids = "'" +ids.join("','") + "'"
             this.export_dialog.visible = true
         },
         confirmExportOrder() {
-            if (!this.export_dialog.school_id) {
-                this.$message.warning('请选择学校！')
-                return
-            }
-            if (!this.export_dialog.time_range[0]) {
-                this.$message.warning('请选择时间范围！')
-                return
-            }
-            var store = JSON.parse(localStorage.getItem('store'))
             var params = {
-                "store_id": store.id,
-                "school_id": this.export_dialog.school_id,
-                "start_at": this.export_dialog.time_range[0] ? moment(this.export_dialog.time_range[0], "YYYY-MM-DD HH:mm:ss").unix() : 0,
-                "end_at": this.export_dialog.time_range[1] ? moment(this.export_dialog.time_range[1], "YYYY-MM-DD HH:mm:ss").unix() : 0,
+                ids: this.export_dialog.ids
             }
             if (this.export_dialog.radio == '0') {
-                // 导出报订单（此功能暂未开放）
+                var store_id = JSON.parse(localStorage.getItem('store')).id
+                params.store_id = store_id
+                window.location.assign(conf.base_url + 'v1/order/export_distribute_order?params=' + JSON.stringify(params))
             } else {
-                window.location.assign('http://admin.goushuyun.com/v1/order/export_order?params=' + JSON.stringify(params))
+                window.location.assign(conf.base_url + 'v1/order/export_delivery_order?params=' + JSON.stringify(params))
             }
             setTimeout(() => {
                 this.export_dialog.visible = false
@@ -492,6 +487,12 @@ export default {
             this.selected_all = this.orders.length == this.selected_orders.length
         },
         selectedAllChange() {
+            this.orders.map(el => {
+                el.order.selected = this.selected_all
+            })
+        },
+        unSelectedAllChange() {
+            this.selected_all = false
             this.orders.map(el => {
                 el.order.selected = this.selected_all
             })
@@ -576,7 +577,7 @@ export default {
             this.size = order_search.size ? order_search.size : 10
         },
         getOrders() {
-            this.selected_all = false
+            // this.selected_all = false
             if (this.search_value && !this.search_type) {
                 this.$message.warning('请选择检索类型！')
                 return
