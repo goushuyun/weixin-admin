@@ -16,6 +16,8 @@
 
     .left_top {
         padding: 8px 0 8px 20px;
+        display: flex;
+        align-items: center;
         .shop_logo {
           width: 48px;
           height: 48px;
@@ -26,11 +28,20 @@
           font-size: 14px;
           color: white;
           text-align: left;
-          line-height: 48px;
+          line-height: 22px;
         }
     }
     .left_middle {
         min-height: 500px;
+        i.icon {
+          color: white;
+          font-size: 13px;
+          padding: 0 8px;
+        }
+        i.fa {
+          width: 14px;
+          padding-right: 10px;
+        }
     }
     .left_bottom {
         position: absolute;
@@ -144,7 +155,7 @@
           </el-menu>
         </div>
         <transition name="el-zoom-in-center">
-          <div v-show="!show_btns" class="left_bottom" @mouseleave="show_btns = true">
+          <div v-show="show_btns" class="left_bottom" @mouseleave="show_btns = false">
             <div class="btn_area" @click="goToGoushuyun">
               <img src="http://okxy9gsls.bkt.clouddn.com/gsy_btn.png">
             </div>
@@ -157,7 +168,7 @@
           </div>
         </transition>
         <transition name="el-zoom-in-center">
-          <div v-show="show_btns" class="left_bottom" @mouseover="show_btns = false">
+          <div v-show="!show_btns" class="left_bottom" @mouseover="show_btns = true">
               <div class="username">
                   {{user_name}}
               </div>
