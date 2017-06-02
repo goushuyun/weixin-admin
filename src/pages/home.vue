@@ -218,6 +218,8 @@ export default {
                     var data = resp.data.data
                     self.store_info.id = data.id
                     self.store_info.name = data.name
+                    // 在首页将 expire_at 存入缓存，后面使用
+                    localStorage.setItem('create_at',data.create_at)
                     self.store_info.expire_at = moment.unix(data.expire_at).format('YYYY-MM-DD')
                     if (self.store_info.expire_at < today) {
                         self.store_info.is_expire = true

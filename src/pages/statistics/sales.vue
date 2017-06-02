@@ -85,32 +85,56 @@ export default {
                 shortcuts: [{
                     text: '最近 7 天',
                     onClick(picker) {
+                        var create_at = moment.unix(parseInt(localStorage.getItem('create_at')))
+                        // 默认起始时间为15天前，但是如果店铺创建不到15天，则起始日期为店铺创建日期
+                        var start_time = moment().subtract(7, 'days');
+                        if (create_at > start_time) {
+                            var start = create_at
+                        } else {
+                            var start = start_time
+                        }
                         const end = moment().subtract(1, 'days');
-                        const start = moment().subtract(8, 'days');
                         picker.$emit('pick', [start, end]);
                     }
                 }, {
                     text: '最近 14 天',
                     onClick(picker) {
+                        var create_at = moment.unix(parseInt(localStorage.getItem('create_at')))
+                        // 默认起始时间为15天前，但是如果店铺创建不到15天，则起始日期为店铺创建日期
+                        var start_time = moment().subtract(14, 'days');
+                        if (create_at > start_time) {
+                            var start = create_at
+                        } else {
+                            var start = start_time
+                        }
                         const end = moment().subtract(1, 'days');
-                        const start = moment().subtract(15, 'days');
                         picker.$emit('pick', [start, end]);
                     }
                 }, {
                     text: '最近一个月',
                     onClick(picker) {
+                        var create_at = moment.unix(parseInt(localStorage.getItem('create_at')))
+                        // 默认起始时间为15天前，但是如果店铺创建不到15天，则起始日期为店铺创建日期
+                        var start_time = moment().subtract(1, 'months');
+                        if (create_at > start_time) {
+                            var start = create_at
+                        } else {
+                            var start = start_time
+                        }
                         const end = moment().subtract(1, 'days');
-                        const start = moment().subtract(1, 'months').subtract(1, 'days');
                         picker.$emit('pick', [start, end]);
                     }
                 }],
                 disabledDate(time) {
-                    return time.getTime() > moment().subtract(1, 'days')
+                    var create_at = moment.unix(parseInt(localStorage.getItem('create_at'))).subtract(1, 'days')
+                    var yesterday = moment().subtract(1, 'days')
+                    return (time.getTime() < create_at || time.getTime() > yesterday)
                 }
             },
             monthOptions: {
                 disabledDate(time) {
-                    return time.getTime() > moment()
+                    var create_at = moment.unix(parseInt(localStorage.getItem('create_at'))).subtract(1, 'months')
+                    return (time.getTime() < create_at || time.getTime() > moment())
                 }
             },
             today_salse: 0,
@@ -139,10 +163,21 @@ export default {
             this.getMonthSales()
         },
         setDefaultTime() {
-            this.date_range.push(moment().subtract(15,'days'))
+            var create_at = moment.unix(parseInt(localStorage.getItem('create_at')))
+            // 默认起始时间为15天前，但是如果店铺创建不到15天，则起始日期为店铺创建日期
+            if (create_at > moment().subtract(15,'days')) {
+                this.date_range.push(create_at)
+            } else {
+                this.date_range.push(moment().subtract(15,'days'))
+            }
             this.date_range.push(moment().subtract(1, 'days'))
 
-            this.month_range[0] = moment().subtract(6,'months').format('YYYY-MM')
+            // 默认起始时间为六个月前，但是如果店铺创建不到六个月，则起始日期为店铺创建月份
+            if (create_at.format('YYYY-MM') > moment().subtract(6,'months').format('YYYY-MM')) {
+                this.month_range[0] = create_at.format('YYYY-MM')
+            } else {
+                this.month_range[0] = moment().subtract(6,'months').format('YYYY-MM')
+            }
             this.month_range[1] = moment().format('YYYY-MM')
         },
         getTodaySales() {
