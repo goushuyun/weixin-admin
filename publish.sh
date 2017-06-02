@@ -26,17 +26,16 @@ buildfile() {
 }
 
 upload_test() {
-    echo '即将发布到 【测试】环境...'
+    echo '即将发布到【测试】环境...'
     buildfile
     rsync -e ssh -r ./build/* --progress -cv 'root@115.28.109.6:/home/web/admin/'
-    rsync -e ssh -r ./static/* --progress -cv 'root@115.28.109.6:/home/web/admin/'
+    rsync -e ssh -r ./static/* --progress -cv 'root@115.28.109.6:/home/web/admin/static/'
     date
 }
 
 upload_production() {
-    echo '即将发布到正式生产环境...'
+    echo '即将发布到【生产】环境...'
     buildfile
-
     rsync -e ssh -r ./build/* --progress -cv 'root@139.129.227.229:/home/web/admin'
     rsync -e ssh -r ./static/* --progress -cv 'root@139.129.227.229:/home/web/admin/static/'
     date
