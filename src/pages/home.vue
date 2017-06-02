@@ -68,6 +68,12 @@
               <div class="text_area">店铺设置</div>
             </div>
           </div>
+          <div class="tool" @click="contactGoushuyun">
+            <div>
+              <div class="icon_area"><i class="fa fa-phone" aria-hidden="true"></i></div>
+              <div class="text_area">咨询热线</div>
+            </div>
+          </div>
         </div>
       </el-card>
     </div>
@@ -129,6 +135,16 @@
         </div>
       </el-card>
     </div>
+
+    <el-dialog title="联系我们" :visible.sync="dialogTableVisible">
+      <p style="margin:0 0 15px 40px;">欢迎您选择任何方式联系我们</p>
+      <el-table :data="gridData">
+        <el-table-column property="name" label="姓名" width="100"></el-table-column>
+        <el-table-column property="tell" label="手机 / 微信" width="150"></el-table-column>
+        <!-- <el-table-column property="weixin" label="微信" width="150"></el-table-column> -->
+        <el-table-column property="remark" label="备注"></el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </div>
 </template>
@@ -142,6 +158,18 @@ import axios from "../scripts/http"
 export default {
     data() {
         return {
+            gridData: [{
+                name: '刘经理',
+                tell: '13122517826',
+                weixin: 'lhc18817380234',
+                remark: '售前（了解咨询、签订合同）'
+            },{
+                name: '赵经理',
+                tell: '17701610579',
+                weixin: 'Menfolk_jun',
+                remark: '售后（需求反馈、续费申请）'
+            }],
+            dialogTableVisible: false,
             store_info: {
                 name: '',
                 id: '',
@@ -228,6 +256,9 @@ export default {
                     }
                 }
             })
+        },
+        contactGoushuyun() {
+            this.dialogTableVisible = true
         },
         //店铺首页订单数量统计
         indexOrderNumStatistic() {
