@@ -26,8 +26,11 @@ buildfile() {
 }
 
 upload_test() {
-    rsync -e ssh -r ./build/* --progress -cv 'root@115.28.109.6:/home/weixin-admin'
-    rsync -e ssh -r ./static/* --progress -cv 'root@115.28.109.6:/home/weixin-admin/static/'
+    echo '即将发布到 【测试】环境...'
+    buildfile
+    rsync -e ssh -r ./build/* --progress -cv 'root@115.28.109.6:/home/web/admin/'
+    rsync -e ssh -r ./static/* --progress -cv 'root@115.28.109.6:/home/web/admin/'
+    date
 }
 
 upload_production() {
