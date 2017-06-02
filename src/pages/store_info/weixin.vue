@@ -175,11 +175,11 @@ export default {
                     axios.post('/v1/weixin/get_office_account_info', {}).then(res => {
                         let resp = res.data
                         if (resp.message == 'not_found') {
-                            axios.post('/v1/weixin/get_auth_url', {}).then(resp => {
+                            let params = {redirect_uri: conf.redirect_uri}
+                            axios.post('/v1/weixin/get_auth_url', params).then(resp => {
                                 this.url = resp.data.url
                             })
                         } else if (resp.message == 'ok') {
-                            console.log('------------OK-------------');
                             this.has_authorized = true
                             this.office_account = resp.data
 

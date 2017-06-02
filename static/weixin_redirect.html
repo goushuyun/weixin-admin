@@ -56,7 +56,7 @@
         <div class="bottom_bar">© 2017 购书云 版权所有 沪ICP备15022838号-2</div>
     </div>
     <script src="https://cdn.bootcss.com/vue/2.2.6/vue.min.js"></script>
-    <script src="http://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
     <script type="text/javascript">
         var app = new Vue({
             el: '#container',
@@ -74,7 +74,7 @@
                     headers: {
                         'Authorization': 'Bearer ' + token
                     },
-                    url: 'http://admin.goushuyun.com/v1/weixin/get_api_query_auth',
+                    url: 'https://admin.goushuyun.cn/v1/weixin/get_api_query_auth',
                     data: JSON.stringify({auth_code: auth_code}),
                     success: function(data){
                         alert(JSON.stringify(data));
