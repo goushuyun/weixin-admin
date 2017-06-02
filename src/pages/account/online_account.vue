@@ -321,28 +321,51 @@ export default {
                 shortcuts: [{
                     text: '最近一周',
                     onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                        var create_at = moment.unix(parseInt(localStorage.getItem('create_at'))).format('YYYY-MM-DD')
+                        var creat_date = moment(create_at)
+                        var start_time = moment(moment().subtract(7, 'days').format('YYYY-MM-DD'));
+                        if (creat_date > start_time) {
+                            var start = creat_date
+                        } else {
+                            var start = start_time
+                        }
+                        const end = moment();
                         picker.$emit('pick', [start, end]);
                     }
                 }, {
                     text: '最近一个月',
                     onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                        var create_at = moment.unix(parseInt(localStorage.getItem('create_at'))).format('YYYY-MM-DD')
+                        var creat_date = moment(create_at)
+                        var start_time = moment(moment().subtract(1, 'months').format('YYYY-MM-DD'));
+                        if (creat_date > start_time) {
+                            var start = creat_date
+                        } else {
+                            var start = start_time
+                        }
+                        const end = moment();
                         picker.$emit('pick', [start, end]);
                     }
                 }, {
                     text: '最近三个月',
                     onClick(picker) {
-                        const end = new Date();
-                        const start = new Date();
-                        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                        var create_at = moment.unix(parseInt(localStorage.getItem('create_at'))).format('YYYY-MM-DD')
+                        var creat_date = moment(create_at)
+                        var start_time = moment(moment().subtract(3, 'months').format('YYYY-MM-DD'));
+                        if (creat_date > start_time) {
+                            var start = creat_date
+                        } else {
+                            var start = start_time
+                        }
+                        const end = moment();
                         picker.$emit('pick', [start, end]);
                     }
-                }]
+                }],
+                disabledDate(time) {
+                    var create_at = moment.unix(parseInt(localStorage.getItem('create_at'))).subtract(1, 'days')
+                    var yesterday = moment().subtract(1, 'days')
+                    return (time.getTime() < create_at || time.getTime() > yesterday)
+                }
             },
             type: '', //交易类型
 

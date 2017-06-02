@@ -255,7 +255,12 @@ export default {
                         start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
                         picker.$emit('pick', [start, end]);
                     }
-                }]
+                }],
+                disabledDate(time) {
+                    var create_at = moment.unix(parseInt(localStorage.getItem('create_at'))).subtract(1, 'days')
+                    var yesterday = moment().subtract(1, 'days')
+                    return (time.getTime() < create_at || time.getTime() > yesterday)
+                }
             },
 
             selected_all: false,

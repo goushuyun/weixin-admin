@@ -113,7 +113,6 @@
 
 <script>
 import axios from "../../scripts/http"
-import uploadImage from "../../scripts/uploadImage"
 import {
     testMobile,testMsgCode,stamp2date
 } from "../../scripts/utils"

@@ -27,14 +27,15 @@ axios.interceptors.response.use(function(response) {
     if(jwt_token != undefined){
         localStorage.setItem('token', jwt_token)
     }
-
-    // if(response.data.code == '11001'){
-    //     app.$message.error('用户名或密码错误!')
-    //     // return new Error(response.data.message)
-    // }
     // relogin
-    if(response.data.code == '11014'){
-        window.location.href = conf.home_href
+    if(response.data.code == '11011' || response.data.code == '11012' || response.data.code == '11013' || response.data.code == '11014'){
+        app.$alert('您的登录已超时，请重新登录，给您带来的不便我们深感抱歉！', '提示', {
+            confirmButtonText: '确定',
+            type: 'warning',
+            callback: action => {
+                window.location.href = conf.home_href
+            }
+        });
     }
     //handler error
     if(response.data.code != '00000'){
