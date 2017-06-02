@@ -334,7 +334,7 @@ export default {
             this.print_dialog.visible = false
             this.printing_dialog.visible = true
             if (this.print_dialog.radio == '0') {
-                this.realityPrint()
+              this.realityPrint()
             } else {
                 // 打印快递单（此功能暂未开放）
             }
@@ -351,53 +351,85 @@ export default {
             },
             this.getOrders()
         },
-        realityPrint() {
-            var self = this
-            var selected_orders = self.selected_orders
-            for (var i = 0; i < selected_orders.length; i++) {
-                (function(order) {
-                    var baseJson = {
-                        "order": order
+        realityPrint(i){
+          var self = this
+          var selected_orders = self.selected_orders
+          if (i == undefined) {
+              i = 0
+          }
+          if (i >= selected_orders.length) {
+              return
+          }
+          var printPromise = new Promise(function(resolve, reject) {
+              var baseOrder = selected_orders[i];
+              var order = {
+                  "order": baseOrder
+              }
+              var unit = 100 / selected_orders.length
+              console.log(order);
+              //工具方法，传一个order进去 order格式具体格式查看上步骤打印出来的order
+              orderPromiseFunc(order);
+              //接下来是一个轮询任务，用于检测是否打印完成,是否打印成功,以及打印失败 打印机任务是否清理完成
+              var count = 0
+              var checkPrintOver = setInterval(function() {
+                  //首先要检测打印是否完成
+                  console.log("打印是否完成："+localStorage.printOver);
+                  if (localStorage.printOver=='true') {
+                      //接下来检测打印成功还是失败
+                      console.log("打印是否成功："+localStorage.printSuccess);
+                      self.printing_dialog.temp_percentage += unit
+                      if (self.printing_dialog.temp_percentage < 100) {
+                          self.printing_dialog.percentage = parseInt(self.printing_dialog.temp_percentage)
+                      } else {
+                          self.printing_dialog.percentage = 100
+                          self.printing_dialog.disabled_btn = false
+                      }
+                      if(localStorage.printSuccess=='true'){
+                          //如果打印成功，执行打印成功的方法
+                          //eg：告知服务器打印成功 ，打印下一个 func()
+                          self.servicePrint(baseOrder.order.id)
+                          resolve()
+                      }else{
+                          //如果打印失败，首先检测打印任务是否清理
+                          self.printing_dialog.fail_orders.push(baseOrder.order.id)
+                          if (localStorage.clearPrinterOk=='true') {
+                              //如果打印清理成功，执行清理成功的方法 func()
+                              //eg 执行之后的任务
+                              reject(1)
+                          } else{
+                              //跳出打印任务，提示连接打印机失败
+                              //func()
+                              reject(2)
+
+                          }
+                      }
+                      console.log("清理任务是否完成："+localStorage.clearPrinterOk);
+                      clearTimeout(checkPrintOver)
+                    } else if (count > 30) {
+                        //打印出现问题，跳出打印任务，提示连接打印机失败
+                        clearTimeout(checkPrintOver)
                     }
-                    var unit = 100 / selected_orders.length
-                    orderPromiseFunc(baseJson);
-                    var count = 0
-                    var checkPrintOver = setInterval(function() {
-                        if (localStorage.printOver == 'true') {
-                            console.log('打印完成！');
-                            self.printing_dialog.temp_percentage += unit
-                            if (self.printing_dialog.temp_percentage < 100) {
-                                self.printing_dialog.percentage = parseInt(self.printing_dialog.temp_percentage)
-                            } else {
-                                self.printing_dialog.percentage = 100
-                                self.printing_dialog.disabled_btn = false
-                            }
-                            if (localStorage.printSuccess == 'true') {
-                                console.log('打印成功！');
-                                self.servicePrint(order.order.id)
-                                self.printing_dialog.success_orders.push(order.order.id)
-                                if (self.print_dialog.checked) {
-                                    self.deliver(order.order.id)
-                                }
-                            } else {
-                                console.log('打印失败！');
-                                self.printing_dialog.fail_orders.push(order.order.id)
-                                if (localStorage.clearPrinterOk == 'true') {} else {
-                                    self.$notify.error({
-                                        title: '错误',
-                                        message: '连接打印机失败！',
-                                        duration: 0
-                                    });
-                                }
-                            }
-                            clearTimeout(checkPrintOver)
-                        } else if (count > 30) {
-                            clearTimeout(checkPrintOver)
-                        }
-                        count++
-                    }, 500)
-                })(selected_orders[i])
-            }
+                    count ++
+                    console.log("打印是否完成："+localStorage.printOver);
+                    console.log(localStorage.printOver=='true');
+              }, 500)
+          })
+
+          printPromise.then(function(value) {
+              //SUCCESS
+              i++
+              self.realityPrint(i)
+              console.log('打印成功！');
+          }, function(value) {
+              //FIELD
+              i++
+              if (value==1) {
+                  self.realityPrint(i)
+              }else {
+                self.$message.error('打印异常，请手动清理打印任务后继续！')
+              }
+              console.log('打印失败！');
+          })
         },
         servicePrint(order_id) {
             axios.post('/v1/order/print', {
@@ -405,6 +437,10 @@ export default {
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     console.log('服务器已记录订单：' + order_id + ' 的此次打印！');
+                    this.printing_dialog.success_orders.push(order_id)
+                    if (this.print_dialog.checked) {
+                        self.deliver(order_id)
+                    }
                 }
             })
         },
@@ -478,12 +514,14 @@ export default {
                 if (el.order.selected) {
                     selected_orders.push(el)
                 }
+            })
+            this.selected_orders = selected_orders
+            this.selected_orders.forEach(el => {
                 if (el.order.print_at) {
                     printed_count++
                 }
             })
             this.print_dialog.printed_count = printed_count
-            this.selected_orders = selected_orders
             return selected_orders
         },
         checkSelectedAll() {
@@ -582,7 +620,7 @@ export default {
             this.size = order_search.size ? order_search.size : 10
         },
         getOrders() {
-            // this.selected_all = false
+            this.selected_all = false
             if (this.search_value && !this.search_type) {
                 this.$message.warning('请选择检索类型！')
                 return
