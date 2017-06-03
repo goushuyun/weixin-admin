@@ -15,13 +15,14 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                axios.post('/v1/school/delete', {
+                axios.post('/v1/school/del', {
                     id
                 }).then(res => {
                     this.$message({
                         type: 'success',
                         message: '删除成功!'
                     });
+                    this.getData()
                     console.log(res.data);
                 })
             }).catch(() => {

@@ -113,6 +113,7 @@ export default {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    padding: 12px;
 }
 .ellipsis {
     display: -webkit-box;
@@ -132,7 +133,7 @@ export default {
     font-size: 14px;
     height: 122px;
     width: 122px;
-    margin: 12px;
+    margin: 0 14px 10px 0;
     border-radius: 4px;
     text-align: center;
     border: 1px solid #D1DBE5;

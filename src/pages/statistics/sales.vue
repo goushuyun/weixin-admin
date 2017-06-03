@@ -3,7 +3,14 @@
   <div class="top_bar">
       <h2 class="title">销售统计</h2>
       <el-select v-model="school_id" style="width: 240px;line-height: 48px;margin-left:20px;" clearable placeholder="学校" size="small" @change="schoolChange">
-          <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
+          <el-option-group label="运营中的学校">
+            <el-option v-for="school in schools" v-if="school.status == 0" :label="school.name" :value="school.id"></el-option>
+          </el-option-group>
+          <el-option-group label="已删除的学校">
+            <el-option v-for="school in schools" v-if="school.status == 1" :label="school.name" :value="school.id">
+              <span style="float: left">{{ school.name }}</span>
+            </el-option>
+          </el-option-group>
       </el-select>
   </div>
   <div class="content_inner">
@@ -444,7 +451,9 @@ export default {
             echart2.setOption(option);
         },
         getSchools() {
-            axios.post('/v1/school/store_schools', {}).then(resp => {
+            axios.post('/v1/school/store_schools', {
+                status: 3
+            }).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.schools = resp.data.data
                 }

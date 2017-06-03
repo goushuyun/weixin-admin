@@ -256,7 +256,9 @@ export default {
         },
         getSchoolName(id) {
             var self = this
-            axios.post('/v1/school/store_schools', {}).then(resp => {
+            axios.post('/v1/school/store_schools', {
+                status: 3
+            }).then(resp => {
                 if (resp.data.message == 'ok') {
                     resp.data.data.forEach(school => {
                         if (school.id == id) {
