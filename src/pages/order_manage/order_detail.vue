@@ -59,8 +59,8 @@
           </el-row>
         </div>
         <div class="opt_area" :style="'height:' + 74 * order_items.length + 'px;'">
-          <p>订单总额（元）￥{{order_detail.total_fee}}</p>
-          <p style="color:#888">（含快递￥{{order_detail.freight}}）</p>
+          <p>订单总额 ￥{{order_detail.total_fee}}</p>
+          <p style="color:#888">（含快递费 ￥{{order_detail.freight}}）</p>
         </div>
         <div class="opt_area" :style="'height:' + 74 * order_items.length + 'px;'">
           <p>

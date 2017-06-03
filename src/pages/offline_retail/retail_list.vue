@@ -53,8 +53,8 @@
             </el-row>
           </div>
           <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
-            <p>应收总额（元）￥{{order.retail.goods_fee}}</p>
-            <p>实收总额（元）￥{{order.retail.total_fee}}</p>
+            <p>应收总额 ￥{{order.retail.goods_fee}}</p>
+            <p>实收总额 ￥{{order.retail.total_fee}}</p>
           </div>
         </div>
       </div>

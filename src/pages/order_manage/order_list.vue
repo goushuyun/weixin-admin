@@ -89,8 +89,8 @@
             </el-row>
           </div>
           <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
-            <p>订单总额（元）￥{{order.order.total_fee}}</p>
-            <p style="color:#888">（含快递￥{{order.order.freight}}）</p>
+            <p>订单总额 ￥{{order.order.total_fee}}</p>
+            <p style="color:#888">（含快递费 ￥{{order.order.freight}}）</p>
           </div>
           <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
             <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-search" aria-hidden="true"></i> 查看详情</el-button>
