@@ -106,7 +106,7 @@
             <ul class="info_list">
                 <li class="info_item">
                     <span class="key">可提现金额</span>
-                    <span class="val"><span class="can_without_amount">345.45</span> 元</span>
+                    <span class="val"><span class="can_without_amount">{{balance}}</span> 元</span>
                 </li>
                 <li class="info_item">
                     <span class="key">支付方式</span>

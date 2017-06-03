@@ -121,7 +121,6 @@ export default {
     },
     mounted() {
         this.getSchools()
-        this.getOrders()
     },
     methods: {
         handleSizeChange(size) {
@@ -164,6 +163,7 @@ export default {
             axios.post('/v1/school/store_schools', {}).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.schools = resp.data.data
+                    this.getOrders()
                 }
             })
         },

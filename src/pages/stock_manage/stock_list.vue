@@ -85,12 +85,14 @@
                         <span v-for="(item,index) in scope.row.new_book.location">{{item.location_str + (index + 1 == scope.row.new_book.location.length ? '' : '，')}}</span>
                       </div>
                     </el-tooltip>
+                    <div v-if="scope.row.has_new_book && !scope.row.new_book.location.length" class="goods_item new_color ellipsis">无</div>
                     <el-tooltip v-if="scope.row.has_old_book && scope.row.old_book.location.length" placement="top" effect="dark" :enterable="false">
                       <div slot="content"><span v-for="(item,index) in scope.row.old_book.location">{{item.location_str + (index + 1 == scope.row.old_book.location.length ? '' : '，')}}</span></div>
                       <div class="goods_item old_color ellipsis">
                         <span v-for="(item,index) in scope.row.old_book.location">{{item.location_str + (index + 1 == scope.row.old_book.location.length ? '' : '，')}}</span>
                       </div>
                     </el-tooltip>
+                    <div v-if="scope.row.has_old_book && !scope.row.old_book.location.length" class="goods_item old_color ellipsis">无</div>
                 </template>
             </el-table-column>
             <!-- <el-table-column prop="update_at" label="修改时间" width="160"></el-table-column> -->

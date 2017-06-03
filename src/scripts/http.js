@@ -29,7 +29,7 @@ axios.interceptors.response.use(function(response) {
     }
     // relogin
     if(response.data.code == '11011' || response.data.code == '11012' || response.data.code == '11013' || response.data.code == '11014'){
-        app.$alert('您的登录已超时，请重新登录，给您带来的不便我们深感抱歉！', '提示', {
+        app.$alert('您的登录已超时，请重新登录！', '提示', {
             confirmButtonText: '确定',
             type: 'warning',
             callback: action => {

@@ -29,6 +29,7 @@
                   <el-button class="btn" type="text" style="color:#FF4949" icon="delete" size="large" @click="deleteLocations(shelf.id)"></el-button>
               </el-button-group>
             </div>
+            <div v-if="!shelf.children.length" class="show_info">需添加货架层信息后，才能正常使用</div>
             <div v-for="(floor,f_index) in shelf.children" class="item">
               <label v-if="!floor.update">{{floor.name}}</label>
               <el-input :id="'shelf_' + s_index + '_floor_' + f_index" v-else style="max-width:200px;" size="small" v-model="floor.name" @blur="comfirmUpdate(floor.id,floor.name,s_index,f_index)" v-on:keyup.enter.native="comfirmUpdate(floor.id,floor.name,s_index,f_index)"></el-input>
@@ -45,6 +46,7 @@
               </el-button-group>
             </div>
         </div>
+        <div v-if="!locations.length" class="show_info">需添加货架及货架层信息后，才能正常使用</div>
     </div>
   </div>
 </template>
@@ -248,13 +250,13 @@ export default {
         line-height: 36px;
         margin: 5px;
         padding: 10px;
-        border-bottom: 1px solid #D1DBE5;
     }
     .locations {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #D1DBE5;
         .box-card {
             position: relative;
             font-size: 14px;
@@ -300,5 +302,17 @@ export default {
     .margin_right20 {
         margin-right: 20px;
     }
+}
+.show_info {
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    border: 1px solid #DFE6EC;
+    margin-top: 10px;
+    background-color: #EEF1F6;
+    color: #1F2D3D;
+    font-family: "Helvetica Neue";
+    font-size: 13px;
+    text-align:center;
 }
 </style>

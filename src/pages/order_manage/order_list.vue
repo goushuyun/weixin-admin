@@ -162,7 +162,7 @@
           <p><el-radio class="radio" v-model="export_dialog.radio" label="0">导出配货单</el-radio></p>
           <p class="desc">配货单将选中的待发货订单中所需要配送的书籍统一整理出来，方便在高峰期配书</p>
           <p><el-radio class="radio" v-model="export_dialog.radio" label="1">导出发货单</el-radio></p>
-          <p class="desc">发货单会将待发货订单整理出来，你可以配合“快递助手”使用，直接打印快递单</p>
+          <p class="desc">发货单会将待发货订单整理出来，你可以配合<el-button type="text" @click="goToKDZS">“快递助手”</el-button> 使用，直接打印快递单</p>
           <div class="footer">
             <el-button type="primary" size="small" @click="confirmExportOrder">导出</el-button>
           </div>
@@ -278,7 +278,6 @@ export default {
     mounted() {
         this.getStoreData()
         this.getSchools()
-        this.getOrders()
     },
     watch: {
         refresh_flag(flag) {
@@ -304,6 +303,9 @@ export default {
         })
     },
     methods: {
+        goToKDZS() {
+            window.open('http://zz.kuaidizs.com')
+        },
         preSelectedPrint() {
             var self = this
             if (!checkLodopIsInstall()) {
@@ -312,7 +314,7 @@ export default {
                     cancelButtonText: '取消',
                     type: 'info'
                 }).then(() => {
-                    window.location.assign('http://okxy9gsls.bkt.clouddn.com/CLodop_Setup_for_Win32NT.exe')
+                    window.location.assign('http://okxy9gsls.bkt.clouddn.com/CLodop_Setup_for_Win32NT_https_2.130.exe')
                 }).catch(() => {
                     self.$message({
                         type: 'info',
@@ -663,6 +665,7 @@ export default {
             axios.post('/v1/school/store_schools', {}).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.schools = resp.data.data
+                    this.getOrders()
                 }
             })
         },
