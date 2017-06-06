@@ -130,7 +130,7 @@
       <div class="body" v-loading="loading" :element-loading-text="拼命加载中">
         <el-upload
           class="avatar-uploader"
-          action="http://upload.qiniu.com/"
+          action="https://upload.qbox.me/"
           :data="imagesFormData"
           :show-file-list="false"
           :before-upload="beforeAvatarUpload"
@@ -220,7 +220,10 @@ import axios from "../../scripts/http"
 import {
     getToken
 } from "../../scripts/token"
+
+import mix from './store_manage.js'
 export default {
+    mixins: [mix],
     data() {
         return {
             isbn: '',
@@ -310,10 +313,11 @@ export default {
         }
     },
     created() {
+        var store = JSON.parse(localStorage.getItem('store'))
+        this.store_id = store.id
     },
     mounted() {
         this.getLocations()
-        // this.getData()
     },
     computed: {
         old_book_discount() {
@@ -393,7 +397,6 @@ export default {
                         }
                         return item
                     })
-                    console.log(self.tableData);
                 }
                 self.loading = false
             })
@@ -420,7 +423,6 @@ export default {
             } else {
                 this.goods_id = data.old_book.goods_id
             }
-            console.log(deleteDialog);
             this.deleteDialog = deleteDialog
         },
         comfirmDelete() {
@@ -469,6 +471,10 @@ export default {
             } else {
                 this.old_book.stock = 0
             }
+
+            // 请求上传图片需要的token
+            this.getToken()
+
             this.book_info_show = true
         },
         confirmEdit() {
@@ -711,7 +717,9 @@ export default {
             this.getToken()
         },
         getToken() {
-            let key = 'store_' + this.store_id + '/book_' + this.book_info.isbn + '.png'
+            let random = moment().unix()
+            let key = 'store_' + this.store_id + '/book_' + this.book_info.isbn + '_' + random + '.png'
+
             //获取token
             axios.post('/v1/mediastore/get_upload_token', {
                 zone: 0,
