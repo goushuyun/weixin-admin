@@ -311,6 +311,10 @@ export default {
                 return
             }
             this.loading = true
+
+            // 将上次上传商品的库存数量清零
+            this.old_book.stock = this.new_book.stock = 0
+
             axios.post('/v1/books/get_book_info_by_isbn', {
                 "isbn": this.book_info.isbn
             }).then(resp => {
