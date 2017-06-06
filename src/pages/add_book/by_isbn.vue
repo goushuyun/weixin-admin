@@ -59,7 +59,7 @@
     <div class="body" v-loading="loading" :element-loading-text="拼命加载中">
       <el-upload
         class="avatar-uploader"
-        action="http://upload.qiniu.com/"
+        action="https://upload.qbox.me/"
         :data="imagesFormData"
         :show-file-list="false"
         :before-upload="beforeAvatarUpload"
@@ -217,11 +217,16 @@ export default {
             return price
         }
     },
+    created(){
+        this.store_id = JSON.parse(localStorage.getItem('store')).id
+    },
     mounted() {
         $('#isbn input').focus()
         var store = this.$store.state.current_store
         this.store_id = store.id
         this.getLocations()
+
+        this.getToken()
     },
     methods: {
         inputBook() {
@@ -560,7 +565,9 @@ export default {
             this.getToken()
         },
         getToken() {
-            let key = 'store_' + this.store_id + '/book_' + this.book_info.isbn + '.png'
+            let random = moment().unix()
+            let key = 'store_' + this.store_id + '/book_' + this.book_info.isbn + '_' + random + '.png'
+            console.log(key);
             //获取token
             axios.post('/v1/mediastore/get_upload_token', {
                 zone: 0,
