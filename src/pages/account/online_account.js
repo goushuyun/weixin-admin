@@ -13,8 +13,8 @@ export default {
             axios.post('/v1/store/recharge_apply', params).then(res=>{
                 let res_data = res.data.data
                 let req = {
-                    amount: 1,
-                    // amount: res_data.recharge_fee,
+                    // amount: 1,
+                    amount: res_data.recharge_fee,
                     subject: '商户充值',
                     order_no: res_data.id,
                     channel: 'alipay_pc_direct',

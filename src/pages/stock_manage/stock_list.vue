@@ -6,16 +6,16 @@
   <div class="content_inner">
     <el-form :inline="true" label-width="80px" class="search_area">
       <el-form-item label="ISBN">
-        <el-input size="small" v-model="isbn"></el-input>
+        <el-input size="small" v-model.trim="isbn" @keyup.enter.native="getData"></el-input>
       </el-form-item>
       <el-form-item label="书名">
-        <el-input size="small" v-model="title"></el-input>
+        <el-input size="small" v-model.trim="title" @keyup.enter.native="getData"></el-input>
       </el-form-item>
       <!-- <el-form-item label="出版社">
         <el-input size="small" v-model="publisher"></el-input>
       </el-form-item> -->
       <el-form-item label="作者">
-        <el-input size="small" v-model="author"></el-input>
+        <el-input size="small" v-model.trim="author" @keyup.enter.native="getData"></el-input>
       </el-form-item>
       <el-form-item class="btn_bottom">
         <el-button size="small" type="primary" @click="getData" icon="search">查询</el-button>
