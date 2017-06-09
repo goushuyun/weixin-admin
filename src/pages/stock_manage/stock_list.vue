@@ -51,9 +51,9 @@
         <el-table :data="tableData" stripe style="width: 100%">
             <el-table-column type="index" width="56" label=""></el-table-column>
             <el-table-column label="图片" width="100">
-                <template scope="scope">
-                  <div class="imageare">
-                      <img :src="'http://onv8eua8j.bkt.clouddn.com/' + scope.row.book.image" class="image"></img>
+                <template scope="scope" >
+                  <div class="image_wrap">
+                      <img :src="'http://images.goushuyun.cn/' + scope.row.book.image" class="image"></img>
                   </div>
                 </template>
             </el-table-column>
@@ -168,8 +168,8 @@
                 <el-input :disabled="!new_book.has_new_book" type="number" min="0" placeholder="新书价格" v-model="new_book.price" @input="inputPrice(0)" @blur="blurPrice(0)"><template slot="append">元</template></el-input>
             </el-form-item>
             <el-form-item label="数 量">
-                <el-input :disabled="!old_book.has_old_book" type="number" min="0" placeholder="二手书数量" v-model="old_book.amount" @input="inputAmount(1)"><template slot="append">当前库存 <span style="color:#1AAD19;font-size:16px">{{old_book.stock}}</span> 本</template></el-input>
-                <el-input :disabled="!new_book.has_new_book" type="number" min="0" placeholder="新书数量" v-model="new_book.amount" @input="inputAmount(0)"><template slot="append">当前库存 <span style="color:#3A8AFF;font-size:16px">{{new_book.stock}}</span> 本</template></el-input>
+                <el-input :disabled="!old_book.has_old_book" type="number" min="0" placeholder="二手书数量" v-model.number="old_book.amount" @input="inputAmount(1)"><template slot="append">当前库存 <span style="color:#1AAD19;font-size:16px">{{old_book.stock}}</span> 本</template></el-input>
+                <el-input :disabled="!new_book.has_new_book" type="number" min="0" placeholder="新书数量" v-model.number="new_book.amount" @input="inputAmount(0)"><template slot="append">当前库存 <span style="color:#3A8AFF;font-size:16px">{{new_book.stock}}</span> 本</template></el-input>
             </el-form-item>
             <el-form-item label="位 置">
                 <el-row>
@@ -737,14 +737,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.imageare {
-    text-align: center;
-    img {
-        margin-top: 5px;
-        width: 60px;
-        height: 80px;
-    }
-}
+@import "./store_list.scss";
+
 .goods_item {
     height: 40px;
     line-height: 40px;

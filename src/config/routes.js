@@ -6,7 +6,7 @@ const home = r => require(['../pages/home'], r)
 
 // * 订单管理
 // ** 订单列表
-const order_list = r => require(['../pages/order_manage/order_list'], r)
+const order_list = r => require(['../pages/order_manage/order_list.vue'], r)
 // ** 订单详情
 const order_detail = r => require(['../pages/order_manage/order_detail'], r)
 
