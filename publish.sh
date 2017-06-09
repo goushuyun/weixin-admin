@@ -37,7 +37,7 @@ upload_production() {
     echo '即将发布到【生产】环境...'
     buildfile
     rsync -e ssh -r ./build/* --progress -cv 'root@139.129.227.229:/home/web/admin'
-    # rsync -e ssh -r ./static/* --progress -cv 'root@139.129.227.229:/home/web/admin/static/'
+    rsync -e ssh -r ./static/* --progress -cv 'root@139.129.227.229:/home/web/admin/static/'
     date
 }
 
