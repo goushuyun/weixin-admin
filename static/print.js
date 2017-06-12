@@ -19,7 +19,7 @@
 					if (singleOrderPrintModel.currentPage != 0 && singleOrderPrintModel.currentPage == singleOrderPrintModel.totalPage) {
 						resolve();
 						clearTimeout(checkPrintTask);
-					} else if (count > 3) {
+					} else if (count > 10) {
 						reject()
 						clearTimeout(checkPrintTask)
 					}
@@ -42,7 +42,7 @@
 						if (localStorage.clearPrinterOk) {
 							clearTimeout(checkClearOk)
 							resolve(value)
-						} else if (count > 3) {
+						} else if (count > 10) {
 							clearTimeout(checkClearOk)
 							reject(value)
 						}
@@ -320,8 +320,6 @@ function printDeliveryOrder(order, items, isLogo, layer, page) {
 
             }
         }, 200);
-
-
     })
     var singleOrderPrintModel = JSON.parse(localStorage.singleOrderPrintModel);
     accessJobId.then(function(value) {
