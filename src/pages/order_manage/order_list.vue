@@ -43,6 +43,8 @@
         <el-radio-button :label="7">已完成</el-radio-button>
         <el-radio-button :label="77">待处理售后</el-radio-button>
         <el-radio-button :label="78">已处理售后</el-radio-button>
+        <el-radio-button :label="0">待支付</el-radio-button>
+        <el-radio-button :label="8">已关闭</el-radio-button>
         <el-radio-button :label="80">全部订单</el-radio-button>
       </el-radio-group>
     </div>
@@ -64,7 +66,8 @@
                <el-checkbox v-model="order.order.selected" @change="checkSelectedAll"></el-checkbox>
              </div>
              <span style="margin:0 10px;">订单编号：{{order.order.id}}</span>
-             <span style="margin:0 10px;">付款时间：{{order.order.pay_at}}</span>
+             <span v-if="order_status == 0 || order_status == 8" style="margin:0 10px;">下单时间：{{order.order.order_at}}</span>
+             <span v-else style="margin:0 10px;">付款时间：{{order.order.pay_at}}</span>
              <span style="margin:0 10px;">学校：{{order.order.school_name}}</span>
              <div class="tag_area">
                 <el-tag v-if="order.order.groupon_id" type="success">班级购</el-tag>
@@ -121,10 +124,11 @@
           <p><el-radio class="radio" v-model="print_dialog.radio" label="0">打印发货详情（需热敏纸打印机）</el-radio></p>
           <p><el-radio class="radio" disabled v-model="print_dialog.radio" label="1">打印快递单（此功能暂未开放）</el-radio></p>
           <p>默认打印机：<span style="color:#FF4949">{{print_dialog.printer}}</span></p>
-          <div class="desc" style="line-height:24px;">请务必确保打印机正确，否则会造成错误。</div>
-          <div class="desc" style="line-height:24px;">您可以在“控制面板-设备和打印机”中修改默认打印机。</div>
+          <div class="desc" style="line-height:24px;">1.请务必确保打印机正确，否则会造成错误。</div>
+          <div class="desc" style="line-height:24px;">2.您可以在“控制面板-设备和打印机”中修改默认打印机。</div>
+          <div class="desc" style="line-height:24px;">3.修改完默认打印机，请务必刷新当前页面。</div>
           <div class="footer1" v-if="order_status == 1">
-            <el-checkbox v-model="print_dialog.checked">打印并发货（不建议勾选）</el-checkbox>
+            <el-checkbox v-model="print_dialog.checked">打印后直接发货（不建议勾选）</el-checkbox>
             <el-button style="float:right" type="primary" size="small" @click="confirmSelectedPrint">打印</el-button>
           </div>
           <div class="footer2" v-else>
@@ -350,6 +354,14 @@ export default {
             }
         },
         completeSelectedPrint() {
+            this.print_dialog = {
+                visible: false,
+                selected_count: 0,
+                printed_count: 0,
+                radio: '0',
+                printer: '',
+                checked: false
+            }
             this.printing_dialog = {
                 visible: false,
                 active_names: ['fail'],
@@ -618,7 +630,7 @@ export default {
             var order_search = this.$store.state.order_search
             console.log(order_search);
             this.order_time = order_search.order_time ? order_search.order_time : [null, null]
-            this.order_status = order_search.order_status ? order_search.order_status : 1
+            this.order_status = order_search.order_status != undefined ? order_search.order_status : 1
             this.school_id = order_search.school_id ? order_search.school_id : ''
             this.search_type = order_search.search_type ? order_search.search_type : ''
             this.search_value = order_search.search_value ? order_search.search_value : ''
@@ -656,6 +668,9 @@ export default {
                             el.order.order_status = el.order.order_status - 16
                         }
                         el.order.pay_at = moment.unix(el.order.pay_at).format('YYYY-MM-DD HH:mm:ss')
+                        if (self.order_status == 0 || self.order_status == 8) {
+                            el.order.order_at = moment.unix(el.order.order_at).format('YYYY-MM-DD HH:mm:ss')
+                        }
                         el.order.school_name = self.getSchoolName(el.order.school_id)
                         el.order.freight = priceFloat(el.order.freight)
                         el.order.total_fee = priceFloat(el.order.total_fee)

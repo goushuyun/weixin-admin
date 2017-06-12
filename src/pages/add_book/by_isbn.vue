@@ -439,7 +439,7 @@ export default {
                 if(new_book_location_bak.length > 0 && !isObjectValueEqual(new_book_location_bak,this.new_book.location)) {
                     this.$notify.warning({
                       title: '新书货架位已被更改',
-                      message: '新书货架位已被更改为原来的货架位',
+                      message: '库存中已有此书，库存位置已自动设置为原库存位置',
                       duration: 10000
                     });
                 }

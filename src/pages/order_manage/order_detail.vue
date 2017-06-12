@@ -5,30 +5,29 @@
   </div>
   <div class="content_inner">
     <div id="order_status">
-        <el-row type="flex" justify="center" align="middle">
-            <el-col :span="1">
-              <el-button icon="arrow-left" type="text" size="samll" @click="goToList">返回上一页</el-button>
-            </el-col>
-            <el-col :span="23" v-if="order_detail.order_status <= 8 && order_detail.after_sale_status == 0">
-                <el-steps :space="200" :active="order_detail.order_step" finish-status="success" center align-center>
-                    <el-step title="买家下单" :description="order_detail.order_at?order_detail.order_at:''"></el-step>
-                    <el-step title="买家付款" :description="order_detail.pay_at?order_detail.pay_at:''"></el-step>
-                    <el-step title="发货" :description="order_detail.deliver_at?order_detail.deliver_at:''"></el-step>
-                    <el-step title="交易成功" :description="order_detail.complete_at?order_detail.complete_at:''"></el-step>
-                </el-steps>
-            </el-col>
-            <el-col :span="24" v-if="order_detail.after_sale_status != 0">
-                <el-steps :space="300" :active="order_detail.after_sale_status" center align-center>
-                    <el-step title="售后申请" :description="order_detail.after_sale_apply_at?order_detail.after_sale_apply_at:''"></el-step>
-                    <el-step title="售后结束" :description="order_detail.after_sale_end_at?order_detail.after_sale_end_at:''"></el-step>
-                </el-steps>
-            </el-col>
+        <el-button style="float:left" icon="arrow-left" type="text" size="samll" @click="goToList">返回上一页</el-button>
+        <el-row type="flex" align="middle" justify="center">
+          <div v-if="order_detail.after_sale_status != 0">
+            <el-steps :space="200" :active="order_detail.after_sale_status" align-center>
+              <el-step title="售后申请" :description="order_detail.after_sale_apply_at?order_detail.after_sale_apply_at:''"></el-step>
+              <el-step title="售后结束" :description="order_detail.after_sale_end_at?order_detail.after_sale_end_at:''"></el-step>
+            </el-steps>
+          </div>
+          <div v-else-if="order_detail.order_status <= 8">
+            <el-steps :space="200" :active="order_detail.order_step" finish-status="success" align-center>
+              <el-step title="买家下单" :description="order_detail.order_at?order_detail.order_at:''"></el-step>
+              <el-step title="买家付款" :description="order_detail.pay_at?order_detail.pay_at:''"></el-step>
+              <el-step title="卖家发货" :description="order_detail.deliver_at?order_detail.deliver_at:''"></el-step>
+              <el-step title="交易成功" :description="order_detail.complete_at?order_detail.complete_at:''"></el-step>
+            </el-steps>
+          </div>
         </el-row>
     </div>
     <div class="order_item">
       <div class="title">
            <span style="margin:0 10px;">订单编号：{{order_detail.id}}</span>
-           <span style="margin:0 10px;">付款时间：{{order_detail.pay_at}}</span>
+           <span v-if="order_detail.order_status == 0 || order_detail.order_status == 8" style="margin:0 10px;">下单时间：{{order_detail.order_at}}</span>
+           <span v-else style="margin:0 10px;">付款时间：{{order_detail.pay_at}}</span>
            <span style="margin:0 10px;">学校：{{school_name}}</span>
            <div class="tag_area">
               <el-tag v-if="order_detail.groupon_id" type="success">班级购</el-tag>
@@ -65,7 +64,7 @@
         <div class="opt_area" :style="'height:' + 74 * order_items.length + 'px;'">
           <p>
             <el-button v-if="order_detail.order_status < 3 && order_detail.after_sale_status == 0" type="primary" style="width:60px" size="mini" @click="deliver"><i class="fa fa-truck" aria-hidden="true"></i> 发货</el-button>
-            <el-button type="primary" style="width:60px" size="mini" @click="print"><i class="fa fa-print" aria-hidden="true"></i> 打印</el-button>
+            <el-button v-if="order_detail.order_status != 0 && order_detail.order_status != 8" type="primary" style="width:60px" size="mini" @click="preSelectedPrint"><i class="fa fa-print" aria-hidden="true"></i> 打印</el-button>
           </p>
           <p v-if="order_detail.groupon_id">班级购编号：{{order_detail.groupon_id}}</p>
         </div>
@@ -137,6 +136,37 @@
       </el-table>
     </div>
   </div>
+  <el-dialog title="订单打印" :visible.sync="print_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false">
+    <div class="print_dialog">
+        <p class="desc">{{print_dialog.is_printed ? '该订单已经打印过了，可以再次打印' : '该订单从未打印过'}}</p>
+        <p><el-radio class="radio" v-model="print_dialog.radio" label="0">打印发货详情（需热敏纸打印机）</el-radio></p>
+        <p><el-radio class="radio" disabled v-model="print_dialog.radio" label="1">打印快递单（此功能暂未开放）</el-radio></p>
+        <p>默认打印机：<span style="color:#FF4949">{{print_dialog.printer}}</span></p>
+        <div class="desc" style="line-height:24px;">1.请务必确保打印机正确，否则会造成错误。</div>
+        <div class="desc" style="line-height:24px;">2.您可以在“控制面板-设备和打印机”中修改默认打印机。</div>
+        <div class="desc" style="line-height:24px;">3.修改完默认打印机，请务必刷新当前页面。</div>
+        <div class="footer1" v-if="order_detail.order_status == 1">
+          <el-checkbox v-model="print_dialog.checked">打印后直接发货（不建议勾选）</el-checkbox>
+          <el-button style="float:right" type="primary" size="small" @click="confirmPrint">打印</el-button>
+        </div>
+        <div class="footer2" v-else>
+          <el-button type="primary" size="small" @click="confirmPrint">打印</el-button>
+        </div>
+    </div>
+  </el-dialog>
+  <!-- 打印过程 -->
+  <el-dialog class="printing_dialog" size="tiny" :title="(printing_dialog.percentage == 100) ? '打印结束' : ('正在打印' + (print_dialog.checked ? '并发货' : '') + '，请耐心等待......')" :visible.sync="printing_dialog.visible" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
+    <div class="printProgress">
+      <el-progress v-if="printing_dialog.percentage != 100" type="circle" :percentage="0"></el-progress>
+      <el-progress v-else-if="printing_dialog.is_print_succese" type="circle" :percentage="100" status="success"></el-progress>
+      <el-progress v-else-if="!printing_dialog.is_print_succese" type="circle" :percentage="100" status="exception"></el-progress>
+    </div>
+    <p v-if="printing_dialog.percentage == 100 && printing_dialog.is_print_succese" class="printResult success">订单“{{order_id}}”打印成功！</p>
+    <p v-if="printing_dialog.percentage == 100 && !printing_dialog.is_print_succese" class="printResult fail">订单“{{order_id}}”打印失败！</p>
+    <div class="footer">
+      <el-button type="primary" size="small" :disabled="printing_dialog.percentage != 100" @click="completePrint">完成</el-button>
+    </div>
+  </el-dialog>
 </div>
 </template>
 
@@ -150,6 +180,18 @@ import axios from "../../scripts/http"
 export default {
     data() {
         return {
+            print_dialog: {
+                visible: false,
+                is_printed: false,
+                radio: '0',
+                printer: '',
+                checked: false
+            },
+            printing_dialog: {
+                visible: false,
+                percentage: 0,
+                is_print_succese: false
+            },
             order_id: '',
             school_name: '',
             order_detail: {},
@@ -177,10 +219,10 @@ export default {
         this.getOrder()
     },
     methods: {
-        print() {
+        preSelectedPrint() {
             var self = this
             if (!checkLodopIsInstall()) {
-                self.$confirm('您尚未安装打印插件，请先安装！','提示',{
+                self.$confirm('您尚未安装打印插件，请先安装！', '提示', {
                     confirmButtonText: '确认安装',
                     cancelButtonText: '取消',
                     type: 'info'
@@ -194,6 +236,21 @@ export default {
                 });
                 return
             }
+            this.print_dialog.is_printed = this.order_detail.print_at != 0
+            this.print_dialog.printer = getPrinterName()
+            this.print_dialog.visible = true
+        },
+        confirmPrint() {
+            this.print_dialog.visible = false
+            this.printing_dialog.visible = true
+            if (this.print_dialog.radio == '0') {
+                this.realityPrint()
+            } else {
+                // 打印快递单（此功能暂未开放）
+            }
+        },
+        realityPrint() {
+            var self = this
 
             //下面一句话测试专用
             var order = self.baseJson;
@@ -213,27 +270,18 @@ export default {
                         //eg：告知服务器打印成功 ，打印下一个 func()
                         self.servicePrint()
                     } else {
+                        self.printing_dialog.percentage = 100
                         //如果打印失败，首先检测打印任务是否清理
                         if (localStorage.clearPrinterOk == 'true') {
                             //如果打印清理成功，执行清理成功的方法 func()
                             //eg 执行之后的任务
-                            self.$notify.error({
-                                title: '错误',
-                                message: '打印失败，已清除该打印任务！',
-                                duration: 0
-                            });
+                            console.log('打印失败，已清除该打印任务！');
                         } else {
                             //跳出打印任务，提示连接打印机失败
                             //func()
-                            self.$notify.error({
-                                title: '错误',
-                                message: '连接打印机失败！',
-                                duration: 0
-                            });
+                            console.log('连接打印机失败！');
                         }
                     }
-
-                    console.log("清理任务是否完成：");
                     clearTimeout(checkPrintOver)
                 } else if (count > 30) {
                     //打印出现问题，跳出打印任务，提示连接打印机失败
@@ -249,10 +297,30 @@ export default {
                 id: this.order_id
             }).then(resp => {
                 if (resp.data.message == 'ok') {
-                    this.$message.success('成功打印订单：' + this.order_id)
+                    this.printing_dialog.percentage = 100
+                    this.printing_dialog.is_print_succese = true
+                    if (this.print_dialog.checked) {
+                        this.deliver()
+                    } else {
+                        this.getOrder()
+                    }
                     console.log('服务器已记录此次打印，订单ID：' + this.order_id);
                 }
             })
+        },
+        completePrint() {
+            this.print_dialog = {
+                visible: false,
+                is_printed: false,
+                radio: '0',
+                printer: '',
+                checked: false
+            }
+            this.printing_dialog = {
+                visible: false,
+                percentage: 0,
+                is_print_succese: false
+            }
         },
         getSchoolName(id) {
             var self = this
@@ -282,7 +350,18 @@ export default {
                 self.refund_loading = false
                 if (resp.data.message == 'ok') {
                     self.$message.success('退款成功！');
-                    self.getOrder()
+                    // self.getOrder()
+                    // 由于后台事物原因，故在前段加入本地时间，再次刷新页面即为真实信息
+                    var after_sale_staff_name = JSON.parse(localStorage.getItem('adminInfo')).username
+                    var after_sale_end_at = moment().format('YYYY-MM-DD HH:mm:ss')
+                    self.order_detail.after_sale_status = 19
+                    self.order_detail.after_sale_staff_name = after_sale_staff_name
+                    self.order_detail.after_sale_end_at = after_sale_end_at
+                    self.operateTable.push({
+                        time: after_sale_end_at,
+                        name: after_sale_staff_name,
+                        info: '卖家处理了售后申请，退款 ' + self.actual_refund_fee + ' 元。'
+                    })
                 } else {
                     self.$message.error(resp.data.message);
                 }
@@ -440,7 +519,7 @@ export default {
             if (this.order_detail.print_at) {
                 operateTable.unshift({
                     time: this.order_detail.print_at,
-                    name: this.print_staff_name,
+                    name: this.order_detail.print_staff_name,
                     info: '卖家打印了订单。'
                 })
             }
@@ -510,6 +589,42 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.print_dialog {
+    padding-left: 12px;
+    p {
+        line-height: 34px;
+    }
+    .desc {
+        color: #888;
+    }
+    .footer1 {
+        line-height: 28px;
+        margin-top: 20px;
+    }
+    .footer2 {
+        margin-top: 20px;
+        text-align: right;
+    }
+}
+.printing_dialog {
+    .printProgress {
+        text-align: center;
+    }
+    .printResult {
+        text-align: center;
+        margin-top: 30px;
+    }
+    .fail {
+        color: #FF4949;
+    }
+    .success {
+        color: #13CE66;
+    }
+    .footer {
+        margin-top: 20px;
+        text-align: right;
+    }
+}
 .pre_page {
     &:hover {
         color: #20A0FF;
@@ -518,7 +633,7 @@ export default {
 }
 #order_status {
     height: 100px;
-    text-align: center;
+    // text-align: center;
 }
 .order_item {
     border: 1px solid #DFE6EC;
