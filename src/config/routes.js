@@ -1,42 +1,42 @@
 // 将组件抽离成不同的代码块，当路由访问到的时候再去加载，实现路由懒加载
-const shops = r => require(['../pages/shops/shops'], r)
+const shops = r => require(['../pages/shops/shops.vue'], r)
 
 // 系统概况/首页
-const home = r => require(['../pages/home'], r)
+const home = r => require(['../pages/home.vue'], r)
 
 // * 订单管理
 // ** 订单列表
 const order_list = r => require(['../pages/order_manage/order_list.vue'], r)
 // ** 订单详情
-const order_detail = r => require(['../pages/order_manage/order_detail'], r)
+const order_detail = r => require(['../pages/order_manage/order_detail.vue'], r)
 
 // * 线下零售
 // ** 零售页面
-const retail = r => require(['../pages/offline_retail/retail'], r)
+const retail = r => require(['../pages/offline_retail/retail.vue'], r)
 // ** 零售订单列表
-const retail_list = r => require(['../pages/offline_retail/retail_list'], r)
+const retail_list = r => require(['../pages/offline_retail/retail_list.vue'], r)
 
 // * 推荐管理
 // *** 话题推荐
-const topic = r => require(['../pages/recommend/topic/index'], r)
+const topic = r => require(['../pages/recommend/topic/index.vue'], r)
 // *** 新增话题
-const add_topic = r => require(['../pages/recommend/topic/add_topic'], r)
+const add_topic = r => require(['../pages/recommend/topic/add_topic.vue'], r)
 // *** 轮播图
-const carousel = r => require(['../pages/recommend/carousel/index'], r)
+const carousel = r => require(['../pages/recommend/carousel/index.vue'], r)
 
 // * 库存管理
 // ** 库存查看
-const stock_list = r => require(['../pages/stock_manage/stock_list'], r)
+const stock_list = r => require(['../pages/stock_manage/stock_list.vue'], r)
 
 // * 图书上架
 // ** ISBN 上传
-const by_isbn = r => require(['../pages/add_book/by_isbn'], r)
+const by_isbn = r => require(['../pages/add_book/by_isbn.vue'], r)
 // ** Excel 上传
-const by_excel = r => require(['../pages/add_book/by_excel'], r)
+const by_excel = r => require(['../pages/add_book/by_excel.vue'], r)
 
 // * 统计
 // ** 销售额统计
-const salses = r => require(['../pages/statistics/sales'], r)
+const salses = r => require(['../pages/statistics/sales.vue'], r)
 
 // * 资产
 // ** 线上资产
@@ -44,27 +44,27 @@ const online_account = r => require(['../pages/account/online_account.vue'], r)
 
 // * 设置
 // ** 店铺信息
-const store_info = r => require(['../pages/store_info/index'], r)
+const store_info = r => require(['../pages/store_info/index.vue'], r)
 // *** 云店信息
-const cloud_store = r => require(['../pages/store_info/cloud_store'], r)
+const cloud_store = r => require(['../pages/store_info/cloud_store.vue'], r)
 // *** 实体店信息
-const real_store = r => require(['../pages/store_info/real_store'], r)
+const real_store = r => require(['../pages/store_info/real_store.vue'], r)
 // 微信设置
-const weixin_setting = r => require(['../pages/store_info/weixin'], r)
+const weixin_setting = r => require(['../pages/store_info/weixin.vue'], r)
 // ** 店铺设置
-const store_setting = r => require(['../pages/store_setting/index'], r)
+const store_setting = r => require(['../pages/store_setting/index.vue'], r)
 // *** 人员管理
-const people = r => require(['../pages/store_setting/people'], r)
+const people = r => require(['../pages/store_setting/people.vue'], r)
 // *** 经营学校
 const school = r => require(['../pages/store_setting/school/school.vue'], r)
 // *** 仓库设置
-const location = r => require(['../pages/store_setting/location/depot'], r)
+const location = r => require(['../pages/store_setting/location/depot.vue'], r)
 // **** 货架管理
-const shelf = r => require(['../pages/store_setting/location/shelf'], r)
+const shelf = r => require(['../pages/store_setting/location/shelf.vue'], r)
 // *** 配送费设置
-const freight = r => require(['../pages/store_setting/freight'], r)
+const freight = r => require(['../pages/store_setting/freight.vue'], r)
 // *** 客服、售后设置
-const service = r => require(['../pages/store_setting/service'], r)
+const service = r => require(['../pages/store_setting/service.vue'], r)
 
 export default [{
     path: '/',
