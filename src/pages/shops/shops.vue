@@ -165,6 +165,7 @@ export default {
                 // change token
                 localStorage.setItem('token', resp.data.token)
 
+                this.$store.commit('setMenuActive', '0')
                 this.$router.push({name:"home"})
             })
         },
