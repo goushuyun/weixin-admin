@@ -6,7 +6,8 @@
   <div class="content_inner">
     <el-form :inline="true">
         <el-form-item>
-            <el-select v-model="school_id" style="width: 240px;" clearable placeholder="学校" size="small" @change="getOrders">
+            <el-select v-model="school_id" style="width: 240px;" clearable placeholder="全部学校" size="small" @change="getOrders">
+                <el-option label="全部学校" value=""></el-option>
                 <el-option-group label="运营中的学校">
                   <el-option v-for="school in schools" v-if="school.status == 0" :label="school.name" :value="school.id"></el-option>
                 </el-option-group>

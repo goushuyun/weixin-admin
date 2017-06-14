@@ -86,7 +86,8 @@
         </div>
       </el-card>
       <el-card>
-        <el-select v-model="school_id" style="width: 240px;" clearable placeholder="所有学校" size="small" @change="indexOrderNumStatistic">
+        <el-select v-model="school_id" style="width: 240px;" clearable placeholder="全部学校" size="small" @change="indexOrderNumStatistic">
+          <el-option label="全部学校" value=""></el-option>
           <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
         </el-select>
       </el-card>
