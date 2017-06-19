@@ -3,6 +3,7 @@
 ul.icons{
     display: flex;
     justify-content: flex-start;
+    cursor: pointer;
 
     li{
         padding: 0 4px;
@@ -29,6 +30,6 @@ ul.icons{
     }
 
     i.will{
-        color: $border_grey_lighter !important; 
+        color: $border_grey_lighter !important;
     }
 }

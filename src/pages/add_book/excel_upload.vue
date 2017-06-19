@@ -31,7 +31,7 @@
             </el-table-column>
             <el-table-column prop="time" label="进度">
                 <template scope="scope">
-                    <el-tooltip content="Top center" placement="left">
+                    <el-tooltip content="正在上传" placement="left">
 
                         <ul class="icons">
                             <li><i class="fa fa-file-excel-o" aria-hidden="true"></i></li>
@@ -49,9 +49,10 @@
             </el-table-column>
             <el-table-column prop="time" label="详情">
                 <template scope="scope">
-                    <el-button size="small" type="text">查看详情</el-button>
+                    <el-button size="small" type="text" @click="view_detail">查看详情</el-button>
                 </template>
             </el-table-column>
+
         </el-table>
 
         <!-- 分页 -->
@@ -61,6 +62,15 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="400">
         </el-pagination>
+
+        <!-- 上传详情弹框 -->
+        <el-dialog title="上传进度" :visible="dialog_show" :show-close="false">
+            <detail></detail>
+            <span slot="footer" class="dialog-footer">
+                <el-button  size="small" type="primary" @click="dialog_show = false">确 定</el-button>
+            </span>
+        </el-dialog>
+
     </div>
 
 </div>
@@ -69,13 +79,22 @@
 </template>
 
 <script>
-
+import detail from './upload_info';
+import mix from './excel_upload.js';
 export default {
+    mixins: [mix],
+    components: {
+        detail
+    },
+
+
     data(){
         return {
             data: [
                 {time: '2017-12-23 12:34:34', file: '新华出版社.xls', fail_data: '下载失败数据'}, {time: '2017-12-23 12:34:34', file: '新华出版社.xls', fail_data: '下载失败数据'}
-            ]
+            ],
+
+            dialog_show: false
         }
     }
 }
