@@ -32,7 +32,7 @@ const stock_list = r => require(['../pages/stock_manage/stock_list.vue'], r)
 // ** ISBN 上传
 const by_isbn = r => require(['../pages/add_book/by_isbn.vue'], r)
 // ** Excel 上传
-const by_excel = r => require(['../pages/add_book/by_excel.vue'], r)
+const by_excel = r => require(['../pages/add_book/excel_upload.vue'], r)
 
 // * 统计
 // ** 销售额统计
