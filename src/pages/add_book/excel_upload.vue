@@ -13,7 +13,7 @@
     <!-- 内容 -->
     <div class="content_inner">
         <p style="padding-bottom: 16px; text-align: right; padding-right: 22px;">
-            <el-button size="small" type="primary"><i class="fa fa-cloud-upload" aria-hidden="true"></i> 导入新数据</el-button>
+            <el-button @click="to_upload" size="small" type="primary"><i class="fa fa-cloud-upload" aria-hidden="true"></i> 导入新数据</el-button>
         </p>
 
         <!-- table data list -->

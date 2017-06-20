@@ -66,6 +66,10 @@ const freight = r => require(['../pages/store_setting/freight.vue'], r)
 // *** 客服、售后设置
 const service = r => require(['../pages/store_setting/service.vue'], r)
 
+// excel 上传
+const upload_excel = r => require(['../pages/add_book/upload.vue'], r)
+
+
 export default [{
     path: '/',
     name: 'login',
@@ -176,5 +180,9 @@ export default [{
         name: 'weixin_setting',
         path: 'weixin_setting',
         component: weixin_setting
+    }, {
+        name: 'upload_excel',
+        path: 'upload_excel',
+        component: upload_excel
     }]
 }]
