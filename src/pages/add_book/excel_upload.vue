@@ -18,15 +18,22 @@
 
         <!-- table data list -->
         <el-table :data="data">
-            <el-table-column prop="time" label="导入时间"></el-table-column>
-            <el-table-column prop="file" label="文件">
+            <el-table-column label="导入时间">
                 <template scope="scope">
-                    <el-button size="small" type="text" icon=""><i class="fa fa-cloud-download" aria-hidden="true"></i> 上海应用技术大学.xlsx</el-button>
+                    {{scope.row.create_at_text}}
                 </template>
             </el-table-column>
-            <el-table-column prop="time" label="失败数据">
+            <el-table-column label="文件">
                 <template scope="scope">
-                    <el-button style="color: #F7BA2A;" size="small" type="text" icon=""><i class="fa fa-download" aria-hidden="true"></i> 下载失败数据</el-button>
+                    <el-button @click="download(scope.row.origin_file)" size="small" type="text" icon=""><i class="fa fa-cloud-download" aria-hidden="true"></i> {{scope.row.origin_filename}}</el-button>
+                </template>
+            </el-table-column>
+            <el-table-column label="失败数据">
+                <template scope="scope">
+                    <el-button v-if="scope.row.error_file != ''" style="color: #F7BA2A;" size="small" type="text"><i class="fa fa-download" aria-hidden="true" @click="download(scope.row.error_file)"></i> 下载失败数据</el-button>
+
+                    <!-- import fail, and no fail data -->
+                    <span v-if="scope.row.error_reason != ''" class="fail_no_data">{{scope.row.error_reason}}</span>
                 </template>
             </el-table-column>
             <el-table-column prop="time" label="进度">
@@ -39,9 +46,9 @@
 
 
                             <li><i style="color: #20A0FF;" class="fa fa-cloud-upload" aria-hidden="true"></i></li>
-                            <li class="arrow_no">--></li>
-                            <li><i class="fa fa-check will" aria-hidden="true"></i></li>
-                            <!-- <li><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></li> -->
+                            <li v-if="scope.row.state > 1" class="arrow_complete">--></li>
+                            <li v-if="scope.row.state === 3"><i class="fa fa-check" aria-hidden="true"></i></li>
+                            <li v-if="scope.row.state === 2"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></li>
                         </ul>
 
                     </el-tooltip>
@@ -49,7 +56,7 @@
             </el-table-column>
             <el-table-column prop="time" label="详情">
                 <template scope="scope">
-                    <el-button size="small" type="text" @click="view_detail">查看详情</el-button>
+                    <el-button size="small" type="text" @click="view_detail(scope.$index)">查看详情</el-button>
                 </template>
             </el-table-column>
 
@@ -58,14 +65,14 @@
         <!-- 分页 -->
         <el-pagination style="margin-top: 16px;"
           :page-sizes="[10, 20, 50]"
-          :page-size="100"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="400">
+          :total="total">
         </el-pagination>
 
         <!-- 上传详情弹框 -->
-        <el-dialog title="上传进度" :visible="dialog_show" :show-close="false">
-            <detail></detail>
+        <el-dialog title="上传进度" close-on-click-modal :visible="dialog_show" :show-close="false">
+            <detail :data="dialog_data"></detail>
             <span slot="footer" class="dialog-footer">
                 <el-button  size="small" type="primary" @click="dialog_show = false">确 定</el-button>
             </span>
@@ -90,9 +97,13 @@ export default {
 
     data(){
         return {
-            data: [
-                {time: '2017-12-23 12:34:34', file: '新华出版社.xls', fail_data: '下载失败数据'}, {time: '2017-12-23 12:34:34', file: '新华出版社.xls', fail_data: '下载失败数据'}
-            ],
+            page: 1,
+            size: 10,
+            total: 0,
+
+            data: [],
+
+            dialog_data: {},
 
             dialog_show: false
         }

@@ -6,7 +6,6 @@
   },
   "dependencies": {
     "axios": "^0.16.1",
-    "element-ui": "^1.3.6",
     "pingpp-js": "^2.1.8",
     "vue": "^2.2.6",
     "vue-amap": "^0.2.4",

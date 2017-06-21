@@ -1,5 +1,5 @@
 <style lang="scss" scoped>
-
+@import "../../common/_color.scss";
 .form{
     max-width: 400px;
     margin-top: 18px;
@@ -13,6 +13,12 @@
     padding-right: 42px;
 }
 
+.download{
+    color: $blue;
+    &:hover{
+        cursor: pointer;
+    }
+}
 </style>
 
 <template lang="html">
@@ -24,13 +30,18 @@
     <div class="content_inner">
         <div class="upload_box">
             <el-upload
+                :data="upload_params"
                 class="upload-demo"
+                :before-upload="pre_check"
                 drag
-                action="https://jsonplaceholder.typicode.com/posts/"
-                multiple>
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                action="https://upload.qbox.me"
+                :multiple="false">
                 <i class="el-icon-upload"></i>
                 <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                <div class="el-upload__tip" slot="tip">只能上传 xlsx 文件，且不超过500kb</div>
+                <div class="el-upload__tip" slot="tip">每次只能上传一个 xlsx 文件，且不超过 2M
+                    <a href="http://image.goushuyun.cn/DemoExcel.xlsx" class="download"> (下载Excel数据模版）</a>
+                </div>
             </el-upload>
 
             <el-button @click="go_back" type="text" icon="arrow-left">返回上一页</el-button>
@@ -39,26 +50,25 @@
         <div class="form">
             <el-form label-width="80px">
                 <el-form-item label="折扣">
-                    <el-input size="small" style="max-width: 193px;">
-                        <template slot="append">折</template>
+                    <el-input v-model.number="discount" size="small" style="max-width: 193px;">
+                        <template slot="append">%</template>
                     </el-input>
                 </el-form-item>
                 <el-form-item label="位置">
-                    <el-cascader size="small">
+                    <el-cascader v-model="location" :options="location_options"></option>
 
                     </el-cascader>
                 </el-form-item>
                 <el-form-item label="新旧">
-                    <el-radio-group size="small">
-                        <el-radio label="新书"></el-radio>
-                        <el-radio label="二手书"></el-radio>
+                    <el-radio-group size="small" v-model="type" >
+                        <el-radio :label="0">新书</el-radio>
+                        <el-radio :label="1">二手书</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" size="small">导入</el-button>
+                    <el-button type="primary" size="small" @click="upload_to_cloud">导入</el-button>
                     <el-button size="small">取消</el-button>
                 </el-form-item>
-
             </el-form>
         </div>
     </div>
@@ -72,7 +82,29 @@
 import mix from './upload.js'
 
 export default {
-    mixins: [mix]
+    mixins: [mix],
+    data(){
+        return {
+            // goods info
+            discount: 0,
+            origin_filename: '',
+            type: 1,
+
+            location: [],
+            location_options: [],
+
+            store: {
+                id: ''
+            },
+            upload_params: {
+                key: '',
+                token: '',
+                zone: 1,
+                url: ''
+            }
+
+        }
+    }
 }
 
 </script>

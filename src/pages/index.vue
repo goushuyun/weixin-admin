@@ -125,7 +125,7 @@
                     <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
                 </el-menu-item>
                 <el-menu-item index="3-2" :route="{name:'by_excel'}">
-                    <i class="fa fa-file-text" aria-hidden="true"></i>批量上架
+                    <i class="fa fa-file-text" aria-hidden="true"></i>Excel上架
                 </el-menu-item>
                 <el-menu-item index="3-3" :route="{name:'stock_list'}">
                     <i class="fa fa-university" aria-hidden="true"></i>库存查看
