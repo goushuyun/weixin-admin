@@ -20,7 +20,22 @@ export default {
     		}
     		axios.post('/v1/goods/batch_list', params).then(res => {
     			this.data = res.data.data.map(upload => {
+					// moment of upload at
     				upload.create_at_text = moment.unix(upload.create_at).format('YYYY-MM-DD HH:mm:ss')
+
+					// tip text
+					switch (upload.state) {
+						case 1:
+							upload.tip_text = '正在上传'
+							break;
+						case 2:
+							upload.tip_text = '上传失败'
+							break;
+						case 3:
+							upload.tip_text = '上传完成'
+							break;
+						default:
+					}
     				return upload
     			})
 

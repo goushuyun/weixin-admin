@@ -38,13 +38,11 @@
             </el-table-column>
             <el-table-column prop="time" label="进度" width="200px">
                 <template scope="scope">
-                    <el-tooltip content="正在上传" placement="left">
+                    <el-tooltip :content="scope.row.tip_text" placement="left">
 
                         <ul class="icons">
                             <li><i class="fa fa-file-excel-o" aria-hidden="true"></i></li>
                             <li class="arrow_complete">--></li>
-
-
                             <li><i style="color: #20A0FF;" class="fa fa-cloud-upload" aria-hidden="true"></i></li>
                             <li v-if="scope.row.state > 1" class="arrow_complete">--></li>
                             <li v-if="scope.row.state === 3"><i class="fa fa-check" aria-hidden="true"></i></li>
