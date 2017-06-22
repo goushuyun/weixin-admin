@@ -17,9 +17,11 @@ export default {
 	methods : {
 		// trigger after upload success
 		on_upload_success(){
+			this.uploaded_file_url = this.upload_params.url
 			this.getToken()
 		},
 		on_upload_error(){
+			this.uploaded_file_url = this.upload_params.url
 			this.getToken()
 		},
 		pre_check(file) {
@@ -52,7 +54,7 @@ export default {
 						shelf_id: this.ruleForm.location[1],
 						floor_id: this.ruleForm.location[2],
 						origin_filename: this.origin_filename,
-						origin_file: this.upload_params.url,
+						origin_file: this.uploaded_file_url,
 						type: this.ruleForm.type
 					}
 

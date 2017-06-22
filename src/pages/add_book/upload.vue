@@ -111,7 +111,7 @@ export default {
 
             // goods info
             origin_filename: '',
-
+            uploaded_file_url: '',
             location_options: [],
 
             store: {

@@ -23,9 +23,9 @@
                     {{scope.row.create_at_text}}
                 </template>
             </el-table-column>
-            <el-table-column label="文件" width="150px">
+            <el-table-column label="文件">
                 <template scope="scope">
-                    <el-button @click="download(scope.row.origin_file)" size="small" type="text" icon=""><i class="fa fa-cloud-download" aria-hidden="true"></i> {{scope.row.origin_filename}}</el-button>
+                    <el-button @click="download(scope.row.origin_file)" size="small" type="text"><i class="fa fa-cloud-download" aria-hidden="true"></i> {{scope.row.origin_filename}}</el-button>
                 </template>
             </el-table-column>
             <el-table-column label="失败数据">
