@@ -38,6 +38,14 @@ export default {
                 has_old_book: false,
                 checkList: []
             },
+            topics: [],
+            recommendDialog: {
+                loading: false,
+                show: false,
+                title: '',
+                associated_topics_bak: [],
+                associated_topics: []
+            },
             loading: false,
             store_id: '',
             book_info_show: false,
@@ -105,7 +113,14 @@ export default {
             },
             categories: [],
 
-            index: 0
+            index: 0,
+
+            count: 0, // 用于记录推荐处理的请求次数
+
+            add_topic: {
+              show: false,
+              title: ''
+            }
         }
     },
     created() {
@@ -113,6 +128,7 @@ export default {
         this.store_id = store.id
     },
     mounted() {
+        this.getShopTopic()
         this.getLocations()
     },
     computed: {
@@ -128,6 +144,139 @@ export default {
         }
     },
     methods: {
+        proAddTopic() {
+            this.add_topic.show = true
+            $('#title_input input').focus()
+        },
+        addTopic() {
+            //检查话题名称、书本数量
+            if (this.add_topic.title == '') {
+                this.$message.info('请填写话题名称')
+                $('#title_input input').focus()
+                return
+            }
+            this.recommendDialog.loading = true
+            let data = {
+                "title": this.add_topic.title, //话题名称
+                "sort": 1, //优先级 1 低 2 中 3 高
+                "profile": "",
+                "items": [{
+                    goods_id: this.tableData[this.index].goods_id
+                }]
+            }
+            axios.post('/v1/topic/add', data).then(resp => {
+                if (resp.data.message == 'ok') {
+                    axios.post('/v1/topic/search', {}).then(resp => {
+                        if (resp.data.message == 'ok') {
+                            this.topics = resp.data.data
+                            this.getData('proRecommend')
+                            this.recommendDialog.loading = false
+                            this.add_topic.show = false
+                        }
+                    })
+                }
+            })
+        },
+        proRecommend(index) {
+            this.add_topic = {
+              show: false,
+              title: ''
+            }
+            this.index = index
+            var data = this.tableData[index]
+            var topics = this.topics
+            var associated_topics = []
+            var associated_topics_bak = []
+            data.associated_topics.forEach(el => {
+                associated_topics.push(el.topic_id)
+                associated_topics_bak.push(el.topic_id)
+            })
+            this.recommendDialog = {
+                show: true,
+                title: data.book.title,
+                associated_topics: associated_topics,
+                associated_topics_bak: associated_topics_bak
+            }
+        },
+        comfirmRecommend() {
+            var self = this
+            self.recommendDialog.loading = true
+            var index = self.index
+            var data = self.tableData[index]
+            var goods_id = data.goods_id
+            var associated_topics = self.recommendDialog.associated_topics
+            var associated_topics_bak = self.recommendDialog.associated_topics_bak
+            var count = 0
+            var opt_count = 0
+            associated_topics.forEach(el => {
+                if (associated_topics_bak.indexOf(el) == -1) {
+                    opt_count ++
+                }
+            })
+            associated_topics_bak.forEach(el => {
+                if (associated_topics.indexOf(el) == -1) {
+                    opt_count ++
+                }
+            })
+            if (opt_count == 0) {
+                self.recommendDialog.loading = false
+                self.recommendDialog.show = false
+                return
+            }
+            associated_topics.forEach(el => {
+                if (associated_topics_bak.indexOf(el) == -1) {
+                    self.addTopicItem(el,goods_id,opt_count)
+                }
+            })
+            associated_topics_bak.forEach(el => {
+                if (associated_topics.indexOf(el) == -1) {
+                    var topic = data.associated_topics.find(tp => {
+                        return tp.topic_id == el
+                    })
+                    var topic_item_id = topic.item_id
+                    self.deleteTopicItem(el,topic_item_id,opt_count)
+                }
+            })
+        },
+        addTopicItem(topic_id,goods_id,opt_count) {
+            axios.post('/v1/topic/add_item', {
+                "topic_id": topic_id, //话题id
+                "goods_id": goods_id //关联的商品id
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.count += 1
+                    if (this.count == opt_count) {
+                        this.recommendDialog.loading = false
+                        this.getData()
+                        this.count = 0
+                        this.recommendDialog.show = false
+                    }
+                }
+            })
+        },
+        deleteTopicItem(topic_id,topic_item_id,opt_count) {
+            axios.post('/v1/topic/del_item', {
+                "topic_id": topic_id, //话题id
+                "id": topic_item_id   //关联的话题项id
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.count += 1
+                    if (this.count == opt_count) {
+                        this.recommendDialog.loading = false
+                        this.getData()
+                        this.count = 0
+                        this.recommendDialog.show = false
+                    }
+                }
+            })
+        },
+        getShopTopic() {
+            axios.post('/v1/topic/search', {}).then(resp => {
+                if (resp.data.message == 'ok') {
+                    this.topics = resp.data.data
+                }
+            })
+        },
         preEdit(index) {
             this.index = index
             var data = this.tableData[index]
@@ -400,7 +549,7 @@ export default {
                 }
             })
         },
-        getData() {
+        getData(proRecommend) {
             var self = this
             self.loading = true
             axios.post("/v1/goods/search", {
@@ -447,6 +596,9 @@ export default {
                     })
                     console.log('self.tableData');
                     console.log(self.tableData);
+                }
+                if (proRecommend) {
+                    self.proRecommend(this.index)
                 }
                 self.loading = false
             })

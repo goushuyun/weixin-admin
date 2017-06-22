@@ -92,10 +92,15 @@
                     <div v-if="scope.row.has_old_book && !scope.row.old_book.location.length" class="goods_item old_color ellipsis">无</div>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="120">
+            <el-table-column label="操作" width="160">
                 <template scope="scope">
-                    <el-button type="text" size="small" @click="preEdit(scope.$index)" icon="edit"></el-button>
-                    <el-button type="text" style="color:#FF4949" size="small" @click="proDelete(scope.$index)" icon="delete"></el-button>
+                    <!-- <el-button type="text" size="small" @click="preEdit(scope.$index)" icon="edit"></el-button>
+                    <el-button type="text" style="color:#FF4949" size="small" @click="proDelete(scope.$index)" icon="delete"></el-button> -->
+                    <el-button-group>
+                      <el-button type="primary" size="small" icon="edit" @click="preEdit(scope.$index)"></el-button>
+                      <el-button type="primary" size="small" icon="delete" @click="proDelete(scope.$index)"></el-button>
+                      <el-button type="primary" size="small" :icon="'star-' + (scope.row.associated_topics.length ? 'on' : 'off')" @click="proRecommend(scope.$index)"></el-button>
+                    </el-button-group>
                 </template>
             </el-table-column>
         </el-table>
@@ -104,10 +109,10 @@
         <el-pagination :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" :total="total_count" @size-change="handleSizeChange" @current-change="handleCurrentChange">
         </el-pagination>
     </div>
-    <el-dialog size="mini" :title="'删除《' + deleteDialog.title + '》'" v-model="deleteDialog.show">
+    <el-dialog size="mini" title="删除商品" v-model="deleteDialog.show">
       <el-form :model="deleteDialog">
         <el-form-item>
-          <div style="text-align:center;width:400px;">请选着要删除的书籍类型</div>
+          <div style="width:400px;">您将要删除《{{deleteDialog.title}}》<br/>请选择要删除的书籍类型</div>
         </el-form-item>
         <el-form-item>
           <el-checkbox-group v-model="deleteDialog.checkList">
@@ -119,6 +124,27 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="deleteDialog.show = false">取 消</el-button>
         <el-button type="primary" :disabled="deleteDialog.checkList.length == 0" @click="comfirmDelete">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog size="mini" title="推荐商品" v-model="recommendDialog.show">
+      <el-form :model="recommendDialog" v-loading.body="recommendDialog.loading">
+        <el-form-item>
+          <div style="width:400px;">您正在推荐《{{recommendDialog.title}}》<br/>请选择要推荐到哪些话题</div>
+        </el-form-item>
+        <el-checkbox-group v-model="recommendDialog.associated_topics">
+          <el-form-item v-for="(topic, index) in topics">
+            <el-checkbox :label="topic.id">{{topic.title}}</el-checkbox>
+          </el-form-item>
+          <el-form-item>
+            <el-input v-if="add_topic.show" v-model="add_topic.title" id="title_input"><el-button slot="append" icon="circle-check" @click="addTopic"></el-button></el-input>
+            <el-button v-else type="text" @click="proAddTopic">+ 新建话题</el-button>
+          </el-form-item>
+        </el-checkbox-group>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="recommendDialog.show = false">取 消</el-button>
+        <el-button type="primary" :disabled="recommendDialog.associated_topics.length == 0 && recommendDialog.associated_topics_bak.length == 0" @click="comfirmRecommend">确 定</el-button>
       </div>
     </el-dialog>
 
