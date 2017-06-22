@@ -26,6 +26,8 @@ export default {
 		},
 
 		upload_to_cloud() {
+			this.is_uploading = true
+
 			let params = {
 				discount: this.discount,
 				storehouse_id: this.location[0],
@@ -35,13 +37,13 @@ export default {
 				origin_file: this.upload_params.url,
 				type: this.type
 			}
-			console.log(params);
 
             axios.post('/v1/goods/batch_upload', params).then(res=>{
                 console.log(res.data);
+				this.$message('提交成功！')
+				// go to list page
+				this.$router.replace({name: 'by_excel'})
             })
-
-
 		},
 
 		go_back() {

@@ -23,20 +23,20 @@
                     {{scope.row.create_at_text}}
                 </template>
             </el-table-column>
-            <el-table-column label="文件">
+            <el-table-column label="文件" width="150px">
                 <template scope="scope">
                     <el-button @click="download(scope.row.origin_file)" size="small" type="text" icon=""><i class="fa fa-cloud-download" aria-hidden="true"></i> {{scope.row.origin_filename}}</el-button>
                 </template>
             </el-table-column>
             <el-table-column label="失败数据">
                 <template scope="scope">
-                    <el-button v-if="scope.row.error_file != ''" style="color: #F7BA2A;" size="small" type="text"><i class="fa fa-download" aria-hidden="true" @click="download(scope.row.error_file)"></i> 下载失败数据</el-button>
+                    <el-button @click="download('http://images.goushuyun.cn/' + scope.row.error_file)" v-if="scope.row.error_file != ''" style="color: #F7BA2A;" size="small" type="text"><i class="fa fa-download" aria-hidden="true"></i> 下载失败数据</el-button>
 
                     <!-- import fail, and no fail data -->
                     <span v-if="scope.row.error_reason != ''" class="fail_no_data">{{scope.row.error_reason}}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="time" label="进度">
+            <el-table-column prop="time" label="进度" width="200px">
                 <template scope="scope">
                     <el-tooltip content="正在上传" placement="left">
 

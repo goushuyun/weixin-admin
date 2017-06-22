@@ -60,13 +60,13 @@
                     </el-cascader>
                 </el-form-item>
                 <el-form-item label="新旧">
-                    <el-radio-group size="small" v-model="type" >
+                    <el-radio-group size="small" v-model="type">
                         <el-radio :label="0">新书</el-radio>
                         <el-radio :label="1">二手书</el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" size="small" @click="upload_to_cloud">导入</el-button>
+                    <el-button :loading="is_uploading" type="primary" size="small" @click="upload_to_cloud">导入</el-button>
                     <el-button size="small">取消</el-button>
                 </el-form-item>
             </el-form>
@@ -85,6 +85,8 @@ export default {
     mixins: [mix],
     data(){
         return {
+            is_uploading: false,
+
             // goods info
             discount: 0,
             origin_filename: '',
