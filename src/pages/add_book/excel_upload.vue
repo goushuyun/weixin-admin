@@ -64,6 +64,8 @@
         <el-pagination style="margin-top: 16px;"
           :page-sizes="[10, 20, 50]"
           :page-size="10"
+          @size-change="on_size_change"
+          @current-change="on_current_change"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>

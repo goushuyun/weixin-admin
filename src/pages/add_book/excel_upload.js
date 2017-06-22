@@ -2,6 +2,18 @@ import axios from "../../scripts/http"
 
 export default {
 	methods : {
+		// handle pagination size change
+		on_size_change(size){
+			this.size = size
+			this.getData()
+		},
+
+		// handle pagination current change
+		on_current_change(current){
+			this.page = current
+			this.getData()
+		},
+
 		view_detail(index) {
 			this.dialog_data = this.data[index]
 			this.dialog_show = true
