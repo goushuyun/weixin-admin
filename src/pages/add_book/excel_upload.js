@@ -31,6 +31,12 @@ export default {
     			size: this.size
     		}
     		axios.post('/v1/goods/batch_list', params).then(res => {
+				// if there is no data, go to upload_excel page
+				if(res.data.total_count === 0){
+					this.$router.replace({name: 'upload_excel'})
+					return
+				}
+
     			this.data = res.data.data.map(upload => {
 					// moment of upload at
     				upload.create_at_text = moment.unix(upload.create_at).format('YYYY-MM-DD HH:mm:ss')
