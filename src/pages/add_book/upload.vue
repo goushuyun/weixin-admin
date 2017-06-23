@@ -120,7 +120,7 @@ export default {
             upload_params: {
                 key: '',
                 token: '',
-                zone: 1,
+                zone: 0,
                 url: ''
             }
 
