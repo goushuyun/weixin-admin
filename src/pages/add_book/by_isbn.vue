@@ -323,7 +323,7 @@ export default {
             axios.post('/v1/books/get_book_info_by_isbn', {
                 "isbn": this.book_info.isbn
             }).then(resp => {
-                if(resp.data.code == '10000' && resp.data.message == 'not_found'){
+                if(resp.data.message == 'book_not_found'){
                     this.loading = false
                     this.$message('没有找到 ' + this.book_info.isbn + ' 这本书')
                     return
