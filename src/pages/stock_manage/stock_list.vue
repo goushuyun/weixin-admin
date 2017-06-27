@@ -50,7 +50,7 @@
             <el-table-column label="图片" width="100">
                 <template scope="scope" >
                   <div class="image_wrap">
-                      <img :src="'http://images.goushuyun.cn/' + scope.row.book.image" class="image"></img>
+                      <img :src="scope.row.book.image == '' ? 'http://image.goushuyun.cn/book.png' : ('http://images.goushuyun.cn/' + scope.row.book.image)" class="image"></img>
                   </div>
                 </template>
             </el-table-column>
@@ -158,7 +158,7 @@
           :before-upload="beforeAvatarUpload"
           :on-success="handleAvatarSuccess"
           :on-error="handleAvatarError">
-          <img v-if="book_info.image" :src="'http://onv8eua8j.bkt.clouddn.com/' + book_info.image" class="avatar">
+          <img v-if="book_info.image" :src="book_info.image == '' ? 'http://image.goushuyun.cn/book.png' : ('http://images.goushuyun.cn/' + book_info.image)" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
         <el-form ref="book_info" :model="book_info" :rules="rules" label-width="70px">
