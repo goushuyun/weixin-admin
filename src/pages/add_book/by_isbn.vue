@@ -14,8 +14,14 @@
     position: absolute;
     left: 420px;
     width: 200px;
-    height: 266px;
+    height: 200px;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img.avatar{
+        height: 100%;
+    }
     &:hover {
         border-color: #20a0ff;
     }
@@ -65,7 +71,7 @@
         :before-upload="beforeAvatarUpload"
         :on-success="handleAvatarSuccess"
         :on-error="handleAvatarError">
-        <img v-if="book_info.image" :src="'http://onv8eua8j.bkt.clouddn.com/' + book_info.image" class="avatar">
+        <img v-if="book_info.image" :src="'http://images.goushuyun.cn/' + book_info.image" class="avatar">
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       <el-form ref="book_info" :model="book_info" :rules="rules" label-width="80px">
