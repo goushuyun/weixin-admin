@@ -148,7 +148,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog size="" v-model="book_info_show" top="6%" :close-on-click-modal="false" @close="reset('book_info')">
+    <el-dialog v-model="book_info_show" top="6%" :close-on-click-modal="false" @close="reset('book_info')">
       <div class="body" v-loading="loading" :element-loading-text="拼命加载中">
         <el-upload
           class="avatar-uploader"
@@ -158,8 +158,10 @@
           :before-upload="beforeAvatarUpload"
           :on-success="handleAvatarSuccess"
           :on-error="handleAvatarError">
-          <img v-if="book_info.image" :src="book_info.image == '' ? 'http://image.goushuyun.cn/book.png' : ('http://images.goushuyun.cn/' + book_info.image)" class="avatar">
-          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          <div class="dialog_image_wrap">
+              <img v-if="book_info.image" :src="book_info.image == '' ? 'http://image.goushuyun.cn/book.png' : ('http://images.goushuyun.cn/' + book_info.image)" class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </div>
         </el-upload>
         <el-form ref="book_info" :model="book_info" :rules="rules" label-width="70px">
             <el-form-item label="ISBN" prop="isbn">
