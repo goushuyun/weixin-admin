@@ -16,11 +16,11 @@ export default {
 	},
 	methods : {
 		// trigger after upload success
-		on_upload_success(){
+		on_upload_success() {
 			this.uploaded_file_url = this.upload_params.url
 			this.getToken()
 		},
-		on_upload_error(){
+		on_upload_error() {
 			this.uploaded_file_url = this.upload_params.url
 			this.getToken()
 		},
@@ -36,13 +36,16 @@ export default {
 
 		upload_to_cloud(formName) {
 			// check ruleForm
-			this.$refs[formName].validate((valid)=>{
-				if(valid){
-					if(this.origin_filename == '' || this.origin_file == ''){
-						this.$message({
-							type: 'warning',
-							message: '请上传 Excel 文件 ！'
-						})
+			this.$refs[formName].validate((valid) => {
+				if (valid) {
+					if (this.origin_filename == '' || this.origin_file == '') {
+						this.$message({type: 'warning', message: '请上传 Excel 文件 ！'})
+						return
+					}
+
+					// check location
+					if (this.ruleForm.location.length != 3) {
+						this.$message({type: 'warning', message: '仓库位置、货架位置、货架层必须填写齐全'})
 						return
 					}
 
@@ -58,7 +61,7 @@ export default {
 						type: this.ruleForm.type
 					}
 
-					axios.post('/v1/goods/batch_upload', params).then(res=>{
+					axios.post('/v1/goods/batch_upload', params).then(res => {
 						console.log(res.data);
 						this.$message('提交成功！')
 						// go to list page
