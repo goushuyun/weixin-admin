@@ -85,7 +85,7 @@
         </li>
         <li class="item">
             <span class="key">折扣：</span>
-            <span class="value">{{data.discount}}折</span>
+            <span class="value">{{(data.discount / 10).toFixed(1)}}折</span>
         </li>
         <li class="item">
             <span class="key">新旧：</span>

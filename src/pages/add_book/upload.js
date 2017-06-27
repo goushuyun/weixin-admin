@@ -52,7 +52,7 @@ export default {
 					this.is_uploading = true
 
 					let params = {
-						discount: this.ruleForm.discount,
+						discount: this.ruleForm.discount*10,
 						storehouse_id: this.ruleForm.location[0],
 						shelf_id: this.ruleForm.location[1],
 						floor_id: this.ruleForm.location[2],

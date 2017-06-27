@@ -51,8 +51,8 @@
         <!--  表单 -->
         <el-form :rules="rules" :model="ruleForm" label-width="100px" class="form" ref="ruleForm">
             <el-form-item label="折扣" prop="discount">
-                <el-input placeholder="百分比值" v-model.number="ruleForm.discount" size="small" style="max-width: 193px;">
-                    <template slot="append">%</template>
+                <el-input placeholder="8.5 表示 原价的 85%" v-model.number="ruleForm.discount" size="small" style="max-width: 193px;">
+                    <template slot="append">折</template>
                 </el-input>
             </el-form-item>
 
