@@ -46,10 +46,10 @@
 
         <el-form :model="ruleForm" :inline="true" style="margin-top: 12px;" :rules="rules" ref="ruleForm">
             <el-form-item label="客服电话" style="margin-bottom:0;" prop="tel">
-                <el-input v-model="ruleForm.tel" size="small"></el-input>
+                <el-input @change="btn_disabled = false" v-model="ruleForm.tel" size="small"></el-input>
             </el-form-item>
             <el-form-item label="配送费用" style="margin-bottom:0;" prop="express_fee">
-                <el-input v-model.number="ruleForm.express_fee" size="small" placeholder="单位：元"></el-input>
+                <el-input @change="btn_disabled = false" v-model.number="ruleForm.express_fee" size="small" placeholder="单位：元"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer" style="padding-top: 0;">
@@ -114,12 +114,6 @@ export default {
             console.log('add school ...');
         },
 
-        // 设置按钮为可用
-        set_btn_usable(){
-            this.btn_disabled = false
-            console.log('btn_can_use');
-        },
-
         // change map's center
         changeCenter(center) {
             this.map.setCenter(center)
@@ -131,6 +125,8 @@ export default {
             this.school.name = this.school.tel = this.school.id = this.school.image = ''
             this.school.express_fee = this.school.lat = this.school.lng = 0
             $('#panel').empty()
+
+            this.btn_disabled = true
         },
         initMap(){
             this.map = new AMap.Map('amap', {
