@@ -102,7 +102,7 @@
 
         <el-form-item>
           <el-button v-if="!update_flag" type="primary" size="small" @click="proUpdate">修改信息</el-button>
-          <el-button v-if="update_flag" type="primary" size="small" @click="cancelUpdate">取消</el-button>
+          <el-button v-if="update_flag" size="small" @click="cancelUpdate">取消</el-button>
           <el-button v-if="update_flag" type="primary" size="small" @click="confirmUpdate">确认修改</el-button>
         </el-form-item>
 
