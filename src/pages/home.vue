@@ -40,13 +40,13 @@
         <div class="tools_area">
           <div class="tool" @click="goToOrderList(1)">
             <div>
-              <div class="icon_area">{{undelivered_order_num}}</div>
+              <div class="icon_area" :style="undelivered_order_num > 0 ? 'background-color:#FF6B67' : ''">{{undelivered_order_num}}</div>
               <div class="text_area">待发货</div>
             </div>
           </div>
           <div class="tool" @click="goToOrderList(77)">
             <div>
-              <div class="icon_area">{{after_sale_order_num}}</div>
+              <div class="icon_area" :style="after_sale_order_num > 0 ? 'background-color:#FF6B67' : ''">{{after_sale_order_num}}</div>
               <div class="text_area">待售后</div>
             </div>
           </div>
