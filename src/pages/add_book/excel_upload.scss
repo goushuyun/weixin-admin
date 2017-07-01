@@ -1,5 +1,18 @@
 @import "../../common/_color.scss";
 
+p.table_top{
+    display: flex;
+    align-items: flex-end;
+    small{
+        color: $font_remark;
+        font-size: 13px;
+        padding-left: 12px;
+        position: relative;
+        bottom: 2px;
+    }
+}
+
+
 ul.icons{
     display: flex;
     justify-content: flex-start;
@@ -36,5 +49,10 @@ ul.icons{
 
 .fail_no_data{
     color: #F7BA2A;
+    font-size: 12px;
+}
+
+.upload_success{
+    color: $weixin_green;
     font-size: 12px;
 }

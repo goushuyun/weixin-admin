@@ -12,8 +12,9 @@
 
     <!-- 内容 -->
     <div class="content_inner">
-        <p style="padding-bottom: 16px; text-align: right; padding-right: 22px;">
+        <p class="table_top" style="padding-bottom: 16px; text-align: left; padding-right: 22px;">
             <el-button @click="to_upload" size="small" type="primary"><i class="fa fa-cloud-upload" aria-hidden="true"></i> 导入新数据</el-button>
+            <small>（我们会保留您近1个月内的导入文件~）</small>
         </p>
 
         <!-- table data list -->
@@ -28,18 +29,9 @@
                     <el-button @click="download(scope.row.origin_file)" size="small" type="text"><i class="fa fa-cloud-download" aria-hidden="true"></i> {{scope.row.origin_filename}}</el-button>
                 </template>
             </el-table-column>
-            <el-table-column label="失败数据">
-                <template scope="scope">
-                    <el-button @click="download('http://images.goushuyun.cn/' + scope.row.error_file)" v-if="scope.row.error_file != ''" style="color: #F7BA2A;" size="small" type="text"><i class="fa fa-download" aria-hidden="true"></i> 下载失败数据</el-button>
-
-                    <!-- import fail, and no fail data -->
-                    <span v-if="scope.row.error_reason != ''" class="fail_no_data">{{scope.row.error_reason}}</span>
-                </template>
-            </el-table-column>
             <el-table-column prop="time" label="进度" width="200px">
                 <template scope="scope">
                     <el-tooltip :content="scope.row.tip_text" placement="left">
-
                         <ul class="icons">
                             <li><i class="fa fa-file-excel-o" aria-hidden="true"></i></li>
                             <li class="arrow_complete">--></li>
@@ -48,10 +40,24 @@
                             <li v-if="scope.row.state === 3"><i class="fa fa-check" aria-hidden="true"></i></li>
                             <li v-if="scope.row.state === 2"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></li>
                         </ul>
-
                     </el-tooltip>
                 </template>
             </el-table-column>
+
+            <el-table-column label="导入结果">
+                <template scope="scope">
+                    <span class="upload_success" v-if="scope.row.error_reason == '' && scope.row.error_file == ''">{{scope.row.success_num}} 条数据全部上传成功</span>
+
+                    <span v-else>
+                        <el-button @click="download('http://images.goushuyun.cn/' + scope.row.error_file)" v-if="scope.row.error_file != ''" style="color: #F7BA2A;" size="small" type="text"><i class="fa fa-download" aria-hidden="true"></i> {{scope.row.failed_num}} 条导入失败</el-button>
+
+                        <!-- import fail, and no fail data -->
+                        <span v-if="scope.row.error_reason != ''" class="fail_no_data">{{scope.row.error_reason}}</span>
+                    </span>
+
+                </template>
+            </el-table-column>
+
             <el-table-column prop="time" label="详情">
                 <template scope="scope">
                     <el-button size="small" type="text" @click="view_detail(scope.$index)">查看详情</el-button>

@@ -59,6 +59,8 @@
     }
 }
 
+@import "./excel_upload.scss";
+
 </style>
 
 <template lang="html">
@@ -95,6 +97,26 @@
             <span class="key">位置：</span>
             <span class="value">{{data.storehouse_name + ' / ' + data.shelf_name + ' / ' + data.floor_name}}</span>
         </li>
+        <li class="item">
+            <span class="key">导入结果：</span>
+            <span class="value">
+
+                <template v-if="data.error_reason == '' && data.error_file == ''">
+                  <span>{{data.success_num}} 条数据全部上传成功</span>
+                </template>
+
+                <template v-else>
+                    <template v-if="data.error_file != ''">
+                        <el-button @click="download('http://images.goushuyun.cn/' + data.error_file)"  type="text">{{data.failed_num}} 条数据导入失败</el-button>
+                    </template>
+
+                    <template v-else>
+                        <span v-if="data.error_reason != ''" class="fail_no_data">{{data.error_reason}}</span>
+                    </template>
+                </template>
+
+            </span>
+        </li>
     </ul>
 
     <!-- 反馈信息 -->
@@ -115,6 +137,13 @@ export default {
     data(){
         return {
             step: 1
+        }
+    },
+    methods: {
+        // download file by url
+        download(url){
+            console.log(url);
+            window.location.href = url
         }
     },
     created(){
