@@ -114,10 +114,13 @@
           <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
             <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-search" aria-hidden="true"></i> 查看详情</el-button>
             <p v-if="order.order.groupon_id">班级购编号：{{order.order.groupon_id}}</p>
-            <p>
-              <el-tooltip class="item" effect="dark" :content="order.order.seller_remark ? order.order.seller_remark : '没有商家标记'" placement="top-start">
+            <p v-if="order.order.seller_remark_type == 0" style="margin-top: 8px;">
+              <el-button size="mini" style="width:80px" @click="preAddRemark(index)"><i class="fa fa-flag" aria-hidden="true"></i> 商家标记</el-button>
+            </p>
+            <p v-else>
+              <el-tooltip class="item" effect="dark" :content="order.order.seller_remark ? order.order.seller_remark : '没有商家标记'" placement="top">
                 <el-button type="text" @click="preAddRemark(index)">
-                  <i v-if="order.order.seller_remark_type == 0" class="fa fa-flag" aria-hidden="true"></i>
+                  <!-- <i v-if="order.order.seller_remark_type == 0" class="fa fa-flag" aria-hidden="true"></i> -->
                   <i v-if="order.order.seller_remark_type == 1" class="fa fa-flag" aria-hidden="true" style="color: #13CE66;"></i>
                   <i v-if="order.order.seller_remark_type == 2" class="fa fa-flag" aria-hidden="true" style="color: #F7BA2A;"></i>
                   <i v-if="order.order.seller_remark_type == 3" class="fa fa-flag" aria-hidden="true" style="color: #FF4949;"></i>
@@ -138,7 +141,7 @@
     <!-- 商家备注 -->
     <el-dialog title="商家标记" :visible.sync="remark_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false">
       <div class="remark_dialog">
-          <el-input type="textarea" :autosize="{ minRows: 6, maxRows: 10}" placeholder="请输入内容" v-model="remark_dialog.seller_remark">
+          <el-input id="remark_textarea" type="textarea" :autosize="{ minRows: 6, maxRows: 10}" placeholder="请输入内容" v-model="remark_dialog.seller_remark">
           </el-input>
           <div class="seller_remark">
             快捷标记：
@@ -379,6 +382,9 @@ export default {
               seller_remark_type: order.seller_remark_type ? order.seller_remark_type : 1,
               index: index
           }
+          this.$nextTick(_ => {
+            $('#remark_textarea textarea').focus()
+          });
         },
         goToKDZS() {
             window.open('http://zz.kuaidizs.com')
