@@ -33,7 +33,14 @@
             </el-input>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click="resetForm" size="small"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
+            <el-select v-model="seller_remark_type" style="width: 125px;" clearable placeholder="筛选标记" size="small" @change="getOrders">
+                <!-- <el-option label="全部订单" :value="0"></el-option> -->
+                <el-option label="无标记订单" :value="79"></el-option>
+                <el-option label="有标记订单" :value="80"></el-option>
+                <el-option label="绿色标记订单" :value="1"></el-option>
+                <el-option label="黄色标记订单" :value="2"></el-option>
+                <el-option label="红色标记订单" :value="3"></el-option>
+            </el-select>
         </el-form-item>
     </el-form>
     <div class="row">
@@ -47,6 +54,7 @@
         <el-radio-button :label="8">已关闭</el-radio-button>
         <el-radio-button :label="80">全部订单</el-radio-button>
       </el-radio-group>
+      <el-button style="margin-left: 385px;" @click="resetForm" size="small"><i class="fa fa-refresh" aria-hidden="true"></i> 重置筛选条件</el-button>
     </div>
     <div class="row">
       <el-checkbox v-model="selected_all" style="margin:0 12px;" @change="selectedAllChange">全选</el-checkbox>
@@ -82,7 +90,7 @@
              </div>
         </div>
         <div class="detail">
-          <div style="width:640px">
+          <div style="width:auto;">
             <el-row type="flex" align="middle" v-for="(item,index) in order.items" :style="index + 1 == order.items.length ? '' : 'border-bottom: 1px solid #EEF1F6;'">
               <el-col style="width:140px;">
                 <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
@@ -106,6 +114,16 @@
           <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
             <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-search" aria-hidden="true"></i> 查看详情</el-button>
             <p v-if="order.order.groupon_id">班级购编号：{{order.order.groupon_id}}</p>
+            <p>
+              <el-tooltip class="item" effect="dark" :content="order.order.seller_remark ? order.order.seller_remark : '没有商家标记'" placement="top-start">
+                <el-button type="text" @click="preAddRemark(index)">
+                  <i v-if="order.order.seller_remark_type == 0" class="fa fa-flag" aria-hidden="true"></i>
+                  <i v-if="order.order.seller_remark_type == 1" class="fa fa-flag" aria-hidden="true" style="color: #13CE66;"></i>
+                  <i v-if="order.order.seller_remark_type == 2" class="fa fa-flag" aria-hidden="true" style="color: #F7BA2A;"></i>
+                  <i v-if="order.order.seller_remark_type == 3" class="fa fa-flag" aria-hidden="true" style="color: #FF4949;"></i>
+                </el-button>
+               </el-tooltip>
+             </p>
           </div>
         </div>
         <div class="address_area">
@@ -116,6 +134,32 @@
     </div>
     <el-pagination :current-page="page" :total="total_count" :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
     </el-pagination>
+
+    <!-- 商家备注 -->
+    <el-dialog title="商家标记" :visible.sync="remark_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false">
+      <div class="remark_dialog">
+          <el-input type="textarea" :autosize="{ minRows: 6, maxRows: 10}" placeholder="请输入内容" v-model="remark_dialog.seller_remark">
+          </el-input>
+          <div class="seller_remark">
+            快捷标记：
+            <el-tag :key="tag" v-for="(tag,idx) in remark_list" type="primary" :closable="true" :close-transition="false" @close.stop="handleClose(idx)" @click.native="setRemark(idx)">{{tag}}</el-tag>
+            <el-input class="input-new-tag" v-if="inputVisible && remark_list.length < 5" v-model="inputValue" ref="saveTagInput" size="mini"
+            @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm"></el-input>
+            <el-button v-if="!inputVisible && remark_list.length < 5" class="button-new-tag" size="small" @click="showInput">新增 +</el-button>
+          </div>
+          <div class="seller_remark_type">
+            标记类型：
+            <el-radio-group v-model="remark_dialog.seller_remark_type">
+              <el-radio :label="1"><i class="fa fa-flag" aria-hidden="true" style="color: #13CE66; font-size: 16px; margin-right: 10px;"></i></el-radio>
+              <el-radio :label="2"><i class="fa fa-flag" aria-hidden="true" style="color: #F7BA2A; font-size: 16px; margin-right: 10px;"></i></el-radio>
+              <el-radio :label="3"><i class="fa fa-flag" aria-hidden="true" style="color: #FF4949; font-size: 16px; margin-right: 10px;"></i></el-radio>
+            </el-radio-group>
+          </div>
+          <div class="footer">
+            <el-button type="primary" size="small" @click="orderRemark">确定</el-button>
+          </div>
+      </div>
+    </el-dialog>
 
     <!-- 批量打印 -->
     <el-dialog title="批量打印" :visible.sync="print_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false" @close="unSelectedAllChange">
@@ -204,6 +248,12 @@ import conf from '../../config/conf.js'
 export default {
     data() {
         return {
+            remark_dialog: {
+                visible: false,
+                seller_remark: '',
+                seller_remark_type: 0,
+                index: 0
+            },
             print_dialog: {
                 visible: false,
                 selected_count: 0,
@@ -234,6 +284,7 @@ export default {
             order_time: [], //时间选择器[最早时间,最晚时间]
             order_status: 1, //订单状态
             school_id: '',
+            seller_remark_type: '',
 
             search_type: '',
             search_value: '',
@@ -284,12 +335,17 @@ export default {
             size: 10,
             total_count: 0,
 
-            refresh_flag: false
+            refresh_flag: false,
+
+            remark_list: [],
+            inputVisible: false,
+            inputValue: ''
         }
     },
     mounted() {
         this.getStoreData()
         this.getSchools()
+        this.getRemarkList()
     },
     watch: {
         refresh_flag(flag) {
@@ -315,8 +371,107 @@ export default {
         })
     },
     methods: {
+        preAddRemark(index) {
+          var order = this.orders[index].order
+          this.remark_dialog = {
+              visible: true,
+              seller_remark: order.seller_remark,
+              seller_remark_type: order.seller_remark_type ? order.seller_remark_type : 1,
+              index: index
+          }
+        },
         goToKDZS() {
             window.open('http://zz.kuaidizs.com')
+        },
+        getRemarkList() {
+            axios.post('/v1/store/get_shortcut_remark_list',{}).then(resp => {
+                if (resp.data.message == 'ok') {
+                    var remark_list = []
+                    if (resp.data.data.length > 0) {
+                        resp.data.data.forEach(el => {
+                            remark_list.push(el.content)
+                        })
+                        this.remark_list = remark_list
+                    }
+                }
+            })
+        },
+        setRemark(index) {
+          console.log(index);
+            var remark = this.remark_list[index]
+            var seller_remark = this.remark_dialog.seller_remark
+            if (seller_remark) {
+                seller_remark += '，'
+            }
+            seller_remark += remark
+            this.remark_dialog.seller_remark = seller_remark
+        },
+        handleClose(index) {
+            this.remark_list.splice(index, 1);
+            this.saveRemarkList()
+        },
+        showInput() {
+            this.inputVisible = true;
+            this.$nextTick(_ => {
+              this.$refs.saveTagInput.$refs.input.focus();
+            });
+        },
+        handleInputConfirm() {
+            let inputValue = this.inputValue;
+            if (inputValue) {
+                this.remark_list.push(inputValue);
+            }
+            this.saveRemarkList()
+            this.inputVisible = false;
+            this.inputValue = '';
+        },
+        saveRemarkList() {
+            var order_shortcut_remarks = []
+            this.remark_list.forEach(el => {
+                var remark = {
+                    type: 1,
+                    content: el
+                }
+                order_shortcut_remarks.push(remark)
+            })
+            axios.post('/v1/store/save_or_update_shortcut_remark',{order_shortcut_remarks}).then(resp => {
+                if (resp.data.message == 'ok') {
+                    console.log('success');
+                } else {
+                    console.log('fail');
+                }
+            })
+        },
+        orderRemark() {
+            if (this.remark_dialog.seller_remark == '') {
+                this.$message.warning('您还没有输入备注信息！')
+                return
+            }
+            var index = this.remark_dialog.index
+            var id = this.orders[index].order.id
+            var seller_remark = this.remark_dialog.seller_remark
+            var seller_remark_type = this.remark_dialog.seller_remark_type
+            axios.post('/v1/order/order_remark',{
+                id,
+                seller_remark,
+                seller_remark_type
+            }).then(resp => {
+                if (resp.data.message == 'ok') {
+                    console.log('success');
+                    this.$message.success('已添加备注！')
+                    this.orders[index].order.seller_remark = seller_remark
+                    this.orders[index].order.seller_remark_type = seller_remark_type
+                    this.remark_dialog = {
+                        visible: false,
+                        seller_remark: '',
+                        seller_remark_type: 0,
+                        index: 0
+                    }
+                } else {
+                    console.log('fail');
+                    this.$message.error('备注添加失败！')
+                }
+            })
         },
         preSelectedPrint() {
             var self = this
@@ -617,6 +772,7 @@ export default {
             this.order_time = [null, null] //时间选择器[最早时间,最晚时间]
             this.order_status = 80 //订单状态
             this.school_id = ''
+            this.seller_remark_type = ''
 
             this.search_type = ''
             this.search_value = ''
@@ -655,6 +811,7 @@ export default {
                 "isbn": self.isbn,
                 "order_status": self.order_status,
                 "school_id": self.school_id.trim(),
+                "seller_remark_type": self.seller_remark_type ? self.seller_remark_type : 0,
                 "start_at": self.order_time ? moment(self.order_time[0], "YYYY-MM-DD HH:mm:ss").unix() : 0,
                 "end_at": self.order_time ? moment(self.order_time[1], "YYYY-MM-DD HH:mm:ss").unix() : 0,
                 "page": self.page,
@@ -709,6 +866,33 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.remark_dialog {
+    .el-tag {
+        margin: 10px 5px 0 0;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+    .button-new-tag,.input-new-tag {
+        // height: 24px;
+        line-height: 22px;
+        width: 80px;
+        padding: 0;
+        margin: 10px 5px 0 0;
+        font-size: 12px;
+        box-sizing: border-box;
+    }
+    .seller_remark {
+        margin-top: 10px;
+    }
+    .seller_remark_type {
+        margin-top: 20px;
+    }
+    .footer {
+        margin-top: 20px;
+        text-align: right;
+    }
+}
 .print_dialog {
     padding-left: 12px;
     p {
