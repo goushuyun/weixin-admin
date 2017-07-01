@@ -109,8 +109,8 @@
               <el-input type="number" min="0" placeholder="新增新书数量" v-model="new_book.amount" @input="inputAmount(0)"><template slot="append">当前库存 <span style="color:#3A8AFF;font-size:16px">{{new_book.stock}}</span> 本</template></el-input>
           </el-form-item>
           <el-form-item label="位 置">
-              <el-cascader placeholder="二手书货架位" filterable :options="old_book.locations" v-model="old_book.location" @change="handleChange"></el-cascader>
-              <el-cascader placeholder="新书货架位" filterable :options="new_book.locations" v-model="new_book.location" @change="handleChange"></el-cascader>
+              <el-cascader id="old_book_locations" placeholder="二手书货架位" filterable :options="old_book.locations" v-model="old_book.location" @change="handleChangeOld"></el-cascader>
+              <el-cascader id="new_book_locations" placeholder="新书货架位" filterable :options="new_book.locations" v-model="new_book.location" @change="handleChangeNew"></el-cascader>
           </el-form-item>
           <el-form-item>
               <el-button type="primary" @click="addBook('book_info')">上架销售</el-button>
@@ -317,6 +317,8 @@ export default {
             $('#isbn input').focus()
         },
         search() {
+            $('#new_book_locations .el-cascader__label').css("color","black");
+            $('#old_book_locations .el-cascader__label').css("color","black");
             if (!isISBNFormat(this.book_info.isbn)) {
                 this.$message.warning('ISBN 码格式不正确！')
                 return
@@ -443,9 +445,10 @@ export default {
                 new_book_location_bak = this.new_book.location //备份新书货架位
                 this.new_book.location = [book_location.storehouse_id, book_location.shelf_id, book_location.floor_id]
                 if(new_book_location_bak.length > 0 && !isObjectValueEqual(new_book_location_bak,this.new_book.location)) {
+                    $('#new_book_locations .el-cascader__label').css("color","red");
                     this.$notify.warning({
                       title: '新书货架位已被更改',
-                      message: '库存中已有此书，库存位置已自动设置为原库存位置',
+                      message: '库存中已有此书，新书货架位已被更改为原来的货架位',
                       duration: 10000
                     });
                 }
@@ -463,9 +466,10 @@ export default {
                 if(old_book_location_bak.length > 0 && !isObjectValueEqual(old_book_location_bak,this.old_book.location)) {
                     var self = this
                     setTimeout(() => {
+                        $('#old_book_locations .el-cascader__label').css("color","red");
                         self.$notify.warning({
                           title: '旧书货架位已被更改',
-                          message: '旧书货架位已被更改为原来的货架位',
+                          message: '库存中已有此书，旧书货架位已被更改为原来的货架位',
                           duration: 10000
                         });
                     },100)
@@ -494,10 +498,14 @@ export default {
             locations.push(location)
             return locations
         },
-        handleChange(val) {
+        handleChangeOld(val) {
+            $('#old_book_locations .el-cascader__label').css("color","black");
             if (val[0] == 'old_all') {
                 this.old_book.locations = this.locations
             }
+        },
+        handleChangeNew(val) {
+            $('#new_book_locations .el-cascader__label').css("color","black");
             if (val[0] == 'new_all') {
                 this.new_book.locations = this.locations
             }
