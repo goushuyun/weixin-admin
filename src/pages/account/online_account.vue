@@ -12,7 +12,7 @@
                 <div class="blue">
                     <div class="block">
                         <p style="font-size:24px"><i class="iconfont icon-moneybag moneyicon"></i>{{online_total_sales}}元</p>
-                        <p>线上总销售额</p>
+                        <p>线上总销售额（截止到昨日24时）</p>
                     </div>
                 </div>
                 <div class="blue">
