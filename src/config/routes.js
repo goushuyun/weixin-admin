@@ -69,6 +69,12 @@ const service = r => require(['../pages/store_setting/service.vue'], r)
 // excel 上传
 const upload_excel = r => require(['../pages/add_book/upload.vue'], r)
 
+// 班级购设置
+const class_buy_setting = r => require(['../pages/class_buy/setting.vue'], r)
+// 班级购列表
+const class_buy_list = r => require(['../pages/class_buy/list.vue'], r)
+// 班级购详情
+const class_buy_detail = r => require(['../pages/class_buy/detail.vue'], r)
 
 export default [{
     path: '/',
@@ -184,5 +190,17 @@ export default [{
         name: 'upload_excel',
         path: 'upload_excel',
         component: upload_excel
+    }, {
+        name: 'class_buy_setting',
+        path: 'classbuy/setting',
+        component: class_buy_setting
+    }, {
+        name: 'class_buy_list',
+        path: 'classbuy/list',
+        component: class_buy_list
+    }, {
+        name: 'class_buy_detail',
+        path: 'classbuy/detail',
+        component: class_buy_detail
     }]
 }]

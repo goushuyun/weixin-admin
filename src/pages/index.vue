@@ -119,6 +119,17 @@
                     <i class="fa fa-picture-o" aria-hidden="true"></i>轮播图
                 </el-menu-item>
               </el-submenu>
+
+              <el-submenu index="6">
+                <template slot="title"><i class="fa fa-users" aria-hidden="true"></i>班级购</template>
+                <el-menu-item index="6-1" :route="{name:'class_buy_setting'}">
+                    <i class="fa fa-cog" aria-hidden="true"></i>班级购设置
+                </el-menu-item>
+                <el-menu-item index="6-2" :route="{name:'class_buy_list'}">
+                    <i class="fa fa-puzzle-piece" aria-hidden="true"></i>班级购列表
+                </el-menu-item>
+              </el-submenu>
+
               <el-submenu index="3">
                 <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>库存管理</template>
                 <el-menu-item index="3-1" :route="{name:'by_isbn'}">
