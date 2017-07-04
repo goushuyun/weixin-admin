@@ -98,11 +98,15 @@
             <el-col :span="12">
                 <div class="info_info">
                     <label class="first-lable">查看图片：</label>
-                    <el-card :body-style="{ padding: '0px' }" class="refund_img" v-for="img in after_sale_detail.images">
-                      <img :src="'http://onv8eua8j.bkt.clouddn.com/' + img.url" @click="picturePreview(img.url)" style="cursor:pointer;">
+                    <el-card :body-style="{ padding: '0px' }" class="refund_img" v-for="(img,index) in after_sale_detail.images">
+                      <img :src="'http://onv8eua8j.bkt.clouddn.com/' + img.url" @click="picturePreview(index)" style="cursor:pointer;">
                     </el-card>
                     <el-dialog v-model="dialog.visible" size="tiny">
-                      <img width="100%" :src="dialog.url">
+                      <el-carousel v-if="dialog.visible" height="450px" :autoplay="false" arrow="hover" :initial-index="dialog.index">
+                        <el-carousel-item style="text-align: center;" v-for="dialog_img in after_sale_detail.images" :key="dialog_img">
+                          <img height="100%" :src="'http://onv8eua8j.bkt.clouddn.com/' + dialog_img.url">
+                        </el-carousel-item>
+                      </el-carousel>
                     </el-dialog>
                 </div>
                 <div class="info_info">
@@ -202,7 +206,7 @@ export default {
             refund_loading: false,
             dialog: {
                 visible: false,
-                url: ''
+                index: 0
             },
             operateTable: [],
 
@@ -419,8 +423,8 @@ export default {
         goToList() {
             this.$router.go(-1)
         },
-        picturePreview(img) {
-            this.dialog.url = 'http://onv8eua8j.bkt.clouddn.com/' + img;
+        picturePreview(index) {
+            this.dialog.index = index;
             this.dialog.visible = true;
         },
         getOrder() {
