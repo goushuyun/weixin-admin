@@ -12,15 +12,16 @@
     cursor: pointer;
     overflow: hidden;
     position: absolute;
-    left: 420px;
-    width: 200px;
-    height: 200px;
+    left: 400px;
+    width: 230px;
+    height: 230px;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    img.avatar{
-        height: 100%;
+    img {
+        max-height: 230px;
+        max-width: 230px;
     }
     &:hover {
         border-color: #20a0ff;
@@ -29,16 +30,12 @@
 .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: 200px;
-    height: 266px;
-    line-height: 266px;
+    width: 230px;
+    height: 230px;
+    line-height: 230px;
     text-align: center;
 }
-.avatar {
-    width: 200px;
-    height: 266px;
-    display: block;
-}
+
 .el-form {
     .el-cascader {
         width: 260px;
@@ -71,7 +68,7 @@
         :before-upload="beforeAvatarUpload"
         :on-success="handleAvatarSuccess"
         :on-error="handleAvatarError">
-        <img v-if="book_info.image" :src="'http://images.goushuyun.cn/' + book_info.image" class="avatar">
+        <img v-if="book_info.image" :src="'http://images.goushuyun.cn/' + book_info.image"/>
         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
       </el-upload>
       <el-form ref="book_info" :model="book_info" :rules="rules" label-width="80px">
@@ -659,7 +656,8 @@ export default {
             if (isObjectValueEqual(this.book_info_bak, this.book_info)) {
                 this.confirmAddBook(data)
             } else {
-                axios.post('/v1/books/modify_book_info', {
+                if (this.book_info.id) {
+                  axios.post('/v1/books/modify_book_info', {
                     "id":this.book_info.id,
                     "isbn":this.book_info.isbn,
                     "title":this.book_info.title,
@@ -667,12 +665,27 @@ export default {
                     "author":this.book_info.author,
                     "price":priceInt(this.book_info.price),
                     "image":this.book_info.image
-                }).then(resp => {
+                  }).then(resp => {
                     if (resp.data.message == 'ok') {
-                        data.book_id = resp.data.data.id
-                        this.confirmAddBook(data)
+                      data.book_id = resp.data.data.id
+                      this.confirmAddBook(data)
                     }
-                })
+                  })
+                } else {
+                  axios.post('/v1/books/insert_book', {
+                    "isbn":this.book_info.isbn,
+                    "title":this.book_info.title,
+                    "publisher":this.book_info.publisher,
+                    "author":this.book_info.author,
+                    "price":priceInt(this.book_info.price),
+                    "image":this.book_info.image
+                  }).then(resp => {
+                    if (resp.data.message == 'ok') {
+                      data.book_id = resp.data.data.id
+                      this.confirmAddBook(data)
+                    }
+                  })
+                }
             }
         },
         confirmAddBook(data) {

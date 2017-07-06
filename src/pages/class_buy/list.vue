@@ -80,112 +80,140 @@
         </el-table>
       </div>
 
-      <el-dialog title="创建班级购" top="5%" size="full" :visible.sync="dialogTableVisible">
-        <div class="head_area row">
-          <div class="avatar_area">
-              <img :src="'http://image.goushuyun.cn/book.png'" class="image"></img>
+      <el-dialog title="创建班级购" top="5%" size="large" :visible.sync="dialogTableVisible">
+        <div class="dialog_area">
+          <div class="head_area row">
+            <div class="left">
+              <div class="avatar_area">
+                <img :src="'http://image.goushuyun.cn/book.png'" class="image"></img>
+              </div>
+              <div class="class_name_id">
+                <p class="name">131042Y1班</p>
+                <p class="id">#110</p>
+              </div>
+            </div>
+            <div class="right">
+              <div class="statistics_area">
+                <span style="font-size: 24px;"><i class="fa fa-jpy" aria-hidden="true"></i></span>
+                <span>1895.12</span>
+              </div>
+              <div class="statistics_area">
+                <span style="font-size: 24px;"><i class="fa fa-user" aria-hidden="true"></i></span>
+                <span>1892</span>
+              </div>
+              <div class="statistics_area">
+                <span style="font-size: 24px;"><i class="fa fa-thumbs-up" aria-hidden="true"></i></span>
+                <span>1895</span>
+              </div>
+            </div>
           </div>
-          <div class="class_name_id">
-            <p class="name">131042Y1班</p>
-            <p class="id">#110</p>
-          </div>
-          <div class="total_sales">
-            <span><i class="iconfont icon-moneybag moneyicon"></i></span>
-            <span>1895.12</span>
-          </div>
-        </div>
-        <div class="class_buy_area">
-          <div class="class_buy_info">
-            <p>
-              <label>学校</label>
-              <el-select v-model="school_id" clearable placeholder="全部学校" size="small" @change="">
-                <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
-              </el-select>
-            </p>
-            <p>
-              <label>学院</label>
-              <el-select v-model="institution_id" clearable placeholder="全部学院" size="small" @change="">
-                <el-option v-for="institution in institutions" :label="institution.name" :value="institution.id"></el-option>
-              </el-select>
-            </p>
-            <p>
-              <label>专业</label>
-              <el-select v-model="profession_id" clearable placeholder="全部专业" size="small" @change="">
-                <el-option v-for="profession in professions" :label="profession.name" :value="profession.id"></el-option>
-              </el-select>
-            </p>
-            <p>
-              <label>学期</label>
-              <el-select v-model="semester_id" clearable placeholder="全部专业" size="small" @change="">
-                <el-option v-for="semester in semesters" :label="semester.name" :value="semester.id"></el-option>
-              </el-select>
-            </p>
-          </div>
-          <div class="class_buy_info">
-            <p>
-              <label>班级购名称</label>
-              <el-input style="width: auto" placeholder="班级购名" size="small"></el-input>
-            </p>
-            <p>
-              <label>发布人姓名</label>
-              <el-input style="width: auto" placeholder="发布人姓名" size="small"></el-input>
-            </p>
-            <p>
-              <label>截 止 日 期</label>
-              <el-date-picker v-model="deadline" style="width: 180px;" type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions"></el-date-picker>
-            </p>
-            <p>
-              <label>班级购备注</label>
-              <el-input style="width: auto" placeholder="备注" size="small"></el-input>
-            </p>
-          </div>
-        </div>
+          <div class="class_buy_area">
+            <div class="class_buy_info">
+              <p>
+                <label>学校</label>
+                <el-select v-model="school_id" clearable placeholder="全部学校" size="small" @change="">
+                  <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
+                </el-select>
+              </p>
+              <p>
+                <label>学院</label>
+                <el-select v-model="institution_id" clearable placeholder="全部学院" size="small" @change="">
+                  <el-option v-for="institution in institutions" :label="institution.name" :value="institution.id"></el-option>
+                </el-select>
+              </p>
+              <p>
+                <label>专业</label>
+                <el-select v-model="profession_id" clearable placeholder="全部专业" size="small" @change="">
+                  <el-option v-for="profession in professions" :label="profession.name" :value="profession.id"></el-option>
+                </el-select>
+              </p>
+              <p>
+                <label>学期</label>
+                <el-select v-model="semester_id" clearable placeholder="全部专业" size="small" @change="">
+                  <el-option v-for="semester in semesters" :label="semester.name" :value="semester.id"></el-option>
+                </el-select>
+              </p>
+            </div>
 
-        <el-form :inline="true" style="margin-top: 15px;">
-            <el-form-item label="添加书籍" :rules="[{ required: true, trigger: 'blur' }]">
-                <el-input style="width: auto" placeholder="请输入isbn编码" size="small" icon="search"></el-input>
+            <div class="class_buy_info">
+              <!-- <p>
+                <label>班级购名称</label>
+                <el-input style="width: auto" placeholder="班级购名" size="small"></el-input>
+              </p> -->
+              <p>
+                <label>发布人姓名</label>
+                <el-input style="width: auto" placeholder="发布人姓名" size="small"></el-input>
+              </p>
+              <p>
+                <label>发布人手机</label>
+                <el-input style="width: auto" placeholder="创建人手机" size="small"></el-input>
+              </p>
+              <p>
+                <label>截 止 日 期</label>
+                <el-date-picker v-model="deadline" style="width: 180px;" type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions"></el-date-picker>
+              </p>
+              <p>
+                <label>班级购备注</label>
+                <el-input id="remark" style="width: auto;" placeholder="班级购备注" size="small"></el-input>
+              </p>
+            </div>
+          </div>
+
+          <el-form :inline="true" class="search_area">
+            <el-form-item  :rules="[{ required: true, trigger: 'blur' }]">
+              <el-input style="width: 460px;" placeholder="请输入isbn编码添加书籍" size="" icon="search"></el-input>
             </el-form-item>
-        </el-form>
+          </el-form>
 
-        <div class="table_area">
-          <el-table :data="tableData">
-            <el-table-column label="图片" width="100">
-              <template scope="scope" >
-                <div class="image_wrap">
-                  <img :src="'http://image.goushuyun.cn/book.png'" class="image"></img>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="address" label="ISBN" width="150"></el-table-column>
-            <el-table-column prop="address" label="书名"></el-table-column>
-            <el-table-column label="类型" width="80">
-              <template scope="scope">
-                <div v-if="scope.row.has_new_book" class="goods_item new_color">新书</div>
-                <div v-if="scope.row.has_old_book" class="goods_item old_color">二手书</div>
-              </template>
-            </el-table-column>
-            <el-table-column label="售价" width="100">
-              <template scope="scope">
-                <div v-if="scope.row.has_new_book" class="goods_item new_color">{{scope.row.new_book.price}}</div>
-                <div v-if="scope.row.has_old_book" class="goods_item old_color">{{scope.row.old_book.price}}</div>
-              </template>
-            </el-table-column>
-            <el-table-column label="数量" width="80">
-              <template scope="scope">
-                <div v-if="scope.row.has_new_book" class="goods_item new_color">{{scope.row.new_book.amount}}</div>
-                <div v-if="scope.row.has_old_book" class="goods_item old_color">{{scope.row.old_book.amount}}</div>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="80">
-              <template scope="scope">
-                <el-button type="text">移除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
+          <div class="table_area">
+            <el-table :data="tableData">
+              <el-table-column label="图片" width="100">
+                <template scope="scope" >
+                  <div class="image_wrap">
+                    <img :src="'http://image.goushuyun.cn/book.png'" class="image"></img>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="address" label="ISBN" width="150"></el-table-column>
+              <el-table-column prop="address" label="书名"></el-table-column>
+              <el-table-column label="类型" width="80">
+                <template scope="scope">
+                  <div v-if="scope.row.has_new_book" class="goods_item new_color">新书</div>
+                  <div v-if="scope.row.has_old_book" class="goods_item old_color">二手书</div>
+                </template>
+              </el-table-column>
+              <el-table-column label="售价" width="100">
+                <template scope="scope">
+                  <div v-if="scope.row.has_new_book" class="goods_item new_color">{{scope.row.new_book.price}}</div>
+                  <div v-if="scope.row.has_old_book" class="goods_item old_color">{{scope.row.old_book.price}}</div>
+                </template>
+              </el-table-column>
+              <el-table-column label="数量" width="80">
+                <template scope="scope">
+                  <div v-if="scope.row.has_new_book" class="goods_item new_color">{{scope.row.new_book.amount}}</div>
+                  <div v-if="scope.row.has_old_book" class="goods_item old_color">{{scope.row.old_book.amount}}</div>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="80">
+                <template scope="scope">
+                  <el-button type="text">移除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
 
-        <div style="height: 30px;">
-          <el-button style="float: right; margin: 20px;" type="primary" size="small">创建</el-button>
+          <!-- <div style="height: 30px;">
+            <el-button style="float: right; margin: 20px;" type="primary" size="small">创建</el-button>
+          </div> -->
+
+          <div class="operate_list">
+            <el-table :data="tableData" stripe style="width: 100%">
+              <el-table-column prop="date" label="操作时间" width="260"></el-table-column>
+              <el-table-column prop="name" label="操作人" width="200"></el-table-column>
+              <el-table-column prop="address" label="操作信息"></el-table-column>
+            </el-table>
+            <div class="show_all"><i class="fa fa-angle-double-down" aria-hidden="true"></i> 查看更多</div>
+          </div>
         </div>
       </el-dialog>
     </div>
@@ -236,47 +264,70 @@ export default {
         }
       }
     }
+  },
+  mounted() {
+    this.$nextTick(_ => {
+      $('#remark input').css("color", "#FF4949");
+    })
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.dialog_area {
+    box-sizing: border-box;
+    padding: 0 16px;
+}
 .row {
     margin-bottom: 15px;
     width: auto;
 }
 .head_area {
-  padding: 0 0 10px 15px;
-  display: flex;
-  align-items: center;
-  .avatar_area {
-    height: 80px;
-    width: 80px;
-    .image {
-      height: 80px;
-      width: 80px;
-      border-radius: 50%;
+    padding: 0 0 5px 15px;
+    display: flex;
+    .left {
+        display: flex;
+        align-items: center;
+        width: 50%;
+        .avatar_area {
+            height: 80px;
+            width: 80px;
+            .image {
+                height: 80px;
+                width: 80px;
+                border-radius: 50%;
+            }
+        }
+        .class_name_id {
+            width: 300px;
+            height: 60px;
+            margin-left: 30px;
+            .name {
+                line-height: 30px;
+                font-size: 16px;
+                font-weight: bold;
+                color: #000;
+            }
+            .id {
+                color: #888;
+                line-height: 30px;
+            }
+        }
     }
-  }
-  .class_name_id {
-    width: 300px;
-    height: 60px;
-    margin-left: 30px;
-    .name {
-      line-height: 30px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #000;
+    .right {
+        width: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
     }
-    .id {
-      color: #888;
-      line-height: 30px;
-    }
-  }
 }
 .class_buy_area {
     display: flex;
     align-items: center;
+    padding: 30px;
+    border-radius: 16px;
+    background-color: #EEF1F6;
+    // justify-content: center;
     .class_buy_info {
         width: 300px;
         p {
@@ -287,6 +338,13 @@ export default {
             }
         }
     }
+}
+.search_area {
+    border-top: 3px dashed #EEF1F6;
+    margin-top: 30px;
+    padding-top: 30px;
+    display: flex;
+    justify-content: center;
 }
 .table_area {
     .image_wrap {
@@ -311,6 +369,21 @@ export default {
     }
     .old_color {
         color: #1AAD19;
+    }
+}
+.operate_list {
+    margin-top: 25px;
+    .show_all {
+        height: 40px;
+        line-height: 40px;
+        width: auto;
+        text-align: center;
+        // background-color: #EEF1F6;
+        color: #1F2D3D;
+        border-bottom: 1px solid #dfe6ec;
+        border-left: 1px solid #dfe6ec;
+        border-right: 1px solid #dfe6ec;
+        box-sizing: border-box;
     }
 }
 </style>
