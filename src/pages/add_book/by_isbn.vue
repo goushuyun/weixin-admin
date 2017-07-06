@@ -500,12 +500,14 @@ export default {
             if (val[0] == 'old_all') {
                 this.old_book.locations = this.locations
             }
+            $('#isbn input').focus()
         },
         handleChangeNew(val) {
             $('#new_book_locations .el-cascader__label').css("color","black");
             if (val[0] == 'new_all') {
                 this.new_book.locations = this.locations
             }
+            $('#isbn input').focus()
         },
         getLocations() {
             axios.post('/v1/location/list_children_location', {
