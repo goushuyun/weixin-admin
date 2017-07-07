@@ -128,6 +128,7 @@ export default {
         this.store_id = store.id
     },
     mounted() {
+        $('#isbn input').focus()
         this.getShopTopic()
         this.getLocations()
     },

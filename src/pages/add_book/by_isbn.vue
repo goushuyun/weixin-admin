@@ -110,7 +110,7 @@
               <el-cascader id="new_book_locations" placeholder="新书货架位" filterable :options="new_book.locations" v-model="new_book.location" @change="handleChangeNew"></el-cascader>
           </el-form-item>
           <el-form-item>
-              <el-button type="primary" @click="addBook('book_info')">上架销售</el-button>
+              <el-button id="add_book" type="primary" @click="addBook('book_info')">上架销售</el-button>
               <el-button @click="reset('book_info','opt')">重置</el-button>
           </el-form-item>
       </el-form>
@@ -500,14 +500,12 @@ export default {
             if (val[0] == 'old_all') {
                 this.old_book.locations = this.locations
             }
-            $('#isbn input').focus()
         },
         handleChangeNew(val) {
             $('#new_book_locations .el-cascader__label').css("color","black");
             if (val[0] == 'new_all') {
                 this.new_book.locations = this.locations
             }
-            $('#isbn input').focus()
         },
         getLocations() {
             axios.post('/v1/location/list_children_location', {

@@ -6,7 +6,7 @@
   <div class="content_inner">
     <el-form :inline="true" label-width="80px" class="search_area">
       <el-form-item label="ISBN">
-        <el-input size="small" v-model.trim="isbn" @keyup.enter.native="getData"></el-input>
+        <el-input id="isbn" size="small" v-model.trim="isbn" @keyup.enter.native="getData"></el-input>
       </el-form-item>
       <el-form-item label="书名">
         <el-input size="small" v-model.trim="title" @keyup.enter.native="getData"></el-input>
