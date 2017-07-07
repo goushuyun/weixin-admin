@@ -157,47 +157,54 @@
                 <el-input id="remark" style="width: auto;" placeholder="班级购备注" size="small"></el-input>
               </p>
             </div>
+
+            <div class="class_buy_info">
+              <p>
+                <el-button style="float: right;" type="primary" size="small">修改信息</el-button>
+              </p>
+              <p>
+                <el-button style="float: right;" type="primary" size="small">添加书籍</el-button>
+              </p>
+            </div>
           </div>
 
-          <el-form :inline="true" class="search_area">
-            <el-form-item  :rules="[{ required: true, trigger: 'blur' }]">
-              <el-input style="width: 460px;" placeholder="请输入isbn编码添加书籍" size="" icon="search"></el-input>
-            </el-form-item>
-          </el-form>
-
           <div class="table_area">
-            <el-table :data="tableData">
-              <el-table-column label="图片" width="100">
-                <template scope="scope" >
-                  <div class="image_wrap">
-                    <img :src="'http://image.goushuyun.cn/book.png'" class="image"></img>
-                  </div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="address" label="ISBN" width="150"></el-table-column>
-              <el-table-column prop="address" label="书名"></el-table-column>
-              <el-table-column label="类型" width="80">
-                <template scope="scope">
-                  <div v-if="scope.row.has_new_book" class="goods_item new_color">新书</div>
-                  <div v-if="scope.row.has_old_book" class="goods_item old_color">二手书</div>
-                </template>
-              </el-table-column>
-              <el-table-column label="售价" width="100">
-                <template scope="scope">
-                  <div v-if="scope.row.has_new_book" class="goods_item new_color">{{scope.row.new_book.price}}</div>
-                  <div v-if="scope.row.has_old_book" class="goods_item old_color">{{scope.row.old_book.price}}</div>
-                </template>
-              </el-table-column>
-              <el-table-column label="数量" width="80">
-                <template scope="scope">
-                  <div v-if="scope.row.has_new_book" class="goods_item new_color">{{scope.row.new_book.amount}}</div>
-                  <div v-if="scope.row.has_old_book" class="goods_item old_color">{{scope.row.old_book.amount}}</div>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="80">
-                <template scope="scope">
-                  <el-button type="text">移除</el-button>
-                </template>
+            <el-input id="search_input" style="width: 260px;" placeholder="请输入isbn编码添加书籍" size="small" icon="search"></el-input>
+            <el-table :data="tableData" border>
+              <el-table-column label="推荐中的书单">
+                <el-table-column label="图片" width="100">
+                  <template scope="scope" >
+                    <div class="image_wrap">
+                      <img :src="'http://image.goushuyun.cn/book.png'" class="image"></img>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="address" label="ISBN" width="150"></el-table-column>
+                <el-table-column prop="address" label="书名"></el-table-column>
+                <el-table-column label="类型" width="80">
+                  <template scope="scope">
+                    <div v-if="scope.row.has_new_book" class="goods_item new_color">新书</div>
+                    <div v-if="scope.row.has_old_book" class="goods_item old_color">二手书</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="售价" width="100">
+                  <template scope="scope">
+                    <div v-if="scope.row.has_new_book" class="goods_item new_color">{{scope.row.new_book.price}}</div>
+                    <div v-if="scope.row.has_old_book" class="goods_item old_color">{{scope.row.old_book.price}}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="数量" width="80">
+                  <template scope="scope">
+                    <div v-if="scope.row.has_new_book" class="goods_item new_color">{{scope.row.new_book.amount}}</div>
+                    <div v-if="scope.row.has_old_book" class="goods_item old_color">{{scope.row.old_book.amount}}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="80">
+                  <template scope="scope">
+                    <el-button type="text">移除</el-button>
+                  </template>
+                </el-table-column>
+
               </el-table-column>
             </el-table>
           </div>
@@ -339,14 +346,22 @@ export default {
         }
     }
 }
-.search_area {
+// .search_area {
+//     border-top: 3px dashed #EEF1F6;
+//     margin-top: 30px;
+//     padding-top: 30px;
+//     display: flex;
+//     justify-content: center;
+// }
+.table_area {
     border-top: 3px dashed #EEF1F6;
     margin-top: 30px;
-    padding-top: 30px;
-    display: flex;
-    justify-content: center;
-}
-.table_area {
+    #search_input {
+        position: relative;
+        top: 36px;
+        left: 120px;
+        z-index: 1;
+    }
     .image_wrap {
         width: 80px;
         height: 80px;
