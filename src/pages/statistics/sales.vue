@@ -27,7 +27,7 @@
       <el-col :span="8">
         <div class="total">
           <div class="block">
-            <p>总销售额</p>
+            <p>总销售额（截止到昨日24时）</p>
             <p style="font-size:24px"><i class="iconfont icon-moneybag moneyicon"></i>{{history_sales.total_sales}}元</p>
             <div>
               <div class="small-font" style="float:left">
@@ -352,41 +352,43 @@ export default {
                     }
                     resp.data.data.forEach(el => {
                         var month_online_offline_sales = el.online_sales + el.offline_sales //等于总销售额
-                        var month_new_old_sales = el.newbook_sales + el.oldbook_sales //不等于总销售额（因为不包含运费）
-                        var month_freight = month_online_offline_sales - month_new_old_sales
-                        month_statistic_0.legend_data.push(el.month)
-                        month_statistic_0.series_month_data.push({
+                        if (month_online_offline_sales > 0) {
+                          var month_new_old_sales = el.newbook_sales + el.oldbook_sales //不等于总销售额（因为不包含运费）
+                          var month_freight = month_online_offline_sales - month_new_old_sales
+                          month_statistic_0.legend_data.push(el.month)
+                          month_statistic_0.series_month_data.push({
                             value: priceFloat(month_online_offline_sales),
                             name: el.month
-                        })
+                          })
 
-                        month_statistic_0.series_data.push({
+                          month_statistic_0.series_data.push({
                             value: priceFloat(el.newbook_sales),
                             name: '新书'
-                        })
-                        month_statistic_0.series_data.push({
+                          })
+                          month_statistic_0.series_data.push({
                             value: priceFloat(el.oldbook_sales),
                             name: '旧书'
-                        })
-                        month_statistic_0.series_data.push({
+                          })
+                          month_statistic_0.series_data.push({
                             value: priceFloat(month_freight),
                             name: '运费'
-                        })
+                          })
 
-                        month_statistic_1.legend_data.push(el.month)
-                        month_statistic_1.series_month_data.push({
+                          month_statistic_1.legend_data.push(el.month)
+                          month_statistic_1.series_month_data.push({
                             value: priceFloat(month_online_offline_sales),
                             name: el.month
-                        })
+                          })
 
-                        month_statistic_1.series_data.push({
+                          month_statistic_1.series_data.push({
                             value: priceFloat(el.online_sales),
                             name: '线上'
-                        })
-                        month_statistic_1.series_data.push({
+                          })
+                          month_statistic_1.series_data.push({
                             value: priceFloat(el.offline_sales),
                             name: '线下'
-                        })
+                          })
+                        }
                     })
                     month_statistic_0.legend_data.push('新书')
                     month_statistic_0.legend_data.push('旧书')

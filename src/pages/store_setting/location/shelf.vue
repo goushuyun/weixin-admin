@@ -46,7 +46,7 @@
               </el-button-group>
             </div>
         </div>
-        <div v-if="!locations.length" class="show_info">需添加货架及货架层信息后，才能正常使用</div>
+        <div v-if="!locations.length" class="show_info">需添加货架及货架层信息后，才能正常使用。点击右上角 <el-button type="text" style="position:relative;top:1px;margin:0 5px;"  @click="addShelf">+ 添加货架</el-button> 添加货架。</div>
     </div>
   </div>
 </template>

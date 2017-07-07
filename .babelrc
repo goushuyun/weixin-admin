@@ -2,7 +2,7 @@
   "presets": [
     ["es2015", { "modules": false }]
   ],
-  "plugins": [["component", [
+  "plugins": ["transform-vue-jsx",["component", [
     {
       "libraryName": "element-ui",
       "styleLibraryName": "theme-default"

@@ -98,9 +98,10 @@
             <el-col :span="12">
                 <div class="info_info">
                     <label class="first-lable">查看图片：</label>
-                    <el-card :body-style="{ padding: '0px' }" class="refund_img" v-for="(img,index) in after_sale_detail.images">
+                    <el-card v-if="showPicture" :body-style="{ padding: '0px' }" class="refund_img" v-for="(img,index) in after_sale_detail.images">
                       <img :src="'http://onv8eua8j.bkt.clouddn.com/' + img.url" @click="picturePreview(index)" style="cursor:pointer;">
                     </el-card>
+                    <label v-else>买家没有上传图片</label>
                     <el-dialog v-model="dialog.visible" size="tiny">
                       <el-carousel v-if="dialog.visible" height="450px" :autoplay="false" arrow="hover" :initial-index="dialog.index">
                         <el-carousel-item style="text-align: center;" v-for="dialog_img in after_sale_detail.images" :key="dialog_img">
@@ -221,6 +222,12 @@ export default {
             this.school_name = this.$route.params.school_name
         }
         this.getOrder()
+    },
+    computed: {
+        showPicture() {
+          var images = this.after_sale_detail.images
+          return images.length > 0
+        }
     },
     methods: {
         preSelectedPrint() {
