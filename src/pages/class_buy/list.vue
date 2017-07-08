@@ -1,55 +1,57 @@
 <template lang="html">
   <div class="container">
     <div class="top_bar">
-        <h2 class="title">班级购列表</h2>
+      <h2 class="title">班级购列表</h2>
     </div>
     <div class="content_inner">
       <el-form :inline="true">
-          <el-form-item>
-              <el-select v-model="school_id" style="width: 170px;" clearable placeholder="全部学校" size="small" @change="">
-                  <el-option label="全部学校" value=""></el-option>
-                  <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
-              </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-select v-model="institution_id" style="width: 170px;" clearable placeholder="全部学院" size="small" @change="">
-                <el-option label="全部学院" value=""></el-option>
-                <el-option v-for="institution in institutions" :label="institution.name" :value="institution.id"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-select v-model="profession_id" style="width: 170px;" clearable placeholder="全部专业" size="small" @change="">
-                <el-option label="全部专业" value=""></el-option>
-                <el-option v-for="profession in professions" :label="profession.name" :value="profession.id"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-              <el-select v-model="expired" style="width: 115px;" clearable placeholder="是否过期" size="small" @change="">
-                  <el-option label="是否过期" value=""></el-option>
-                  <el-option label="未过期" :value="79"></el-option>
-                  <el-option label="已过期" :value="80"></el-option>
-              </el-select>
-          </el-form-item>
-          <el-form-item>
-              <el-input placeholder="搜索值" v-model.trim="search_value" style="width: 270px;" size="small" icon="search" @input="">
-                  <el-select v-model="search_type" style="width: 125px;" clearable slot="prepend" placeholder="筛选条件" size="small" @change="">
-                      <el-option label="编号" value="order"></el-option>
-                      <el-option label="班级名/班号" value="mobile"></el-option>
-                      <el-option label="发布人姓名" value="name"></el-option>
-                      <el-option label="发布人手机" value="isbn"></el-option>
-                  </el-select>
-              </el-input>
-          </el-form-item>
-          <el-form-item>
-              <el-button @click="" size="small" type="primary"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
-          </el-form-item>
+        <el-form-item>
+          <el-select v-model="school_id" style="width: 220px;" clearable placeholder="全部学校" size="small" @change="findGroupon('school')">
+            <el-option label="全部学校" value=""></el-option>
+            <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="institute_id" style="width: 220px;" clearable placeholder="全部学院" size="small" @change="findGroupon('institute')">
+            <el-option label="全部学院" value=""></el-option>
+            <el-option v-for="institute in institutes" :label="institute.name" :value="institute.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="institute_major_id" style="width: 220px;" clearable placeholder="全部专业" size="small" @change="findGroupon">
+            <el-option label="全部专业" value=""></el-option>
+            <el-option v-for="major in majors" :label="major.name" :value="major.id"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="term_index" style="width: 140px;" clearable placeholder="全部学期" size="small" @change="findGroupon">
+            <el-option label="全部学期" value=""></el-option>
+            <el-option v-for="(item, index) in terms" :label="item" :value="index"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-select v-model="search_type" style="width: 140px;" clearable placeholder="是否过期" size="small" @change="findGroupon">
+            <el-option label="是否过期" value=""></el-option>
+            <el-option label="未过期" :value="1"></el-option>
+            <el-option label="已过期" :value="2"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-input placeholder="班级购编号" v-model.trim="groupon_id" style="width: 220px;" size="small" icon="search" :on-icon-click="findGroupon" @keyup.enter.native="findGroupon"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input placeholder="班级名/班号" v-model.trim="class_name" style="width: 220px;" size="small" icon="search" :on-icon-click="findGroupon" @keyup.enter.native="findGroupon"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="small" type="primary" @click="resetForm"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
+        </el-form-item>
       </el-form>
 
       <div class="row">
-        <el-radio-group v-model="order_status" size="small" @change="">
-          <el-radio-button :label="1">官方班级购</el-radio-button>
-          <el-radio-button :label="2">其他版机构</el-radio-button>
-          <el-radio-button :label="3">全部班级购</el-radio-button>
+        <el-radio-group v-model="founder_type" size="small" @change="findGroupon">
+          <el-radio-button :label="2">官方班级购</el-radio-button>
+          <el-radio-button :label="1">其他版机构</el-radio-button>
+          <el-radio-button :label="0">全部班级购</el-radio-button>
         </el-radio-group>
       </div>
 
@@ -80,7 +82,7 @@
         </el-table>
       </div>
 
-      <el-dialog title="创建班级购" top="5%" size="large" :visible.sync="dialogTableVisible">
+      <el-dialog title="创建班级购" top="5%" size="large" :visible.sync="dialogVisible">
         <div class="dialog_area">
           <div class="head_area row">
             <div class="left">
@@ -111,26 +113,26 @@
             <div class="class_buy_info">
               <p>
                 <label>学校</label>
-                <el-select v-model="school_id" clearable placeholder="全部学校" size="small" @change="">
+                <el-select v-model="school_id" :disabled="!edit_main_info" filterable clearable placeholder="选择学校（可搜索）" size="small" @change="">
                   <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
                 </el-select>
               </p>
               <p>
                 <label>学院</label>
-                <el-select v-model="institution_id" clearable placeholder="全部学院" size="small" @change="">
-                  <el-option v-for="institution in institutions" :label="institution.name" :value="institution.id"></el-option>
+                <el-select v-model="institute_id" :disabled="!edit_main_info" filterable clearable placeholder="选择学院（可搜索）" size="small" @change="">
+                  <el-option v-for="institute in institutes" :label="institute.name" :value="institute.id"></el-option>
                 </el-select>
               </p>
               <p>
                 <label>专业</label>
-                <el-select v-model="profession_id" clearable placeholder="全部专业" size="small" @change="">
-                  <el-option v-for="profession in professions" :label="profession.name" :value="profession.id"></el-option>
+                <el-select v-model="institute_major_id" :disabled="!edit_main_info" filterable clearable placeholder="选择专业（可搜索）" size="small" @change="">
+                  <el-option v-for="major in majors" :label="major.name" :value="major.id"></el-option>
                 </el-select>
               </p>
               <p>
                 <label>学期</label>
-                <el-select v-model="semester_id" clearable placeholder="全部专业" size="small" @change="">
-                  <el-option v-for="semester in semesters" :label="semester.name" :value="semester.id"></el-option>
+                <el-select v-model="term" :disabled="!edit_main_info" filterable clearable placeholder="选择学期（可搜索）" size="small" @change="">
+                  <el-option v-for="item in terms" :label="item.name" :value="item.id"></el-option>
                 </el-select>
               </p>
             </div>
@@ -142,34 +144,42 @@
               </p> -->
               <p>
                 <label>发布人姓名</label>
-                <el-input style="width: auto" placeholder="发布人姓名" size="small"></el-input>
+                <el-input style="width: auto" readonly placeholder="发布人姓名" size="small"></el-input>
               </p>
               <p>
                 <label>发布人手机</label>
-                <el-input style="width: auto" placeholder="创建人手机" size="small"></el-input>
+                <el-input style="width: auto" readonly placeholder="创建人手机" size="small"></el-input>
               </p>
               <p>
                 <label>截 止 日 期</label>
-                <el-date-picker v-model="deadline" style="width: 180px;" type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions"></el-date-picker>
+                <el-date-picker v-model="deadline" :disabled="!edit_main_info" style="width: 180px;" type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions"></el-date-picker>
               </p>
               <p>
                 <label>班级购备注</label>
-                <el-input id="remark" style="width: auto;" placeholder="班级购备注" size="small"></el-input>
+                <el-input id="remark" :readonly="!edit_main_info" style="width: auto;" placeholder="班级购备注" size="small"></el-input>
               </p>
             </div>
 
-            <div class="class_buy_info">
-              <p>
-                <el-button style="float: right;" type="primary" size="small">修改信息</el-button>
-              </p>
-              <p>
-                <el-button style="float: right;" type="primary" size="small">添加书籍</el-button>
-              </p>
-            </div>
+            <transition name="el-zoom-in-center">
+              <div class="class_buy_info" style="position: relative; top: 68px; left: 30px;">
+                <el-button v-if="!edit_main_info" type="primary" size="small" @click="edit_main_info = true">修改信息</el-button>
+                <el-button v-if="edit_main_info" type="primary" size="small">保存</el-button>
+                <el-button v-if="edit_main_info" type="default" size="small" @click="edit_main_info = false">取消</el-button>
+              </div>
+            </transition>
           </div>
 
           <div class="table_area">
-            <el-input id="search_input" style="width: 260px;" placeholder="请输入isbn编码添加书籍" size="small" icon="search"></el-input>
+            <div v-show="!edit_book_list" class="search_area">
+              <el-button type="primary" style="margin-bottom: 2px;" size="small" @click="edit_book_list = true">编辑书单</el-button>
+            </div>
+            <transition name="el-zoom-in-center">
+              <div v-show="edit_book_list" class="search_area">
+                <el-input style="width: 260px; margin-right: 10px;" placeholder="通过搜索 ISBN 添加书籍" size="small" icon="search"></el-input>
+                <el-button type="primary" size="small">保存</el-button>
+                <el-button type="default" size="small" @click="edit_book_list = false">取消</el-button>
+              </div>
+            </transition>
             <el-table :data="tableData" border>
               <el-table-column label="推荐中的书单">
                 <el-table-column label="图片" width="100">
@@ -201,10 +211,9 @@
                 </el-table-column>
                 <el-table-column label="操作" width="80">
                   <template scope="scope">
-                    <el-button type="text">移除</el-button>
+                    <el-button :disabled="!edit_book_list" type="text">移除</el-button>
                   </template>
                 </el-table-column>
-
               </el-table-column>
             </el-table>
           </div>
@@ -228,40 +237,42 @@
 </template>
 
 <script>
+import axios from "../../scripts/http"
 export default {
   data() {
     return {
-      school_id: '',
-      institution_id: '',
-      profession_id: '',
-      semester_id: '',
-      expired: '',
-      search_value: '',
-      search_type: 'order',
+      // select 基础信息
+      schools: [],
+      institutes: [],
+      majors: [],
+      terms: ['大一上', '大一下', '大二上', '大二下', '大三上', '大三下', '大四上', '大四下', '其他'],
+
+      // 班级购检索条件
+      school_id: '', // 学校id
+      institute_id: '', // 学院id
+      institute_major_id: '', // 专业id
+      term_index: '', // 学期index
+      search_type: '', // 0:all 1:正常状态下所有班级购 2:过期班级购 3:异常班级购
+      groupon_id: '', // 班级购编号
+      class_name: '', // 班级名/班号
+      founder_type: 0,
+      page: 1, // 页数
+      size: 15, // 请求记录数量
+
+      // 班级购列表
+      groupons: [], // 班级购列表
+
+      edit_main_info: false,
+      edit_book_list: false,
+
       order_status: 1,
 
-      schools: [],
-      institutions: [],
-      professions: [],
-
-      dialogTableVisible: true,
+      dialogVisible: false,
 
       tableData: [{
         date: '2016-05-02',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
       }],
 
       deadline: '',
@@ -276,6 +287,81 @@ export default {
     this.$nextTick(_ => {
       $('#remark input').css("color", "#FF4949");
     })
+    this.getSchoolMajors()
+    this.findGroupon()
+  },
+  methods: {
+    getSchoolMajors() {
+      axios.post('/v1/groupon/get_school_majors', {}).then(resp => {
+        if (resp.data.message == 'ok') {
+          this.schools = resp.data.data
+        }
+      })
+    },
+    findGroupon(type) {
+      if (type === 'school') {
+        var school_id = this.school_id
+        if (school_id != '') {
+          this.getInstitutes(school_id)
+        } else {
+          this.institute_id = ''
+          this.institute_major_id = ''
+          this.institutes = []
+          this.majors = []
+        }
+      } else if (type === 'institute') {
+        var institute_id = this.institute_id
+        if (institute_id != '') {
+          this.getMajors(institute_id)
+        } else {
+          this.institute_major_id = ''
+          this.majors = []
+        }
+      }
+      axios.post('/v1/groupon/find_groupon', {
+        "id": this.groupon_id,
+        "school_id": this.school_id,
+        "institute_id": this.institute_id,
+        "institute_major_id": this.institute_major_id,
+        "term": this.terms[this.term_index],
+        "search_type": this.search_type == '' ? 0 : this.search_type, //0：all 1： 正常状态下所有班级购 2：过期班级购 3：异常班级购
+        "class": this.class_name,
+        "founder_id": "",
+        "founder_type": this.founder_type,
+        "page": this.page,
+        "size": this.size
+      }).then(resp => {
+        if (resp.data.message == 'ok') {
+          console.log(resp.data.data);
+          this.groupons = resp.data.data
+        }
+      })
+    },
+    getInstitutes(school_id) {
+      var school = this.schools.find(el => {
+        return el.id == school_id
+      })
+      this.institutes = school.institutes
+    },
+    getMajors(institute_id) {
+      var institute = this.institutes.find(el => {
+        return el.id == institute_id
+      })
+      this.majors = institute.majors
+    },
+    resetForm() {
+      this.school_id = ''
+      this.institute_id = ''
+      this.institute_major_id = ''
+      this.institutes = []
+      this.majors = []
+      this.term_index = ''
+      this.search_type = ''
+      this.groupon_id = ''
+      this.class_name = ''
+      this.page = 1
+      this.size = 15
+    }
   }
 }
 </script>
@@ -346,21 +432,16 @@ export default {
         }
     }
 }
-// .search_area {
-//     border-top: 3px dashed #EEF1F6;
-//     margin-top: 30px;
-//     padding-top: 30px;
-//     display: flex;
-//     justify-content: center;
-// }
+
 .table_area {
     border-top: 3px dashed #EEF1F6;
     margin-top: 30px;
-    #search_input {
+    .search_area {
         position: relative;
         top: 36px;
-        left: 120px;
+        right: 20px;
         z-index: 1;
+        float: right;
     }
     .image_wrap {
         width: 80px;
