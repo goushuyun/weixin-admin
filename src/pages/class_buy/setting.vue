@@ -31,7 +31,7 @@
                 <span style="float: right;">
                   <el-button-group>
                     <el-button type="primary" size="mini" @click.stop="preAddMajor(s_index, i_index)">添加专业</el-button>
-                    <el-button type="danger" size="mini">删除</el-button>
+                    <el-button type="danger" size="mini" @click="delSchoolInstitute(s_index, i_index)">删除</el-button>
                   </el-button-group>
                 </span>
 
@@ -62,7 +62,7 @@
                 <div class="discipline" v-for="(major, m_index) in institute.majors">
                   <span>· {{major.name}}</span>
                   <span style="float: right;">
-                    <el-button type="danger" size="mini">删除</el-button>
+                    <el-button type="danger" size="mini" @click="delInstituteMajor(s_index, i_index, m_index)">删除</el-button>
                   </span>
                 </div>
               </div>
@@ -81,13 +81,13 @@ export default {
   data() {
     return {
       add_institution_name: '', // 要添加学院的名称
-      add_major_name: '',       // 要添加专业的名称
-      loading: false,           // 检索专业的时 loading
-      activeNames: ['1'],       // 用于打开 collapse
-      school_majors: [],        // 本页面全部数据：学校 - 学院 - 专业
+      add_major_name: '', // 要添加专业的名称
+      loading: false, // 检索专业的时 loading
+      activeNames: ['1'], // 用于打开 collapse
+      school_majors: [], // 本页面全部数据：学校 - 学院 - 专业
 
       manual_add: false,
-      shared_majors: []         // 远程检索出来的专业列表
+      shared_majors: [] // 远程检索出来的专业列表
     }
   },
   mounted() {
@@ -125,7 +125,9 @@ export default {
         "name": this.add_institution_name
       }).then(resp => {
         if (resp.data.message == 'ok') {
-          this.school_majors[s_index].institutes.unshift(resp.data.data)
+          var institute = resp.data.data
+          institute.add = false
+          this.school_majors[s_index].institutes.unshift(institute)
           this.school_majors[s_index].add = false
           this.$message.success('添加成功！')
         }
@@ -169,7 +171,7 @@ export default {
     searchSharedMajor(query) {
       if (query !== '') {
         this.loading = true
-        query = query.replace(/'/g,"").trim()
+        query = query.replace(/'/g, "").trim()
         axios.post('/v1/groupon/search_shared_major', {
           "name": query, //专业名称
           "page": 1,
@@ -183,6 +185,52 @@ export default {
       } else {
         this.shared_major = []
       }
+    },
+    delSchoolInstitute(s_index, i_index) {
+      var id = this.school_majors[s_index].institutes[i_index].id
+      this.$confirm('此操作将永久删除该学院, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        axios.post('/v1/groupon/del_school_institute', {
+          id
+        }).then(resp => {
+          this.school_majors[s_index].institutes.splice(i_index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    delInstituteMajor(s_index, i_index, m_index) {
+      var id = this.school_majors[s_index].institutes[i_index].majors[m_index].id
+      this.$confirm('此操作将永久删除该专业, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        axios.post('/v1/groupon/del_institute_major', {
+          id
+        }).then(resp => {
+          this.school_majors[s_index].institutes[i_index].majors.splice(m_index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     }
   }
 };
