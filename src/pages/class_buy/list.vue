@@ -58,7 +58,7 @@
 
         <div class="row">
           <el-button :disabled="founder_type != 2" @click="" size="small" type="primary"><i class="fa fa-refresh" aria-hidden="true"></i> 批量改变日期</el-button>
-          <el-button style="float: right" @click="openDialog('add')" size="small" type="primary"> + 新增班级购</el-button>
+          <el-button style="float: right" @click="openDialog('add',null)" size="small" type="primary"> + 新增班级购</el-button>
         </div>
 
         <div class="row">
@@ -71,7 +71,12 @@
             <el-table-column prop="order_num" label="订单量" width="100"></el-table-column>
             <el-table-column label="班级购信息" width="240">
               <template scope="scope">
-                {{scope.row.school.name}} - {{scope.row.institute.name}} - {{scope.row.major.name}} - {{scope.row.term}}
+                <div style="line-height: 24px;padding: 5px 0">
+                  <p>{{scope.row.school.name}}</p>
+                  <p>{{scope.row.institute.name}}</p>
+                  <p>{{scope.row.major.name}}</p>
+                  <p>{{scope.row.term}}</p>
+                </div>
               </template>
             </el-table-column>
             <el-table-column prop="expire_at" label="截止日期" width="140"></el-table-column>
@@ -94,7 +99,7 @@
             <div v-if="operate_type == 'view'" class="head_area row">
               <div class="left">
                 <div class="avatar_area">
-                  <img :src="'http://image.goushuyun.cn/book.png'" class="image"></img>
+                  <img :src="dialog_groupon.founder_avatar == '' ? 'http://image.goushuyun.cn/book.png' : ('http://images.goushuyun.cn/' + dialog_groupon.founder_avatar)" class="image"></img>
                 </div>
                 <div class="class_name_id">
                   <div v-if="!edit_main_info">
@@ -125,12 +130,12 @@
             <div class="class_buy_area">
               <div class="class_buy_info">
                 <el-form-item label="学校" prop="dialog_school_id">
-                  <el-select v-model="dialog_data.dialog_school_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学校（可搜索）" size="small" @change="getInstitutes(true)">
+                  <el-select v-model="dialog_data.dialog_school_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学校（可搜索）" size="small" @change="getInstitutesOrMajors('school')">
                     <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="学院" prop="dialog_institute_id">
-                  <el-select v-model="dialog_data.dialog_institute_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学院（可搜索）" size="small" @change="getMajors(true)">
+                  <el-select v-model="dialog_data.dialog_institute_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学院（可搜索）" size="small" @change="getInstitutesOrMajors('institute')">
                     <el-option v-for="institute in dialog_institutes" :label="institute.name" :value="institute.id"></el-option>
                   </el-select>
                 </el-form-item>
@@ -151,24 +156,24 @@
                   <el-input v-model="dialog_data.dialog_class" style="width: auto" placeholder="班级购名" size="small"></el-input>
                 </el-form-item>
                 <el-form-item label="发布人姓名" prop="dialog_founder_name">
-                  <el-input v-model="dialog_data.dialog_founder_name" style="width: auto" :readonly="operate_type == 'view' && !edit_main_info" placeholder="发布人姓名" size="small"></el-input>
+                  <el-input v-model="dialog_data.dialog_founder_name" style="width: auto" :disabled="operate_type == 'view' && !edit_main_info" placeholder="发布人姓名" size="small"></el-input>
                 </el-form-item>
                 <el-form-item v-if="operate_type == 'view'" label="发布人手机" prop="dialog_founder_mobile">
-                  <el-input v-model="dialog_data.dialog_founder_mobile" style="width: auto" :readonly="operate_type == 'view' && !edit_main_info" placeholder="创建人手机" size="small"></el-input>
+                  <el-input v-model="dialog_data.dialog_founder_mobile" style="width: auto" :disabled="operate_type == 'view' && !edit_main_info" placeholder="创建人手机" size="small"></el-input>
                 </el-form-item>
                 <el-form-item label="截 止 日 期" prop="dialog_expire_at">
-                  <el-date-picker v-model="dialog_data.dialog_expire_at" :disabled="operate_type == 'view' && !edit_main_info" style="width: 180px;" type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions"></el-date-picker>
+                  <el-date-picker v-model="dialog_data.dialog_expire_at" :disabled="operate_type == 'view' && !edit_main_info" style="width: 190px;" type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="班级购说明" prop="dialog_profile">
-                  <el-input v-model="dialog_data.dialog_profile" id="remark" :readonly="operate_type == 'view' && !edit_main_info" style="width: auto;" placeholder="班级购说明" size="small"></el-input>
+                  <el-input v-model="dialog_data.dialog_profile" id="remark" :disabled="operate_type == 'view' && !edit_main_info" style="width: auto;" placeholder="班级购说明" size="small"></el-input>
                 </el-form-item>
               </div>
 
               <transition v-if="operate_type == 'view'" name="el-zoom-in-center">
                 <div class="class_buy_info" style="position: relative; top: 78px; left: 30px;">
-                  <el-button v-if="!edit_main_info" type="primary" size="small" @click="edit_main_info = true">修改信息</el-button>
+                  <el-button v-if="!edit_main_info" type="primary" size="small" :disabled="dialog_groupon.founder_type != 2" @click="edit_main_info = true">修改信息</el-button>
                   <el-button v-if="edit_main_info" type="primary" size="small" @click="saveMainInfo('dialog_data')">保存</el-button>
-                  <el-button v-if="edit_main_info" type="default" size="small" @click="openDialog('view', false)">取消</el-button>
+                  <el-button v-if="edit_main_info" type="default" size="small" @click="openDialog('view', null)">取消</el-button>
                 </div>
               </transition>
             </div>
@@ -176,13 +181,13 @@
 
           <div class="table_area">
             <div v-show="!edit_book_list" class="search_area">
-              <el-button type="primary" style="margin-bottom: 2px;" size="small" @click="preEditBookList">编辑书单</el-button>
+              <el-button type="primary" style="margin-bottom: 2px;" size="small" :disabled="dialog_groupon.founder_type != 2" @click="preEditBookList">编辑书单</el-button>
             </div>
             <transition name="el-zoom-in-center">
               <div v-show="edit_book_list" class="search_area">
                 <el-input id="isbn_input" v-model="isbn" style="width: 260px;" placeholder="通过搜索 ISBN 添加书籍" size="small" :maxlength="13" icon="search" @keyup.enter.native="searchGoods" :on-icon-click="searchGoods"></el-input>
                 <el-button style="margin-left: 10px;" v-if="operate_type == 'view'" type="primary" size="small" @click="saveBookList">保存</el-button>
-                <el-button v-if="operate_type == 'view'" type="default" size="small" @click="openDialog('view', false)">取消</el-button>
+                <el-button v-if="operate_type == 'view'" type="default" size="small" @click="openDialog('view', null)">取消</el-button>
               </div>
             </transition>
             <el-table :data="groupon_items" border v-loading.body="loading.groupon_items">
@@ -363,7 +368,7 @@ export default {
 
       pickerOptions: {
         disabledDate(time) {
-          return time.getTime() < Date.now() - 8.64e7;
+          return time.getTime() < moment().subtract(1, 'd');
         }
       }
     }
@@ -428,6 +433,27 @@ export default {
         this.loading.groupons = false
       })
     },
+    getInstitutesOrMajors(option) {
+      if (option === 'school') {
+        var school_id = this.dialog_data.dialog_school_id
+        if (school_id != '') {
+          this.getInstitutes(true)
+        } else {
+          this.dialog_data.dialog_institute_id = ''
+          this.dialog_data.dialog_institute_major_id = ''
+          this.dialog_institutes = []
+          this.dialog_majors = []
+        }
+      } else if (option === 'institute') {
+        var institute_id = this.dialog_data.dialog_institute_id
+        if (institute_id != '') {
+          this.getMajors(true)
+        } else {
+          this.dialog_data.dialog_institute_major_id = ''
+          this.dialog_majors = []
+        }
+      }
+    },
     getInstitutes(is_dialog) {
       var school_id = is_dialog == true ? this.dialog_data.dialog_school_id : this.school_id
       var school = this.schools.find(el => {
@@ -477,12 +503,15 @@ export default {
       this.findGroupon()
     },
     openDialog(operate_type, index) {
+      // 记录参数
+      this.operate_type = operate_type
       // 设置修改状态为false
       this.edit_main_info = false
       this.edit_book_list = false
-      // 记录参数
-      this.operate_type = operate_type
-      if (index != false) {
+      // 清空班级购条目，可能是上次添加版机构的，也可能是上次啥看班级购的信息
+      this.groupon_items = []
+      console.log(index);
+      if (index != null) {
         this.dialog_index = index
       } else {
         index = this.dialog_index
@@ -491,25 +520,33 @@ export default {
       this.$nextTick(_ => {
         $('#remark input').css("color", "#FF4949");
       })
-      // 清空班级购条目，可能是上次添加版机构的，也可能是上次啥看班级购的信息
-      this.groupon_items = []
       // 打开dialog
       this.dialog_visible = true
       // 如果是添加版机构执行以下操作
       if (operate_type == 'add') {
-        var store_name = localStorage.getItem('store_name')
-        this.dialog_data.dialog_founder_name = store_name + '【官方】'
+        this.dialog_data = {
+          dialog_school_id: '', // 学校id
+          dialog_institute_id: '', // 学院id
+          dialog_institute_major_id: '', // 专业id
+          dialog_term_index: '', // 学期index
+          dialog_class: '', // 班级购名称
+          dialog_founder_name: '【官方】' + localStorage.getItem('store_name'), // 创建人姓名
+          dialog_founder_mobile: '', // 创建人电话
+          dialog_expire_at: '', // 过期时间
+          dialog_profile: '' // 备注
+        }
         this.edit_book_list = true
         // 否则执行以下操作
       } else {
-        this.loading.dialog = true
+        console.log('index:' + index);
         var groupon = this.groupons[index]
+        console.log(groupon);
+        console.log(groupon.expire_at);
         this.dialog_groupon = groupon
         this.dialog_data.dialog_school_id = groupon.school_id
         this.getInstitutes(true)
         this.dialog_data.dialog_institute_id = groupon.institute_id
         this.getMajors(true)
-
         this.dialog_data = {
           dialog_school_id: groupon.school_id, // 学校id
           dialog_institute_id: groupon.institute_id, // 学院id
@@ -518,7 +555,7 @@ export default {
           dialog_class: groupon.class, // 班级购名称
           dialog_founder_name: groupon.founder_name, // 创建人姓名
           dialog_founder_mobile: groupon.founder_mobile, // 创建人电话
-          dialog_expire_at: groupon.expire_at, // 过期时间
+          dialog_expire_at: moment(groupon.expire_at), // 过期时间
           dialog_profile: groupon.profile // 备注
         }
         // 获取班级购条目
@@ -717,6 +754,7 @@ export default {
       })
     },
     getGrouponItems(id) {
+      this.loading.dialog = true
       axios.post('/v1/groupon/groupon_items', {
         id
       }).then(resp => {
@@ -751,6 +789,7 @@ export default {
       })
     },
     getGrouponLog(id) {
+      this.loading.dialog = true
       axios.post('/v1/groupon/groupon_log', {
         id
       }).then(resp => {
@@ -776,6 +815,7 @@ export default {
           })
           this.groupon_logs = this.groupon_logs_bak.slice(0, 5)
         }
+        this.loading.dialog = false
       })
     },
     showAllLogs() {
