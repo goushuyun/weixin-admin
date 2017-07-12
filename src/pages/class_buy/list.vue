@@ -57,12 +57,12 @@
         </div>
 
         <div class="row">
-          <el-button :disabled="founder_type != 2" @click="" size="small" type="primary"><i class="fa fa-refresh" aria-hidden="true"></i> 批量改变日期</el-button>
+          <el-button :disabled="founder_type != 2" size="small" type="primary" @click="preResetExpireAt"><i class="fa fa-refresh" aria-hidden="true"></i> 批量改变日期</el-button>
           <el-button style="float: right" @click="openDialog('add',null)" size="small" type="primary"> + 新增班级购</el-button>
         </div>
 
         <div class="row">
-          <el-table :data="groupons" border style="width: 100%">
+          <el-table :data="groupons" border style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="id" label="班级购编号" width="160"></el-table-column>
             <el-table-column prop="class" label="班级名/班级号" width="160"></el-table-column>
@@ -93,8 +93,19 @@
         </el-pagination>
       </div>
 
-      <el-dialog :title="operate_type == 'add' ? '创建班级购' : '查看班级购'" top="1%" size="large" :visible.sync="dialog_visible" v-loading.body="loading.dialog" @close="findGroupon">
-        <div class="dialog_area">
+      <el-dialog title="批量修改过期日期" :visible.sync="reset_dialog.visible" size="tiny">
+        <div class="reset_dialog">
+          <span style="margin-right: 20px;">选择要修改的日期：</span>
+          <el-date-picker v-model="reset_dialog.reset_expire_at" type="date" size="small" placeholder="选择日期" :picker-options="pickerOptions"></el-date-picker>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="reset_dialog.visible = false">取 消</el-button>
+          <el-button type="primary" @click="confirmResetExpireAt">确 定</el-button>
+        </div>
+      </el-dialog>
+
+      <el-dialog :title="operate_type == 'add' ? '创建班级购' : '查看班级购'" top="1%" size="large" :visible.sync="dialog_visible" @close="findGroupon">
+        <div class="dialog_area" v-loading.body="loading.dialog">
           <el-form label-width="140px" :model="dialog_data" :rules="dialog_rules" ref="dialog_data">
             <div v-if="operate_type == 'view'" class="head_area row">
               <div class="left">
@@ -291,6 +302,13 @@ export default {
       // 班级购列表
       groupons: [], // 班级购列表
       total_count: 0, // 记录总数量
+
+      // 批量修改日期
+      selected_groupons: [], // 选中的班级购列表
+      reset_dialog: {
+        visible: false,
+        reset_expire_at: '', // 批量修改日期
+      },
 
       // ---------- 分割线 ---------- //
       // dialog 内参数
@@ -828,6 +846,41 @@ export default {
     },
     closeAllLogs() {
       this.groupon_logs = this.groupon_logs_bak.slice(0, 5)
+    },
+    handleSelectionChange(val) {
+      this.selected_groupons = val
+    },
+    preResetExpireAt() {
+      if (this.selected_groupons.length == 0) {
+        this.$message.warning('没有选中任何班级购！')
+        return
+      }
+      this.reset_dialog = {
+        visible: true,
+        reset_expire_at: '', // 批量修改日期
+      }
+    },
+    confirmResetExpireAt() {
+      var update_ids = []
+      this.selected_groupons.forEach(el => {
+        update_ids.push({
+          id: el.id
+        })
+      })
+      var expire_at = moment(this.reset_dialog.reset_expire_at, "YYYY-MM-DD").unix()
+      axios.post('/v1/groupon/reset_expire_at',{
+        update_ids,
+        expire_at
+      }).then(resp => {
+        if (resp.data.message == 'ok') {
+          this.$message.success('批量修改日期成功！')
+          this.reset_dialog = {
+            visible: false,
+            reset_expire_at: '', // 批量修改日期
+          }
+          this.findGroupon()
+        }
+      })
     }
   }
 }
@@ -945,5 +998,11 @@ export default {
         border-right: 1px solid #dfe6ec;
         box-sizing: border-box;
     }
+}
+.reset_dialog {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
