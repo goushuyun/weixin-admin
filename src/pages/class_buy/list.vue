@@ -162,7 +162,15 @@
                   <el-input v-model="dialog_data.dialog_founder_mobile" style="width: auto" :disabled="operate_type == 'view' && !edit_main_info" placeholder="创建人手机" size="small"></el-input>
                 </el-form-item>
                 <el-form-item label="截 止 日 期" prop="dialog_expire_at">
-                  <el-date-picker v-model="dialog_data.dialog_expire_at" :disabled="operate_type == 'view' && !edit_main_info" style="width: 190px;" type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions"></el-date-picker>
+                  <el-date-picker
+                    v-model="dialog_data.dialog_expire_at"
+                    :disabled="operate_type == 'view' && !edit_main_info"
+                    style="width: 190px;"
+                    type="date"
+                    placeholder="选择日期"
+                    size="small"
+                    :picker-options="pickerOptions">
+                  </el-date-picker>
                 </el-form-item>
                 <el-form-item label="班级购说明" prop="dialog_profile">
                   <el-input v-model="dialog_data.dialog_profile" id="remark" :disabled="operate_type == 'view' && !edit_main_info" style="width: auto;" placeholder="班级购说明" size="small"></el-input>
@@ -422,7 +430,6 @@ export default {
         "size": this.size
       }).then(resp => {
         if (resp.data.message == 'ok') {
-          console.log(resp.data.data);
           this.total_count = resp.data.total_count
           this.groupons = resp.data.data.map(el => {
             el.total_sales = priceFloat(el.total_sales)
@@ -510,7 +517,6 @@ export default {
       this.edit_book_list = false
       // 清空班级购条目，可能是上次添加版机构的，也可能是上次啥看班级购的信息
       this.groupon_items = []
-      console.log(index);
       if (index != null) {
         this.dialog_index = index
       } else {
@@ -538,10 +544,7 @@ export default {
         this.edit_book_list = true
         // 否则执行以下操作
       } else {
-        console.log('index:' + index);
         var groupon = this.groupons[index]
-        console.log(groupon);
-        console.log(groupon.expire_at);
         this.dialog_groupon = groupon
         this.dialog_data.dialog_school_id = groupon.school_id
         this.getInstitutes(true)
@@ -555,7 +558,7 @@ export default {
           dialog_class: groupon.class, // 班级购名称
           dialog_founder_name: groupon.founder_name, // 创建人姓名
           dialog_founder_mobile: groupon.founder_mobile, // 创建人电话
-          dialog_expire_at: moment(groupon.expire_at), // 过期时间
+          dialog_expire_at: new Date(groupon.expire_at), // 过期时间
           dialog_profile: groupon.profile // 备注
         }
         // 获取班级购条目
