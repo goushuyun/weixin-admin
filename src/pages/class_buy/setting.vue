@@ -3,11 +3,11 @@
     <div class="top_bar">
         <h2 class="title">班级购设置</h2>
     </div>
-    <div class="content_inner" style="min-height: 500px;">
+    <div class="content_inner" style="min-height: 600px;">
       <div class="school_majors">
         <div class="school" v-for="(school, s_index) in school_majors">
-          <el-collapse value="default_open">
-            <el-collapse-item name="default_open">
+          <el-collapse :value="school.id">
+            <el-collapse-item :name="school.id">
               <template slot="title">
                 <span class="school_name">{{school.name}}</span>
                 <el-button class="btn_add" type="primary" size="mini" @click.stop="preAddInstitute(s_index)">添加学院</el-button>
@@ -216,12 +216,15 @@ export default {
 
 <style lang="scss" scoped>
 .school_majors {
-    display: flex;
-    flex-wrap: wrap;
+    height: auto;
+    column-count: 2;
+    column-gap: 0;
 }
 .school {
-    min-width: 420px;
-    margin: 10px;
+    width: auto;
+    padding: 10px;
+    break-inside: avoid;
+    box-sizing: border-box;
     .school_name {
         font-size: 16px;
         font-weight: bold;

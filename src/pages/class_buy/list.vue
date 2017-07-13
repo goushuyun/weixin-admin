@@ -204,7 +204,7 @@
             </div>
             <transition name="el-zoom-in-center">
               <div v-show="edit_book_list" class="search_area">
-                <!-- <el-input id="isbn_input" v-model="isbn" style="width: 260px;" placeholder="通过搜索 ISBN 或这 书名 添加书籍" size="small" :maxlength="13" icon="search" @keyup.enter.native="searchGoods" :on-icon-click="searchGoods"></el-input> -->
+                <!-- <el-input id="isbn_input" v-model="isbn" style="width: 260px;" placeholder="通过搜索 ISBN 或者 书名 添加书籍" size="small" :maxlength="13" icon="search" @keyup.enter.native="searchGoods" :on-icon-click="searchGoods"></el-input> -->
 
                 <el-autocomplete  id="isbn_input" style="width: 460px;" placeholder="通过搜索 ISBN 或这 书名 添加书籍" size="small" :maxlength="13" icon="search"
                   :trigger-on-focus="false" v-model="isbn" :fetch-suggestions="searchGoods" @select="handleSelect">
@@ -406,8 +406,8 @@ export default {
   },
   watch: {
     dialog_data: {
-      handler: function(curVal, oldVal) {　　　　　
-        if (this.operate_type == 'add') {
+      handler: function(curVal, oldVal) {　　
+        if (!(this.operate_type == 'view' && this.edit_main_info == false)) {
           var major_name = ''
           this.dialog_majors.forEach(m => {
             if (m.id == curVal.dialog_institute_major_id) {
@@ -568,9 +568,9 @@ export default {
         index = this.dialog_index
       }
       // 设置班级购说明为红色
-      this.$nextTick(_ => {
-        $('#remark input').css("color", "#FF4949");
-      })
+      // this.$nextTick(_ => {
+      //   $('#remark input').css("color", "#FF4949");
+      // })
       // 打开dialog
       this.dialog_visible = true
       // 如果是添加版机构执行以下操作
