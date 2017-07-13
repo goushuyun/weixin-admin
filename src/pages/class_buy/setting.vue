@@ -31,25 +31,16 @@
                 <span style="float: right;">
                   <el-button-group>
                     <el-button type="primary" size="mini" @click.stop="preAddMajor(s_index, i_index)">添加专业</el-button>
-                    <el-button type="danger" size="mini" @click="delSchoolInstitute(s_index, i_index)">删除</el-button>
+                    <el-button type="disabled" size="mini" @click="delSchoolInstitute(s_index, i_index)">删除</el-button>
                   </el-button-group>
                 </span>
 
                 <!-- 添加 “专业” 时显示以下部分 -->
                 <div class="discipline" v-if="institute.add == true">
-                  <el-select v-if="manual_add == false" :id="'add_major_s_' + s_index + '_i_' + i_index" size="small" v-model="add_major_name" filterable remote placeholder="请输入关键词"
-                      :remote-method="searchSharedMajor" :loading="loading">
-                      <el-option v-for="major in shared_majors" :key="major.id" :label="major.name" :value="major.name"></el-option>
-                  </el-select>
-                  <el-button-group v-if="manual_add == false">
-                    <el-button type="success" size="mini" @click="comfirmAddMajor(s_index, i_index)">确认</el-button>
-                    <el-button type="primary" size="mini" @click="cancelAddMajor(s_index, i_index)">取消</el-button>
-                    <el-button type="warning" size="mini" @click="manualAddMajor(s_index, i_index)">手动添加</el-button>
-                  </el-button-group>
-
-                  <!-- 手动添加展示以下部分 -->
-                  <el-input v-if="manual_add == true" :id="'add_major_s_' + s_index + '_i_' + i_index" style="max-width:200px;" size="small" v-model="add_major_name" @blur="comfirmAddMajor(s_index, i_index)"></el-input>
-                  <el-button-group v-if="manual_add == true">
+                  <el-autocomplete :id="'add_major_s_' + s_index + '_i_' + i_index" style="max-width:200px;" size="small"
+                    v-model="add_major_name" :fetch-suggestions="searchSharedMajor" placeholder="请输入专业" :trigger-on-focus="false"
+                    @blur.native="comfirmAddMajor(s_index, i_index)"></el-autocomplete>
+                  <el-button-group>
                     <el-button type="text" style="color:#13CE66; margin-left: 10px;" icon="check" size="large" @click="comfirmAddMajor(s_index, i_index)"></el-button>
                   </el-button-group>
                 </div>
@@ -62,7 +53,7 @@
                 <div class="discipline" v-for="(major, m_index) in institute.majors">
                   <span>· {{major.name}}</span>
                   <span style="float: right;">
-                    <el-button type="danger" size="mini" @click="delInstituteMajor(s_index, i_index, m_index)">删除</el-button>
+                    <el-button type="disabled" size="mini" @click="delInstituteMajor(s_index, i_index, m_index)">删除</el-button>
                   </span>
                 </div>
               </div>
@@ -82,12 +73,8 @@ export default {
     return {
       add_institution_name: '', // 要添加学院的名称
       add_major_name: '', // 要添加专业的名称
-      loading: false, // 检索专业的时 loading
       activeNames: ['1'], // 用于打开 collapse
-      school_majors: [], // 本页面全部数据：学校 - 学院 - 专业
-
-      manual_add: false,
-      shared_majors: [] // 远程检索出来的专业列表
+      school_majors: [] // 本页面全部数据：学校 - 学院 - 专业
     }
   },
   mounted() {
@@ -135,8 +122,6 @@ export default {
     },
     preAddMajor(s_index, i_index) {
       this.add_major_name = ''
-      this.shared_majors = []
-      this.manual_add = false
       this.school_majors[s_index].institutes[i_index].add = true
       this.$nextTick(() => {
         $('#add_major_s_' + s_index + '_i_' + i_index + ' input').focus()
@@ -144,12 +129,6 @@ export default {
     },
     cancelAddMajor(s_index, i_index) {
       this.school_majors[s_index].institutes[i_index].add = false
-    },
-    manualAddMajor(s_index, i_index) {
-      this.manual_add = true
-      this.$nextTick(() => {
-        $('#add_major_s_' + s_index + '_i_' + i_index + ' input').focus()
-      })
     },
     comfirmAddMajor(s_index, i_index) {
       if (this.add_major_name == '') {
@@ -168,9 +147,8 @@ export default {
         }
       })
     },
-    searchSharedMajor(query) {
+    searchSharedMajor(query, cb) {
       if (query !== '') {
-        this.loading = true
         query = query.replace(/'/g, "").trim()
         axios.post('/v1/groupon/search_shared_major', {
           "name": query, //专业名称
@@ -178,12 +156,12 @@ export default {
           "size": 15
         }).then(resp => {
           if (resp.data.message == 'ok') {
-            this.shared_majors = resp.data.data
-            this.loading = false
+            cb(resp.data.data.map(el => {
+              el.value = el.name
+              return el
+            }));
           }
         })
-      } else {
-        this.shared_major = []
       }
     },
     delSchoolInstitute(s_index, i_index) {
@@ -261,5 +239,10 @@ export default {
     .discipline {
         padding: 5px 0 5px 20px;
     }
+}
+.el-button--disabled {
+    color: #fff;
+    background-color: #A8B9C3;
+    border-color: #A8B9C3;
 }
 </style>

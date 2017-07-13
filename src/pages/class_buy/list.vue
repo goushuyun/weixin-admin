@@ -51,7 +51,7 @@
         <div class="row">
           <el-radio-group v-model="founder_type" size="small" @change="findGroupon">
             <el-radio-button :label="2">官方班级购</el-radio-button>
-            <el-radio-button :label="1">其他版机构</el-radio-button>
+            <el-radio-button :label="1">其他班级购</el-radio-button>
             <el-radio-button :label="0">全部班级购</el-radio-button>
           </el-radio-group>
         </div>
@@ -110,7 +110,7 @@
             <div v-if="operate_type == 'view'" class="head_area row">
               <div class="left">
                 <div class="avatar_area">
-                  <img :src="dialog_groupon.founder_avatar == '' ? 'http://image.goushuyun.cn/book.png' : ('http://images.goushuyun.cn/' + dialog_groupon.founder_avatar)" class="image"></img>
+                  <img :src="dialog_groupon.founder_avatar == '' ? 'http://image.goushuyun.cn/book.png' : dialog_groupon.founder_avatar" class="image"></img>
                 </div>
                 <div class="class_name_id">
                   <div v-if="!edit_main_info">
@@ -141,22 +141,22 @@
             <div class="class_buy_area">
               <div class="class_buy_info">
                 <el-form-item label="学校" prop="dialog_school_id">
-                  <el-select v-model="dialog_data.dialog_school_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学校（可搜索）" size="small" @change="getInstitutesOrMajors('school')">
+                  <el-select v-if="dialog_visible" v-model="dialog_data.dialog_school_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学校（可搜索）" size="small" @change="getInstitutesOrMajors('school')">
                     <el-option v-for="school in schools" :label="school.name" :value="school.id"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="学院" prop="dialog_institute_id">
-                  <el-select v-model="dialog_data.dialog_institute_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学院（可搜索）" size="small" @change="getInstitutesOrMajors('institute')">
+                  <el-select v-if="dialog_visible" v-model="dialog_data.dialog_institute_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学院（可搜索）" size="small" @change="getInstitutesOrMajors('institute')">
                     <el-option v-for="institute in dialog_institutes" :label="institute.name" :value="institute.id"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="专业" prop="dialog_institute_major_id">
-                  <el-select v-model="dialog_data.dialog_institute_major_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择专业（可搜索）" size="small" @change="">
+                  <el-select v-if="dialog_visible" v-model="dialog_data.dialog_institute_major_id" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择专业（可搜索）" size="small">
                     <el-option v-for="major in dialog_majors" :label="major.name" :value="major.id"></el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="学期" prop="dialog_term_index">
-                  <el-select v-model="dialog_data.dialog_term_index" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学期（可搜索）" size="small" @change="">
+                  <el-select v-if="dialog_visible" v-model="dialog_data.dialog_term_index" :disabled="operate_type == 'view' && !edit_main_info" filterable clearable placeholder="选择学期（可搜索）" size="small">
                     <el-option v-for="(item, index) in terms" :label="item" :value="index"></el-option>
                   </el-select>
                 </el-form-item>
@@ -176,7 +176,7 @@
                   <el-date-picker
                     v-model="dialog_data.dialog_expire_at"
                     :disabled="operate_type == 'view' && !edit_main_info"
-                    style="width: 190px;"
+                    style="width: 180px;"
                     type="date"
                     placeholder="选择日期"
                     size="small"
@@ -189,7 +189,7 @@
               </div>
 
               <transition v-if="operate_type == 'view'" name="el-zoom-in-center">
-                <div class="class_buy_info" style="position: relative; top: 78px; left: 30px;">
+                <div class="class_buy_info" style="width:auto; position: relative; top: 78px; left: 30px;">
                   <el-button v-if="!edit_main_info" type="primary" size="small" :disabled="dialog_groupon.founder_type != 2" @click="edit_main_info = true">修改信息</el-button>
                   <el-button v-if="edit_main_info" type="primary" size="small" @click="saveMainInfo('dialog_data')">保存</el-button>
                   <el-button v-if="edit_main_info" type="default" size="small" @click="openDialog('view', null)">取消</el-button>
@@ -210,7 +210,7 @@
               </div>
             </transition>
             <el-table :data="groupon_items" border v-loading.body="loading.groupon_items">
-              <el-table-column label="推荐中的书单">
+              <el-table-column label="班级购书单">
                 <el-table-column label="图片" width="100">
                   <template scope="scope" >
                     <div class="image_wrap">
@@ -399,6 +399,28 @@ export default {
       }
     }
   },
+  watch: {
+    dialog_data: {
+      handler:function(curVal, oldVal) {　　　　　
+        if (this.operate_type == 'add') {
+          var major_name = ''
+          this.dialog_majors.forEach(m => {
+            if (m.id == curVal.dialog_institute_major_id) {
+              major_name = m.name
+            }
+            return m.id == curVal.dialog_institute_major_id
+          })
+          var term = this.terms[curVal.dialog_term_index]
+          if (major_name && term) {
+            curVal.dialog_class = major_name + '（' + term + '）教材单'
+          } else {
+            curVal.dialog_class = ''
+          }
+        }
+      },
+      deep: true
+    }
+  },
   mounted() {
     this.getSchoolMajors()
     this.findGroupon()
@@ -554,15 +576,19 @@ export default {
           dialog_institute_major_id: '', // 专业id
           dialog_term_index: '', // 学期index
           dialog_class: '', // 班级购名称
-          dialog_founder_name: '【官方】' + localStorage.getItem('store_name'), // 创建人姓名
+          dialog_founder_name: '[官方] ' + localStorage.getItem('store_name'), // 创建人姓名
           dialog_founder_mobile: '', // 创建人电话
-          dialog_expire_at: '', // 过期时间
+          dialog_expire_at: moment().add(4, 'months'), // 过期时间
           dialog_profile: '' // 备注
         }
         this.edit_book_list = true
         // 否则执行以下操作
       } else {
         var groupon = this.groupons[index]
+        if (groupon.founder_avatar != '' && groupon.founder_avatar.indexOf('http') == -1) {
+          groupon.founder_avatar = 'http://images.goushuyun.cn/' + groupon.founder_avatar
+        }
+
         this.dialog_groupon = groupon
         this.dialog_data.dialog_school_id = groupon.school_id
         this.getInstitutes(true)
@@ -868,7 +894,7 @@ export default {
         })
       })
       var expire_at = moment(this.reset_dialog.reset_expire_at, "YYYY-MM-DD").unix()
-      axios.post('/v1/groupon/reset_expire_at',{
+      axios.post('/v1/groupon/reset_expire_at', {
         update_ids,
         expire_at
       }).then(resp => {
@@ -1000,9 +1026,9 @@ export default {
     }
 }
 .reset_dialog {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 </style>
