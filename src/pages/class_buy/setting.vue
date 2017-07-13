@@ -38,8 +38,8 @@
                 <!-- 添加 “专业” 时显示以下部分 -->
                 <div class="discipline" v-if="institute.add == true">
                   <el-autocomplete :id="'add_major_s_' + s_index + '_i_' + i_index" style="max-width:200px;" size="small"
-                    v-model="add_major_name" :fetch-suggestions="searchSharedMajor" placeholder="请输入专业" :trigger-on-focus="false"
-                    @blur.native="comfirmAddMajor(s_index, i_index)"></el-autocomplete>
+                    v-model="add_major_name" :fetch-suggestions="searchSharedMajor" placeholder="请输入专业" :trigger-on-focus="false">
+                  </el-autocomplete>
                   <el-button-group>
                     <el-button type="text" style="color:#13CE66; margin-left: 10px;" icon="check" size="large" @click="comfirmAddMajor(s_index, i_index)"></el-button>
                   </el-button-group>

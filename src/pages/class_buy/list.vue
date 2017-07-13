@@ -204,7 +204,12 @@
             </div>
             <transition name="el-zoom-in-center">
               <div v-show="edit_book_list" class="search_area">
-                <el-input id="isbn_input" v-model="isbn" style="width: 260px;" placeholder="通过搜索 ISBN 添加书籍" size="small" :maxlength="13" icon="search" @keyup.enter.native="searchGoods" :on-icon-click="searchGoods"></el-input>
+                <!-- <el-input id="isbn_input" v-model="isbn" style="width: 260px;" placeholder="通过搜索 ISBN 或这 书名 添加书籍" size="small" :maxlength="13" icon="search" @keyup.enter.native="searchGoods" :on-icon-click="searchGoods"></el-input> -->
+
+                <el-autocomplete  id="isbn_input" style="width: 460px;" placeholder="通过搜索 ISBN 或这 书名 添加书籍" size="small" :maxlength="13" icon="search"
+                  :trigger-on-focus="false" v-model="isbn" :fetch-suggestions="searchGoods" @select="handleSelect">
+                </el-autocomplete>
+
                 <el-button style="margin-left: 10px;" v-if="operate_type == 'view'" type="primary" size="small" @click="saveBookList">保存</el-button>
                 <el-button v-if="operate_type == 'view'" type="default" size="small" @click="openDialog('view', null)">取消</el-button>
               </div>
@@ -401,7 +406,7 @@ export default {
   },
   watch: {
     dialog_data: {
-      handler:function(curVal, oldVal) {　　　　　
+      handler: function(curVal, oldVal) {　　　　　
         if (this.operate_type == 'add') {
           var major_name = ''
           this.dialog_majors.forEach(m => {
@@ -578,7 +583,7 @@ export default {
           dialog_class: '', // 班级购名称
           dialog_founder_name: '[官方] ' + localStorage.getItem('store_name'), // 创建人姓名
           dialog_founder_mobile: '', // 创建人电话
-          dialog_expire_at: moment().add(4, 'months'), // 过期时间
+          dialog_expire_at: new Date(moment().add(4, 'months')), // 过期时间
           dialog_profile: '' // 备注
         }
         this.edit_book_list = true
@@ -611,16 +616,74 @@ export default {
         this.getGrouponLog(groupon.id)
       }
     },
-    searchGoods() {
+    searchGoods(query, cb) {
       //isbn为空
-      if (!isISBNFormat(this.isbn)) {
-        this.$message.warning('请填写正确的 ISBN 码')
-        return
+      var is_isbn = isISBNFormat(query)
+      var data = {}
+      if (is_isbn == true) {
+        // 如果是添加话题，则每次添加话题项之前判断列表中又没有这本书
+        if (this.groupon_items.length > 0) {
+          for (var i = 0; i < this.groupon_items.length; i++) {
+            if (this.groupon_items[i].book.isbn == query) {
+              this.$message.warning('该商品已存在')
+              this.isbn = ''
+              $('#isbn_input input').focus()
+              cb([])
+              return
+            }
+          }
+        }
+        data = {
+          "isbn": this.isbn, //not required 书本的isbn
+          "search_amount": -100, //required -100 过滤这个线索 ;除了-100 的num 查找库存为num的数据
+          "search_type": -100, //required -100 过滤这个线索 ; 0 检索新书数据 1 检索二手书数据
+          "search_picture": -100, //required -100 过滤这个线索 0 查找图片不为空的商品 1查找图片为空的商品
+        }
+      } else {
+        data = {
+          "title": this.isbn, //not required 书本的isbn
+          "search_amount": -100, //required -100 过滤这个线索 ;除了-100 的num 查找库存为num的数据
+          "search_type": -100, //required -100 过滤这个线索 ; 0 检索新书数据 1 检索二手书数据
+          "search_picture": -100, //required -100 过滤这个线索 0 查找图片不为空的商品 1查找图片为空的商品
+        }
       }
-      // 如果是添加话题，则每次添加话题项之前判断列表中又没有这本书
+
+      // 检查仓库中没有这本书
+      axios.post("/v1/goods/search", data).then(resp => {
+        if (resp.data.message == 'ok') {
+          var goods_list = resp.data.data.map(goods => {
+            if (goods.new_book) {
+              goods.has_new_book = true
+              goods.new_book.price = priceFloat(goods.new_book.price)
+            } else {
+              goods.has_new_book = false
+            }
+            if (goods.old_book) {
+              goods.has_old_book = true
+              goods.old_book.price = priceFloat(goods.old_book.price)
+            } else {
+              goods.has_old_book = false
+            }
+            goods.label = goods.book.isbn
+            goods.value = goods.book.title + '-' + goods.book.isbn
+            return goods
+          })
+
+          if (is_isbn && goods_list.length == 1) {
+            this.handleSelect(goods_list[0])
+          } else {
+            cb(goods_list)
+          }
+        } else {
+          this.isbn = ''
+          $('#isbn_input input').focus()
+        }
+      })
+    },
+    handleSelect(item) {
       if (this.groupon_items.length > 0) {
         for (var i = 0; i < this.groupon_items.length; i++) {
-          if (this.groupon_items[i].book.isbn == this.isbn) {
+          if (this.groupon_items[i].book.isbn == item.book.isbn) {
             this.$message.warning('该商品已存在')
             this.isbn = ''
             $('#isbn_input input').focus()
@@ -628,43 +691,9 @@ export default {
           }
         }
       }
-      // 检查仓库中没有这本书
-      this.loading.groupon_items = true
-      axios.post("/v1/goods/search", {
-        "isbn": this.isbn, //not required 书本的isbn
-        "search_amount": -100, //required -100 过滤这个线索 ;除了-100 的num 查找库存为num的数据
-        "search_type": -100, //required -100 过滤这个线索 ; 0 检索新书数据 1 检索二手书数据
-        "search_picture": -100, //required -100 过滤这个线索 0 查找图片不为空的商品 1查找图片为空的商品
-      }).then(resp => {
-        if (resp.data.message == 'ok') {
-          var data = resp.data.data
-          if (data.length == 0) {
-            this.$message.warning('没有在仓库找到这本书')
-            this.loading.groupon_items = false
-            return
-          }
-          var goods = data[0]
-          if (goods.new_book) {
-            goods.has_new_book = true
-            goods.new_book.price = priceFloat(goods.new_book.price)
-          } else {
-            goods.has_new_book = false
-          }
-          if (goods.old_book) {
-            goods.has_old_book = true
-            goods.old_book.price = priceFloat(goods.old_book.price)
-          } else {
-            goods.has_old_book = false
-          }
-          this.groupon_items.push(goods)
-          this.loading.groupon_items = false
-          this.isbn = ''
-          $('#isbn_input input').focus()
-        } else {
-          this.isbn = ''
-          $('#isbn_input input').focus()
-        }
-      })
+      this.groupon_items.push(item)
+      this.isbn = ''
+      $('#isbn_input input').focus()
     },
     removeItem(index) {
       this.groupon_items.splice(index, 1)
