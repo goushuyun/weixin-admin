@@ -761,6 +761,7 @@ export default {
             if (resp.data.message == 'ok') {
               this.$message.success('班级购信息修改成功！')
               this.edit_main_info = false
+              this.getGrouponLog(this.dialog_groupon.id)
             }
             this.loading.dialog = false
           })
@@ -825,6 +826,7 @@ export default {
         if (resp.data.message == 'ok') {
           this.$message.success('书籍列表修改成功！')
           this.edit_book_list = false
+          this.getGrouponLog(this.dialog_groupon.id)
         }
         this.loading.dialog = false
       })
