@@ -173,14 +173,8 @@
                   <el-input v-model="dialog_data.dialog_founder_mobile" style="width: auto" :disabled="operate_type == 'view' && !edit_main_info" placeholder="创建人手机" size="small"></el-input>
                 </el-form-item>
                 <el-form-item label="截 止 日 期" prop="dialog_expire_at">
-                  <el-date-picker
-                    v-model="dialog_data.dialog_expire_at"
-                    :disabled="operate_type == 'view' && !edit_main_info"
-                    style="width: 180px;"
-                    type="date"
-                    placeholder="选择日期"
-                    size="small"
-                    :picker-options="pickerOptions">
+                  <el-date-picker v-model="dialog_data.dialog_expire_at" :disabled="operate_type == 'view' && !edit_main_info" style="width: 180px;"
+                    type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions">
                   </el-date-picker>
                 </el-form-item>
                 <el-form-item label="班级购说明" prop="dialog_profile">
@@ -204,12 +198,10 @@
             </div>
             <transition name="el-zoom-in-center">
               <div v-show="edit_book_list" class="search_area">
-                <!-- <el-input id="isbn_input" v-model="isbn" style="width: 260px;" placeholder="通过搜索 ISBN 或者 书名 添加书籍" size="small" :maxlength="13" icon="search" @keyup.enter.native="searchGoods" :on-icon-click="searchGoods"></el-input> -->
-
-                <el-autocomplete  id="isbn_input" style="width: 460px;" placeholder="通过搜索 ISBN 或这 书名 添加书籍" size="small" :maxlength="13" icon="search"
-                  :trigger-on-focus="false" v-model="isbn" :fetch-suggestions="searchGoods" @select="handleSelect">
-                </el-autocomplete>
-
+                <el-select id="isbn_input" style="width: 460px;" size="small" filterable remote placeholder="通过搜索 ISBN 或这 书名 添加书籍" :loading="loading.select"
+                  v-model="search_index" :remote-method="searchGoods" @change="handleSelect">
+                  <el-option v-for="(item,index) in search_list" :key="index" :label="item.label" :value="index"></el-option>
+                </el-select>
                 <el-button style="margin-left: 10px;" v-if="operate_type == 'view'" type="primary" size="small" @click="saveBookList">保存</el-button>
                 <el-button v-if="operate_type == 'view'" type="default" size="small" @click="openDialog('view', null)">取消</el-button>
               </div>
@@ -381,7 +373,9 @@ export default {
         }] // 过期时间
       },
 
-      isbn: '', // 搜索isbn
+      search_index: '', // 搜索isbn
+      search_list: [], //搜索出来的图书列表
+
       groupon_items: [], // 班级购条目
       groupon_items_bak: [], // 班级购条目备份
       groupon_logs: [], // 班级购日志
@@ -394,7 +388,8 @@ export default {
       loading: {
         groupons: false,
         dialog: false,
-        groupon_items: false
+        groupon_items: false,
+        select: false
       }, // 书单table的loading
 
       pickerOptions: {
@@ -545,6 +540,7 @@ export default {
       this.class_name = ''
       this.page = 1
       this.size = 15
+      this.findGroupon()
     },
     handleSizeChange(size) {
       this.size = size
@@ -618,7 +614,10 @@ export default {
         this.getGrouponLog(groupon.id)
       }
     },
-    searchGoods(query, cb) {
+    searchGoods(query) {
+      if (query == '') {
+        return
+      }
       //isbn为空
       var is_isbn = isISBNFormat(query)
       var data = {}
@@ -628,22 +627,22 @@ export default {
           for (var i = 0; i < this.groupon_items.length; i++) {
             if (this.groupon_items[i].book.isbn == query) {
               this.$message.warning('该商品已存在')
-              this.isbn = ''
+              this.search_index = ''
+              this.search_list = []
               $('#isbn_input input').focus()
-              cb([])
               return
             }
           }
         }
         data = {
-          "isbn": this.isbn, //not required 书本的isbn
+          "isbn": query, //not required 书本的isbn
           "search_amount": -100, //required -100 过滤这个线索 ;除了-100 的num 查找库存为num的数据
           "search_type": -100, //required -100 过滤这个线索 ; 0 检索新书数据 1 检索二手书数据
           "search_picture": -100, //required -100 过滤这个线索 0 查找图片不为空的商品 1查找图片为空的商品
         }
       } else {
         data = {
-          "title": this.isbn, //not required 书本的isbn
+          "title": query, //not required 书本的isbn
           "search_amount": -100, //required -100 过滤这个线索 ;除了-100 的num 查找库存为num的数据
           "search_type": -100, //required -100 过滤这个线索 ; 0 检索新书数据 1 检索二手书数据
           "search_picture": -100, //required -100 过滤这个线索 0 查找图片不为空的商品 1查找图片为空的商品
@@ -660,41 +659,44 @@ export default {
             } else {
               goods.has_new_book = false
             }
+
             if (goods.old_book) {
               goods.has_old_book = true
               goods.old_book.price = priceFloat(goods.old_book.price)
             } else {
               goods.has_old_book = false
             }
-            goods.label = goods.book.isbn
-            goods.value = goods.book.title + '-' + goods.book.isbn
+
+            goods.label = goods.book.title + '-' + goods.book.isbn
             return goods
           })
-
-          if (is_isbn && goods_list.length == 1) {
-            this.handleSelect(goods_list[0])
-          } else {
-            cb(goods_list)
-          }
+          this.search_list = goods_list
         } else {
-          this.isbn = ''
+          this.search_index = ''
+          this.search_list = []
           $('#isbn_input input').focus()
         }
       })
     },
-    handleSelect(item) {
+    handleSelect() {
+      var item = this.search_list[this.search_index]
+      if (item == undefined) {
+        return
+      }
       if (this.groupon_items.length > 0) {
         for (var i = 0; i < this.groupon_items.length; i++) {
           if (this.groupon_items[i].book.isbn == item.book.isbn) {
             this.$message.warning('该商品已存在')
-            this.isbn = ''
+            this.search_index = ''
+            this.search_list = []
             $('#isbn_input input').focus()
             return
           }
         }
       }
       this.groupon_items.push(item)
-      this.isbn = ''
+      this.search_index = ''
+      this.search_list = []
       $('#isbn_input input').focus()
     },
     removeItem(index) {

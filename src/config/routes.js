@@ -74,6 +74,11 @@ const class_buy_setting = r => require(['../pages/class_buy/setting.vue'], r)
 // 班级购列表
 const class_buy_list = r => require(['../pages/class_buy/list.vue'], r)
 
+// 求购订单
+const purchase_list = r => require(['../pages/purchase/list.vue'], r)
+// 我的求购
+const purchase_my = r => require(['../pages/purchase/my.vue'], r)
+
 export default [{
     path: '/',
     name: 'login',
@@ -196,5 +201,13 @@ export default [{
         name: 'class_buy_list',
         path: 'classbuy/list',
         component: class_buy_list
+    }, {
+        name: 'purchase_list',
+        path: 'purchase/list',
+        component: purchase_list
+    }, {
+        name: 'purchase_my',
+        path: 'purchase/my',
+        component: purchase_my
     }]
 }]
