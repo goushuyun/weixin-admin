@@ -586,6 +586,8 @@ export default {
           dialog_expire_at: new Date(moment().add(4, 'months')), // 过期时间
           dialog_profile: '' // 备注
         }
+        this.dialog_institutes = []
+        this.dialog_majors = []
         this.edit_book_list = true
         // 否则执行以下操作
       } else {
