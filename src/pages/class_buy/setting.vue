@@ -15,9 +15,10 @@
 
               <!-- 添加 “学院” 时显示以下部分 -->
               <div class="institution" v-if="school.add == true">
-                <el-input :id="'add_institution_' + s_index" style="max-width:200px;" size="small" v-model="add_institution_name" @blur="comfirmAddInstitute(s_index)"></el-input>
+                <el-input :id="'add_institution_' + s_index" style="max-width:200px;" size="small" v-model="add_institution_name" @keyup.enter.native="comfirmAddInstitute(s_index)"></el-input>
                 <el-button-group>
                   <el-button type="text" style="color:#13CE66; margin-left: 10px;" icon="check" size="large" @click="comfirmAddInstitute(s_index)"></el-button>
+                  <el-button type="text" style="color:#8492A6; margin-left: 10px;" icon="close" size="large" @click="cancelAddInstitute(s_index)"></el-button>
                 </el-button-group>
               </div>
 
@@ -39,10 +40,11 @@
                 <div class="discipline" v-if="institute.add == true">
                   <el-autocomplete :id="'add_major_s_' + s_index + '_i_' + i_index" style="max-width:200px;" size="small"
                     v-model="add_major_name" :fetch-suggestions="searchSharedMajor" placeholder="请输入专业" :trigger-on-focus="false"
-                    @blur.native.capture="comfirmAddMajor(s_index, i_index)">
+                    @keyup.enter.native.capture="comfirmAddMajor(s_index, i_index)">
                   </el-autocomplete>
                   <el-button-group>
                     <el-button type="text" style="color:#13CE66; margin-left: 10px;" icon="check" size="large" @click="comfirmAddMajor(s_index, i_index)"></el-button>
+                    <el-button type="text" style="color:#8492A6; margin-left: 10px;" icon="close" size="large" @click="cancelAddMajor(s_index, i_index)"></el-button>
                   </el-button-group>
                 </div>
 
@@ -101,6 +103,9 @@ export default {
       this.$nextTick(() => {
         $('#add_institution_' + s_index + ' input').focus()
       })
+    },
+    cancelAddInstitute(s_index) {
+      this.school_majors[s_index].add = false
     },
     comfirmAddInstitute(s_index) {
       if (this.add_institution_name == '') {
