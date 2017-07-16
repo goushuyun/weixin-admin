@@ -93,9 +93,9 @@
         </el-pagination>
       </div>
 
-      <el-dialog title="批量修改过期日期" :visible.sync="reset_dialog.visible" size="tiny">
+      <el-dialog title="批量修改截止日期" :visible.sync="reset_dialog.visible" size="tiny">
         <div class="reset_dialog">
-          <span style="margin-right: 20px;">选择要修改的日期：</span>
+          <span style="margin-right: 20px;">截止日期</span>
           <el-date-picker v-model="reset_dialog.reset_expire_at" type="date" size="small" placeholder="选择日期" :picker-options="pickerOptions"></el-date-picker>
         </div>
         <div slot="footer" class="dialog-footer">
@@ -294,7 +294,7 @@ export default {
       class_name: '', // 班级名/班号
       founder_type: 0,
       page: 1, // 页数
-      size: 15, // 请求记录数量
+      size: 10, // 请求记录数量
 
       // 班级购列表
       groupons: [], // 班级购列表
@@ -539,7 +539,7 @@ export default {
       this.groupon_id = ''
       this.class_name = ''
       this.page = 1
-      this.size = 15
+      this.size = 10
       this.findGroupon()
     },
     handleSizeChange(size) {
