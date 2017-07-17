@@ -591,7 +591,6 @@ export default {
         if (groupon.founder_avatar != '' && groupon.founder_avatar.indexOf('http') == -1) {
           groupon.founder_avatar = 'http://images.goushuyun.cn/' + groupon.founder_avatar
         }
-
         this.dialog_groupon = groupon
         this.dialog_data.dialog_school_id = groupon.school_id
         this.getInstitutes(true)
@@ -608,6 +607,10 @@ export default {
           dialog_expire_at: new Date(groupon.expire_at), // 过期时间
           dialog_profile: groupon.profile // 备注
         }
+        // 去掉控件的错误提示
+        this.$nextTick(() => {
+          this.$refs['dialog_data'].validate()
+        })
         // 获取班级购条目
         this.getGrouponItems(groupon.id)
         // 获取班级购修改日志

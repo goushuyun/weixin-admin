@@ -6,7 +6,7 @@
     <div class="content_inner" style="min-height: 600px;">
       <div class="school_majors">
         <div class="school" v-for="(school, s_index) in school_majors">
-          <el-collapse :value="school.id">
+          <el-collapse>
             <el-collapse-item :name="school.id">
               <template slot="title">
                 <span class="school_name">{{school.name}}</span>
@@ -223,11 +223,13 @@ export default {
 <style lang="scss" scoped>
 .school_majors {
     height: auto;
-    column-count: 2;
-    column-gap: 0;
+    // column-count: 2;
+    // column-gap: 0;
 }
 .school {
-    width: auto;
+    width: 60%;
+    min-width: 450px;
+    max-width: 600px;
     padding: 10px;
     break-inside: avoid;
     box-sizing: border-box;
