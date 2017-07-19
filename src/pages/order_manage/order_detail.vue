@@ -30,7 +30,7 @@
            <span v-else style="margin:0 10px;">付款时间：{{order_detail.pay_at}}</span>
            <span style="margin:0 10px;">学校：{{school_name}}</span>
            <div class="tag_area">
-              <el-tag v-if="order_detail.groupon_id" type="success">班级购</el-tag>
+              <el-tag v-if="order_detail.groupon_id" type="groupon">班级购：{{order_detail.groupon_id}}</el-tag>
               <el-tag v-if="order_detail.print_at" type="warning">已打印</el-tag>
               <el-tag v-if="order_detail.after_sale_status == 1" type="danger">待处理售后</el-tag>
               <el-tag v-if="order_detail.after_sale_status > 1" type="primary">已处理售后</el-tag>
@@ -66,7 +66,7 @@
             <el-button v-if="order_detail.order_status < 3 && order_detail.after_sale_status == 0" type="primary" style="width:60px" size="mini" @click="deliver"><i class="fa fa-truck" aria-hidden="true"></i> 发货</el-button>
             <el-button v-if="order_detail.order_status != 0 && order_detail.order_status != 8" type="primary" style="width:60px" size="mini" @click="preSelectedPrint"><i class="fa fa-print" aria-hidden="true"></i> 打印</el-button>
           </p>
-          <p v-if="order_detail.groupon_id">班级购编号：{{order_detail.groupon_id}}</p>
+          <!-- <p v-if="order_detail.groupon_id">班级购编号：{{order_detail.groupon_id}}</p> -->
         </div>
       </div>
       <div class="address_area">
@@ -725,5 +725,10 @@ export default {
             height: 80px;
         }
     }
+}
+.el-tag--groupon {
+    background-color: rgba(158,128,91,.1);
+    border-color: rgba(158,128,91,.2);
+    color: #9e805b;
 }
 </style>

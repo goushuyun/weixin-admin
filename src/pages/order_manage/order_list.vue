@@ -28,7 +28,7 @@
                     <el-option label="收货人手机号" value="mobile"></el-option>
                     <el-option label="收货人姓名" value="name"></el-option>
                     <el-option label="ISBN" value="isbn"></el-option>
-                    <!-- <el-option label="班级购编号" value="class"></el-option> -->
+                    <el-option label="班级购编号" value="class"></el-option>
                 </el-select>
             </el-input>
         </el-form-item>
@@ -78,7 +78,7 @@
              <span v-else style="margin:0 10px;">付款时间：{{order.order.pay_at}}</span>
              <span style="margin:0 10px;">学校：{{order.order.school_name}}</span>
              <div class="tag_area">
-                <el-tag v-if="order.order.groupon_id" type="success">班级购</el-tag>
+                <el-tag v-if="order.order.groupon_id" type="groupon">班级购：{{order.order.groupon_id}}</el-tag>
                 <el-tag v-if="order.order.print_at" type="warning">已打印</el-tag>
 
                 <el-tag v-if="order.order.after_sale_status == 1" type="danger">待处理售后</el-tag>
@@ -113,7 +113,7 @@
           </div>
           <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
             <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-search" aria-hidden="true"></i> 查看详情</el-button>
-            <p v-if="order.order.groupon_id">班级购编号：{{order.order.groupon_id}}</p>
+            <!-- <p v-if="order.order.groupon_id">班级购编号：{{order.order.groupon_id}}</p> -->
             <p v-if="order.order.seller_remark_type == 0" style="margin-top: 8px;">
               <el-button size="mini" style="width:80px" @click="preAddRemark(index)"><i class="fa fa-flag" aria-hidden="true"></i> 商家标记</el-button>
             </p>
@@ -295,6 +295,7 @@ export default {
             mobile: '',
             name: '',
             isbn: '',
+            groupon_id: '',
 
             pickerOptions: {
                 shortcuts: [{
@@ -749,6 +750,7 @@ export default {
             this.mobile = ''
             this.name = ''
             this.isbn = ''
+            this.groupon_id = ''
             if (this.search_value.trim() != '') {
                 this.inputSearchValue(0, type)
             }
@@ -772,6 +774,9 @@ export default {
                 case 'isbn':
                     this.isbn = this.search_value
                     break;
+                case 'class':
+                    this.groupon_id = this.search_value
+                    break;
             }
         },
         resetForm() {
@@ -786,6 +791,7 @@ export default {
             this.mobile = ''
             this.name = ''
             this.isbn = ''
+            this.groupon_id = ''
             this.getOrders()
         },
         getStoreData() {
@@ -800,6 +806,7 @@ export default {
             this.mobile = order_search.mobile ? order_search.mobile : ''
             this.name = order_search.name ? order_search.name : ''
             this.isbn = order_search.isbn ? order_search.isbn : ''
+            this.groupon_id = order_search.groupon_id ? order_search.groupon_id : ''
             this.page = order_search.page ? order_search.page : 1
             this.size = order_search.size ? order_search.size : 10
         },
@@ -815,6 +822,7 @@ export default {
                 "mobile": self.mobile,
                 "name": self.name,
                 "isbn": self.isbn,
+                "groupon_id": self.groupon_id,
                 "order_status": self.order_status,
                 "school_id": self.school_id.trim(),
                 "seller_remark_type": self.seller_remark_type ? self.seller_remark_type : 0,
@@ -1013,5 +1021,10 @@ export default {
 .row {
     margin-bottom: 15px;
     width: auto;
+}
+.el-tag--groupon {
+    background-color: rgba(158,128,91,.1);
+    border-color: rgba(158,128,91,.2);
+    color: #9e805b;
 }
 </style>

@@ -118,7 +118,7 @@
                     <p class="id">#{{dialog_groupon.id}}</p>
                   </div>
                   <el-form-item v-else prop="dialog_class" label-width="0">
-                    <el-input v-model="dialog_data.dialog_class" style="width: 200px" placeholder="输入班级购名" size="small"></el-input>
+                    <el-input v-model="dialog_data.dialog_class" style="width: 200px" placeholder="输入班级购名" size="small" @input.native.capture="inputting = true" @blur.native.capture="inputting = false"></el-input>
                     <p class="id">#{{dialog_groupon.id}}</p>
                   </el-form-item>
                 </div>
@@ -164,21 +164,21 @@
 
               <div class="class_buy_info">
                 <el-form-item v-if="operate_type == 'add'" label="班级购名称" prop="dialog_class">
-                  <el-input v-model="dialog_data.dialog_class" style="width: auto" placeholder="班级购名" size="small"></el-input>
+                  <el-input v-model="dialog_data.dialog_class" placeholder="班级购名" size="small"></el-input>
                 </el-form-item>
                 <el-form-item label="发布人姓名" prop="dialog_founder_name">
-                  <el-input v-model="dialog_data.dialog_founder_name" style="width: auto" :disabled="operate_type == 'view' && !edit_main_info" placeholder="发布人姓名" size="small"></el-input>
+                  <el-input v-model="dialog_data.dialog_founder_name" :disabled="operate_type == 'view' && !edit_main_info" placeholder="发布人姓名" size="small"></el-input>
                 </el-form-item>
                 <el-form-item v-if="operate_type == 'view'" label="发布人手机" prop="dialog_founder_mobile">
-                  <el-input v-model="dialog_data.dialog_founder_mobile" style="width: auto" :disabled="operate_type == 'view' && !edit_main_info" placeholder="创建人手机" size="small"></el-input>
+                  <el-input v-model="dialog_data.dialog_founder_mobile" :disabled="operate_type == 'view' && !edit_main_info" placeholder="创建人手机" size="small"></el-input>
                 </el-form-item>
                 <el-form-item label="截 止 日 期" prop="dialog_expire_at">
-                  <el-date-picker v-model="dialog_data.dialog_expire_at" :disabled="operate_type == 'view' && !edit_main_info" style="width: 180px;"
+                  <el-date-picker v-model="dialog_data.dialog_expire_at" :disabled="operate_type == 'view' && !edit_main_info"
                     type="date" placeholder="选择日期" size="small" :picker-options="pickerOptions">
                   </el-date-picker>
                 </el-form-item>
                 <el-form-item label="班级购说明" prop="dialog_profile">
-                  <el-input v-model="dialog_data.dialog_profile" id="remark" :disabled="operate_type == 'view' && !edit_main_info" style="width: auto;" placeholder="班级购说明" size="small"></el-input>
+                  <el-input v-model="dialog_data.dialog_profile" id="remark" :disabled="operate_type == 'view' && !edit_main_info" placeholder="班级购说明" size="small"></el-input>
                 </el-form-item>
               </div>
 
@@ -316,6 +316,7 @@ export default {
       dialog_index: 0, // 当前班级购的索引
       dialog_groupon: {}, //当前班级购
 
+      inputting: false, //是否手动修改班级购名称
       // 班级购基本信息
       dialog_data: {
         dialog_school_id: '', // 学校id
@@ -411,10 +412,13 @@ export default {
             return m.id == curVal.dialog_institute_major_id
           })
           var term = this.terms[curVal.dialog_term_index]
-          if (major_name && term) {
-            curVal.dialog_class = major_name + '（' + term + '）教材单'
-          } else {
-            curVal.dialog_class = ''
+          if(this.inputting == false) {
+            if (major_name && term) {
+              curVal.dialog_class = major_name + '（' + term + '）教材单'
+              console.log(curVal);
+            } else {
+              curVal.dialog_class = ''
+            }
           }
         }
       },
@@ -1012,6 +1016,10 @@ export default {
             label {
                 margin: 0 10px;
             }
+        }
+        .el-input,
+        .el-select {
+          width: 190px;
         }
     }
 }
