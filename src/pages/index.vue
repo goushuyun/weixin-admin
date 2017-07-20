@@ -129,6 +129,15 @@
                     <i class="fa fa-puzzle-piece" aria-hidden="true"></i>班级购列表
                 </el-menu-item>
               </el-submenu>
+              <!-- <el-submenu index="7">
+                <template slot="title"><i class="fa fa-recycle" aria-hidden="true"></i>旧书求购</template>
+                <el-menu-item index="7-1" :route="{name:'purchase_list'}">
+                    <i class="fa fa-bullhorn" aria-hidden="true"></i>求购订单
+                </el-menu-item>
+                <el-menu-item index="7-2" :route="{name:'purchase_my'}">
+                    <i class="fa fa-podcast" aria-hidden="true"></i>我的求购
+                </el-menu-item>
+              </el-submenu> -->
 
               <el-submenu index="3">
                 <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>库存管理</template>

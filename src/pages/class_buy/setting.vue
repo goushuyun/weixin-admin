@@ -3,11 +3,11 @@
     <div class="top_bar">
         <h2 class="title">班级购设置</h2>
     </div>
-    <div class="content_inner" style="min-height: 500px;">
+    <div class="content_inner" style="min-height: 600px;">
       <div class="school_majors">
         <div class="school" v-for="(school, s_index) in school_majors">
-          <el-collapse value="default_open">
-            <el-collapse-item name="default_open">
+          <el-collapse>
+            <el-collapse-item :name="school.id">
               <template slot="title">
                 <span class="school_name">{{school.name}}</span>
                 <el-button class="btn_add" type="primary" size="mini" @click.stop="preAddInstitute(s_index)">添加学院</el-button>
@@ -15,9 +15,10 @@
 
               <!-- 添加 “学院” 时显示以下部分 -->
               <div class="institution" v-if="school.add == true">
-                <el-input :id="'add_institution_' + s_index" style="max-width:200px;" size="small" v-model="add_institution_name" @blur="comfirmAddInstitute(s_index)"></el-input>
+                <el-input :id="'add_institution_' + s_index" style="max-width:200px;" size="small" v-model="add_institution_name" @keyup.enter.native="comfirmAddInstitute(s_index)"></el-input>
                 <el-button-group>
                   <el-button type="text" style="color:#13CE66; margin-left: 10px;" icon="check" size="large" @click="comfirmAddInstitute(s_index)"></el-button>
+                  <el-button type="text" style="color:#8492A6; margin-left: 10px;" icon="close" size="large" @click="cancelAddInstitute(s_index)"></el-button>
                 </el-button-group>
               </div>
 
@@ -38,10 +39,12 @@
                 <!-- 添加 “专业” 时显示以下部分 -->
                 <div class="discipline" v-if="institute.add == true">
                   <el-autocomplete :id="'add_major_s_' + s_index + '_i_' + i_index" style="max-width:200px;" size="small"
-                    v-model="add_major_name" :fetch-suggestions="searchSharedMajor" placeholder="请输入专业" :trigger-on-focus="false">
+                    v-model="add_major_name" :fetch-suggestions="searchSharedMajor" placeholder="请输入专业" :trigger-on-focus="false"
+                    @keyup.enter.native.capture="comfirmAddMajor(s_index, i_index)">
                   </el-autocomplete>
                   <el-button-group>
                     <el-button type="text" style="color:#13CE66; margin-left: 10px;" icon="check" size="large" @click="comfirmAddMajor(s_index, i_index)"></el-button>
+                    <el-button type="text" style="color:#8492A6; margin-left: 10px;" icon="close" size="large" @click="cancelAddMajor(s_index, i_index)"></el-button>
                   </el-button-group>
                 </div>
 
@@ -100,6 +103,9 @@ export default {
       this.$nextTick(() => {
         $('#add_institution_' + s_index + ' input').focus()
       })
+    },
+    cancelAddInstitute(s_index) {
+      this.school_majors[s_index].add = false
     },
     comfirmAddInstitute(s_index) {
       if (this.add_institution_name == '') {
@@ -216,12 +222,17 @@ export default {
 
 <style lang="scss" scoped>
 .school_majors {
-    display: flex;
-    flex-wrap: wrap;
+    height: auto;
+    // column-count: 2;
+    // column-gap: 0;
 }
 .school {
-    min-width: 420px;
-    margin: 10px;
+    width: 60%;
+    min-width: 450px;
+    max-width: 600px;
+    padding: 10px;
+    break-inside: avoid;
+    box-sizing: border-box;
     .school_name {
         font-size: 16px;
         font-weight: bold;
