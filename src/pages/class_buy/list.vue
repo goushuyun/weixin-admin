@@ -622,6 +622,7 @@ export default {
       }
     },
     searchGoods(query) {
+      query = query.trim()
       if (query == '') {
         return
       }
