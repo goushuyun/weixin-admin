@@ -3,8 +3,13 @@
     <div class="top_bar">
         <h2 class="title">班级购设置</h2>
     </div>
-    <div class="content_inner" style="min-height: 600px;">
+    <div class="content_inner" style="min-height: 200px;">
       <div class="school_majors">
+        <div class="row" v-if="!school_majors.length">
+          <div class="order_item">
+            <div class="title" style="text-align:center">暂无数据</div>
+          </div>
+        </div>
         <div class="school" v-for="(school, s_index) in school_majors">
           <el-collapse>
             <el-collapse-item :name="school.id">
@@ -87,14 +92,31 @@ export default {
     getSchoolMajors() {
       axios.post('/v1/groupon/get_school_majors', {}).then(resp => {
         if (resp.data.message == 'ok') {
-          this.school_majors = resp.data.data.map(school => {
-            school.add = false
-            school.institutes.map(institute => {
-              institute.add = false
-              return institute
+          if (resp.data.data.length > 0) {
+            this.school_majors = resp.data.data.map(school => {
+              school.add = false
+              school.institutes.map(institute => {
+                institute.add = false
+                return institute
+              })
+              return school
             })
-            return school
-          })
+          } else {
+            this.$alert('请移步“经营学校”添加学校', '提示', {
+                confirmButtonText: '确定',
+                callback: action => {
+                    this.$store.commit('setMenuActive','5-2')
+                    localStorage.setItem('menu_active', '5-2')
+                    console.log(this.$store.state.menu_active);
+                    this.$router.push({
+                        name: 'school',
+                        params: {
+                            activeName: 'school'
+                        }
+                    })
+                }
+            });
+          }
         }
       })
     },
@@ -222,9 +244,24 @@ export default {
 
 <style lang="scss" scoped>
 .school_majors {
-    height: auto;
+    // height: auto;
     // column-count: 2;
     // column-gap: 0;
+    .row {
+      .order_item {
+          border: 1px solid #DFE6EC;
+          margin-bottom: 15px;
+          font-size: 13px;
+          color: #1F2D3D;
+          font-family: "Helvetica Neue";
+          .title {
+              background-color: #EEF1F6;
+              height: 40px;
+              line-height: 40px;
+              width: 100%;
+          }
+       }
+    }
 }
 .school {
     width: 60%;
