@@ -3,7 +3,7 @@
     <div class="top_bar">
         <h2 class="title">班级购设置</h2>
     </div>
-    <div class="content_inner" style="min-height: 200px;">
+    <div class="content_inner" style="min-height: 200px;" v-loading.body="loading" element-loading-text="拼命加载中">
       <div class="school_majors">
         <div class="row" v-if="!school_majors.length">
           <div class="order_item">
@@ -82,7 +82,9 @@ export default {
       add_institution_name: '', // 要添加学院的名称
       add_major_name: '', // 要添加专业的名称
       activeNames: ['1'], // 用于打开 collapse
-      school_majors: [] // 本页面全部数据：学校 - 学院 - 专业
+      school_majors: [], // 本页面全部数据：学校 - 学院 - 专业
+
+      loading: false
     }
   },
   mounted() {
@@ -90,6 +92,7 @@ export default {
   },
   methods: {
     getSchoolMajors() {
+      this.loading = true
       axios.post('/v1/groupon/get_school_majors', {}).then(resp => {
         if (resp.data.message == 'ok') {
           if (resp.data.data.length > 0) {
@@ -118,6 +121,7 @@ export default {
             });
           }
         }
+        this.loading = false
       })
     },
     preAddInstitute(s_index) {

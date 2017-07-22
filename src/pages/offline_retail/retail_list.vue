@@ -27,48 +27,50 @@
             </el-input>
         </el-form-item>
     </el-form>
-    <div class="row" v-if="!orders.length">
-      <div class="order_item">
-        <div class="title" style="text-align:center">
-          暂无数据
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="order_item" v-for="(order,index) in orders">
-        <div class="title">
-             <span style="margin:0 10px;">订单编号：{{order.retail.id}}</span>
-             <span style="margin:0 10px;">付款时间：{{order.retail.create_at}}</span>
-             <span style="margin:0 10px;">学校：{{order.retail.school_name}}</span>
-             <div class="tag_area">处理人：{{order.retail.handle_staff_name}}</div>
-        </div>
-        <div class="detail">
-          <div style="width:640px">
-            <el-row type="flex" align="middle" v-for="(item,index) in order.items" :style="index + 1 == order.items.length ? '' : 'border-bottom: 1px solid #EEF1F6;'">
-              <el-col style="width:140px;">
-                <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
-              </el-col>
-              <el-col style="width:300px">
-                <p>{{item.book_title}}</p>
-                <p style="color:#555">{{item.book_isbn}}</p>
-              </el-col>
-              <el-col style="width:100px">
-                <el-tag v-if="item.type == 0" type="primary">新书</el-tag>
-                <el-tag v-else type="success">二手书</el-tag>
-              </el-col>
-              <el-col style="width:100px">￥{{item.price}}</el-col>
-              <el-col style="width:100px">x{{item.amount}}</el-col>
-            </el-row>
-          </div>
-          <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
-            <p>应收总额 ￥{{order.retail.goods_fee}}</p>
-            <p>实收总额 ￥{{order.retail.total_fee}}</p>
+    <div style="background-color: #FFFFFF; min-height:100px;" v-loading.body="loading" element-loading-text="拼命加载中">
+      <div class="row" v-if="!orders.length">
+        <div class="order_item">
+          <div class="title" style="text-align:center">
+            暂无数据
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="order_item" v-for="(order,index) in orders">
+          <div class="title">
+            <span style="margin:0 10px;">订单编号：{{order.retail.id}}</span>
+            <span style="margin:0 10px;">付款时间：{{order.retail.create_at}}</span>
+            <span style="margin:0 10px;">学校：{{order.retail.school_name}}</span>
+            <div class="tag_area">处理人：{{order.retail.handle_staff_name}}</div>
+          </div>
+          <div class="detail">
+            <div style="width:640px">
+              <el-row type="flex" align="middle" v-for="(item,index) in order.items" :style="index + 1 == order.items.length ? '' : 'border-bottom: 1px solid #EEF1F6;'">
+                <el-col style="width:140px;">
+                  <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
+                </el-col>
+                <el-col style="width:300px">
+                  <p>{{item.book_title}}</p>
+                  <p style="color:#555">{{item.book_isbn}}</p>
+                </el-col>
+                <el-col style="width:100px">
+                  <el-tag v-if="item.type == 0" type="primary">新书</el-tag>
+                  <el-tag v-else type="success">二手书</el-tag>
+                </el-col>
+                <el-col style="width:100px">￥{{item.price}}</el-col>
+                <el-col style="width:100px">x{{item.amount}}</el-col>
+              </el-row>
+            </div>
+            <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
+              <p>应收总额 ￥{{order.retail.goods_fee}}</p>
+              <p>实收总额 ￥{{order.retail.total_fee}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <el-pagination :current-page="page" :total="total_count" :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+      </el-pagination>
     </div>
-    <el-pagination :current-page="page" :total="total_count" :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
-    </el-pagination>
   </div>
 </div>
 </template>
@@ -124,7 +126,9 @@ export default {
 
             page: 1,
             size: 10,
-            total_count: 0
+            total_count: 0,
+
+            loading: false
         }
     },
     mounted() {
@@ -140,6 +144,7 @@ export default {
             this.getOrders()
         },
         getOrders() {
+            this.loading = true
             var self = this
             var data = {
                 "school_id": self.school_id,
@@ -165,6 +170,7 @@ export default {
                         return el
                     })
                 }
+                this.loading = false
             })
         },
         getSchools() {

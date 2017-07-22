@@ -8,54 +8,56 @@
       title="点击图片可修改轮播图"
       description="1.仅支持 jpg、jpeg、png 格式的图片；2.图片尺寸 375 px X 180 px；3.图片大小不能超过2M"
       type="info" :closable="false" show-icon></el-alert>
-      <div v-for="(item,index) in circulars" class="row_area">
+      <div style="background-color: #FFFFFF; min-height:500px;" v-loading.body="loading" element-loading-text="拼命加载中">
+        <div v-for="(item,index) in circulars" class="row_area">
           <el-row v-loading="item.loading" element-loading-text="正在检索图书">
             <el-col style="width:400px;">
               <div style="width:360px;" @click.stop="getIndex(index)">
                 <el-upload
-                  action="http://upload.qiniu.com/"
-                  :data="imagesFormData"
-                  :show-file-list="false"
-                  :before-upload="beforeAvatarUpload"
-                  :on-success="handleAvatarSuccess"
-                  :on-error="handleAvatarError"
-                  >
-                  <img v-if="item.image" :src="item.image" class="avatar">
-                  <i v-if="!item.image" class="el-icon-upload"></i>
-                  <div v-if="!item.image" class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                </el-upload>
-              </div>
-            </el-col>
-            <el-col :span="12">
-              <el-radio-group v-model="item.type" @change="radioChange(index * TEN + item.type)">
-                <el-row class="radio_area">
-                  <el-col :span="24"><el-radio :label="1">轮播图不可点击</el-radio></el-col>
-                </el-row>
-                <el-row class="radio_area">
-                  <el-col :span="24">
-                    <el-radio :label="2">点击轮播图跳转到某本书</el-radio>
-                    <el-button type="text" v-if="!item.isbn_flag && item.type == 2" style="margin:0 20px">{{item.isbn}}</el-button>
-                    <el-input v-if="item.isbn_flag && item.type == 2" style="margin:0 20px" :id="'num_' + index" v-model="item.update_isbn" size="small" :maxlength="13" placeholder="请输入13位ISBN"></el-input>
-                    <el-button v-if="!item.isbn_flag && item.type == 2" type="text" @click="proUpdateIsbn(index)">{{item.isbn?'修改':'添加'}}</el-button>
-                    <el-button v-if="item.isbn_flag && item.type == 2" type="text" @click="confirmUpdateIsbn(index)">确定</el-button>
-                    <el-button v-if="item.isbn_flag && item.type == 2" type="text" style="color:#13CE66" @click="cancelUpdate(index)">取消</el-button>
-                  </el-col>
-                </el-row>
-                <el-row class="radio_area">
-                  <el-col :span="24">
-                    <el-radio :label="3">点击轮播图跳转到某个话题</el-radio>
-                    <el-button type="text" v-if="!item.topic_flag && item.type == 3" style="margin:0 20px">{{item.topic}}</el-button>
-                    <el-select v-if="item.topic_flag && item.type == 3" style="margin:0 20px" v-model="item.source_id" size="small" placeholder="请选择">
-                      <el-option v-for="topic in item.topics" :label="topic.title" :value="topic.id"></el-option>
-                    </el-select>
-                    <el-button v-if="!item.topic_flag && item.type == 3" type="text" @click="proUpdateTopic(index)">{{item.topic?'修改':'添加'}}</el-button>
-                    <el-button v-if="item.topic_flag && item.type == 3" type="text" @click="confirmUpdateTopic(index)">确定</el-button>
-                    <el-button v-if="item.topic_flag && item.type == 3" type="text" style="color:#13CE66" @click="cancelUpdate(index)">取消</el-button>
-                  </el-col>
-                </el-row>
-              </el-radio-group>
-            </el-col>
+                action="http://upload.qiniu.com/"
+                :data="imagesFormData"
+                :show-file-list="false"
+                :before-upload="beforeAvatarUpload"
+                :on-success="handleAvatarSuccess"
+                :on-error="handleAvatarError"
+                >
+                <img v-if="item.image" :src="item.image" class="avatar">
+                <i v-if="!item.image" class="el-icon-upload"></i>
+                <div v-if="!item.image" class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+              </el-upload>
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <el-radio-group v-model="item.type" @change="radioChange(index * TEN + item.type)">
+              <el-row class="radio_area">
+                <el-col :span="24"><el-radio :label="1">轮播图不可点击</el-radio></el-col>
+              </el-row>
+              <el-row class="radio_area">
+                <el-col :span="24">
+                  <el-radio :label="2">点击轮播图跳转到某本书</el-radio>
+                  <el-button type="text" v-if="!item.isbn_flag && item.type == 2" style="margin:0 20px">{{item.isbn}}</el-button>
+                  <el-input v-if="item.isbn_flag && item.type == 2" style="margin:0 20px" :id="'num_' + index" v-model="item.update_isbn" size="small" :maxlength="13" placeholder="请输入13位ISBN"></el-input>
+                  <el-button v-if="!item.isbn_flag && item.type == 2" type="text" @click="proUpdateIsbn(index)">{{item.isbn?'修改':'添加'}}</el-button>
+                  <el-button v-if="item.isbn_flag && item.type == 2" type="text" @click="confirmUpdateIsbn(index)">确定</el-button>
+                  <el-button v-if="item.isbn_flag && item.type == 2" type="text" style="color:#13CE66" @click="cancelUpdate(index)">取消</el-button>
+                </el-col>
+              </el-row>
+              <el-row class="radio_area">
+                <el-col :span="24">
+                  <el-radio :label="3">点击轮播图跳转到某个话题</el-radio>
+                  <el-button type="text" v-if="!item.topic_flag && item.type == 3" style="margin:0 20px">{{item.topic}}</el-button>
+                  <el-select v-if="item.topic_flag && item.type == 3" style="margin:0 20px" v-model="item.source_id" size="small" placeholder="请选择">
+                    <el-option v-for="topic in item.topics" :label="topic.title" :value="topic.id"></el-option>
+                  </el-select>
+                  <el-button v-if="!item.topic_flag && item.type == 3" type="text" @click="proUpdateTopic(index)">{{item.topic?'修改':'添加'}}</el-button>
+                  <el-button v-if="item.topic_flag && item.type == 3" type="text" @click="confirmUpdateTopic(index)">确定</el-button>
+                  <el-button v-if="item.topic_flag && item.type == 3" type="text" style="color:#13CE66" @click="cancelUpdate(index)">取消</el-button>
+                </el-col>
+              </el-row>
+            </el-radio-group>
+          </el-col>
         </el-row>
+      </div>
       </div>
     </div>
   </div>
@@ -77,7 +79,8 @@ export default {
                 key: '',
                 token: '',
                 index: 0
-            }
+            },
+            loading: false
         };
     },
     mounted() {
@@ -85,6 +88,7 @@ export default {
     },
     methods: {
         getTopics() {
+            this.loading = true
             axios.post('/v1/topic/topics_info',{}).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
@@ -117,6 +121,7 @@ export default {
         },
         // 加载页面是获取并处理数据
         getCarousels(topics) {
+            this.loading = true
             axios.post('/v1/circular/list', {}).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
@@ -137,6 +142,7 @@ export default {
                     // 备份数据
                     this.circulars_bak = JSON.parse(JSON.stringify(this.circulars))
                 }
+                this.loading = false
             })
         },
 
