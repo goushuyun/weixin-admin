@@ -28,7 +28,7 @@
                     <el-option label="收货人手机号" value="mobile"></el-option>
                     <el-option label="收货人姓名" value="name"></el-option>
                     <el-option label="ISBN" value="isbn"></el-option>
-                    <!-- <el-option label="班级购编号" value="class"></el-option> -->
+                    <el-option label="班级购编号" value="class"></el-option>
                 </el-select>
             </el-input>
         </el-form-item>
@@ -56,87 +56,89 @@
       </el-radio-group>
       <el-button style="margin-left: 385px;" @click="resetForm" size="small"><i class="fa fa-refresh" aria-hidden="true"></i> 重置筛选条件</el-button>
     </div>
-    <div class="row">
-      <el-checkbox v-model="selected_all" style="margin:0 12px;" @change="selectedAllChange">全选</el-checkbox>
-      <el-button type="primary" @click="preExportOrder" size="small"><i class="fa fa-download" aria-hidden="true"></i> 批量导出</el-button>
-      <el-button type="primary" size="small" @click="preSelectedPrint"><i class="fa fa-print" aria-hidden="true"></i> 批量打印</el-button>
-      <el-button v-if="order_status == 1" type="primary" @click="preSelectedDeliver" size="small"><i class="fa fa-truck" aria-hidden="true"></i> 批量发货</el-button>
-    </div>
-    <div class="row" v-if="!orders.length">
-      <div class="order_item">
-        <div class="title" style="text-align:center">暂无数据</div>
+    <div style="background-color: #FFFFFF; min-height:100px;" v-loading.body="loading" element-loading-text="拼命加载中">
+      <div class="row">
+        <el-checkbox v-model="selected_all" style="margin:0 12px;" @change="selectedAllChange">全选</el-checkbox>
+        <el-button type="primary" @click="preExportOrder" size="small"><i class="fa fa-download" aria-hidden="true"></i> 批量导出</el-button>
+        <el-button type="primary" size="small" @click="preSelectedPrint"><i class="fa fa-print" aria-hidden="true"></i> 批量打印</el-button>
+        <el-button v-if="order_status == 1" type="primary" @click="preSelectedDeliver" size="small"><i class="fa fa-truck" aria-hidden="true"></i> 批量发货</el-button>
       </div>
-    </div>
-    <div class="row">
-      <div class="order_item" v-for="(order,index) in orders">
-        <div class="title">
-             <div class="checkbox_area">
-               <el-checkbox v-model="order.order.selected" @change="checkSelectedAll"></el-checkbox>
-             </div>
-             <span style="margin:0 10px;">订单编号：{{order.order.id}}</span>
-             <span v-if="order_status == 0 || order_status == 8" style="margin:0 10px;">下单时间：{{order.order.order_at}}</span>
-             <span v-else style="margin:0 10px;">付款时间：{{order.order.pay_at}}</span>
-             <span style="margin:0 10px;">学校：{{order.order.school_name}}</span>
-             <div class="tag_area">
-                <el-tag v-if="order.order.groupon_id" type="success">班级购</el-tag>
-                <el-tag v-if="order.order.print_at" type="warning">已打印</el-tag>
-
-                <el-tag v-if="order.order.after_sale_status == 1" type="danger">待处理售后</el-tag>
-                <el-tag v-if="order.order.after_sale_status > 1" type="primary">已处理售后</el-tag>
-
-                <el-tag v-if="order.order.order_status == 1" type="danger">待发货</el-tag>
-                <el-tag v-if="order.order.order_status == 3" type="primary">已发货</el-tag>
-                <el-tag v-if="order.order.order_status == 7" type="primary">已完成</el-tag>
-             </div>
-        </div>
-        <div class="detail">
-          <div style="width:auto;">
-            <el-row type="flex" align="middle" v-for="(item,index) in order.items" :style="index + 1 == order.items.length ? '' : 'border-bottom: 1px solid #EEF1F6;'">
-              <el-col style="width:140px;">
-                <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
-              </el-col>
-              <el-col style="width:300px">
-                <p>{{item.book_title}}</p>
-                <p style="color:#555">{{item.book_isbn}}</p>
-              </el-col>
-              <el-col style="width:100px">
-                <el-tag v-if="item.type == 0" type="primary">新书</el-tag>
-                <el-tag v-else type="success">二手书</el-tag>
-              </el-col>
-              <el-col style="width:100px">￥{{item.price}}</el-col>
-              <el-col style="width:100px">x{{item.amount}}</el-col>
-            </el-row>
-          </div>
-          <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
-            <p>订单总额 ￥{{order.order.total_fee}}</p>
-            <p style="color:#888; font-size: 12px;">（含快递费 ￥{{order.order.freight}}）</p>
-          </div>
-          <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
-            <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-search" aria-hidden="true"></i> 查看详情</el-button>
-            <p v-if="order.order.groupon_id">班级购编号：{{order.order.groupon_id}}</p>
-            <p v-if="order.order.seller_remark_type == 0" style="margin-top: 8px;">
-              <el-button size="mini" style="width:80px" @click="preAddRemark(index)"><i class="fa fa-flag" aria-hidden="true"></i> 商家标记</el-button>
-            </p>
-            <p v-else>
-              <el-tooltip class="item" effect="dark" :content="order.order.seller_remark ? order.order.seller_remark : '没有商家标记'" placement="top">
-                <el-button type="text" @click="preAddRemark(index)">
-                  <!-- <i v-if="order.order.seller_remark_type == 0" class="fa fa-flag" aria-hidden="true"></i> -->
-                  <i v-if="order.order.seller_remark_type == 1" class="fa fa-flag" aria-hidden="true" style="color: #13CE66;"></i>
-                  <i v-if="order.order.seller_remark_type == 2" class="fa fa-flag" aria-hidden="true" style="color: #F7BA2A;"></i>
-                  <i v-if="order.order.seller_remark_type == 3" class="fa fa-flag" aria-hidden="true" style="color: #FF4949;"></i>
-                </el-button>
-               </el-tooltip>
-             </p>
-          </div>
-        </div>
-        <div class="address_area">
-          <span style="margin-right:20px;">收货人信息：{{order.order.name}}，{{order.order.mobile}}，{{order.order.address}}</span>
-          <span v-if="order.order.remark" style="color:#FF4949;">订单备注：{{order.order.remark}}</span>
+      <div class="row" v-if="!orders.length">
+        <div class="order_item">
+          <div class="title" style="text-align:center">暂无数据</div>
         </div>
       </div>
+      <div class="row">
+        <div class="order_item" v-for="(order,index) in orders">
+          <div class="title">
+            <div class="checkbox_area">
+              <el-checkbox v-model="order.order.selected" @change="checkSelectedAll"></el-checkbox>
+            </div>
+            <span style="margin:0 10px;">订单编号：{{order.order.id}}</span>
+            <span v-if="order_status == 0 || order_status == 8" style="margin:0 10px;">下单时间：{{order.order.order_at}}</span>
+            <span v-else style="margin:0 10px;">付款时间：{{order.order.pay_at}}</span>
+            <span style="margin:0 10px;">学校：{{order.order.school_name}}</span>
+            <div class="tag_area">
+              <el-tag v-if="order.order.groupon_id" type="groupon">班级购：{{order.order.groupon_id}}</el-tag>
+              <el-tag v-if="order.order.print_at" type="warning">已打印</el-tag>
+
+              <el-tag v-if="order.order.after_sale_status == 1" type="danger">待处理售后</el-tag>
+              <el-tag v-if="order.order.after_sale_status > 1" type="primary">已处理售后</el-tag>
+
+              <el-tag v-if="order.order.order_status == 1" type="danger">待发货</el-tag>
+              <el-tag v-if="order.order.order_status == 3" type="primary">已发货</el-tag>
+              <el-tag v-if="order.order.order_status == 7" type="primary">已完成</el-tag>
+            </div>
+          </div>
+          <div class="detail">
+            <div style="width:auto;">
+              <el-row type="flex" align="middle" v-for="(item,index) in order.items" :style="index + 1 == order.items.length ? '' : 'border-bottom: 1px solid #EEF1F6;'">
+                <el-col style="width:140px;">
+                  <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
+                </el-col>
+                <el-col style="width:300px">
+                  <p>{{item.book_title}}</p>
+                  <p style="color:#555">{{item.book_isbn}}</p>
+                </el-col>
+                <el-col style="width:100px">
+                  <el-tag v-if="item.type == 0" type="primary">新书</el-tag>
+                  <el-tag v-else type="success">二手书</el-tag>
+                </el-col>
+                <el-col style="width:100px">￥{{item.price}}</el-col>
+                <el-col style="width:100px">x{{item.amount}}</el-col>
+              </el-row>
+            </div>
+            <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
+              <p>订单总额 ￥{{order.order.total_fee}}</p>
+              <p style="color:#888; font-size: 12px;">（含快递费 ￥{{order.order.freight}}）</p>
+            </div>
+            <div class="opt_area" :style="'height:' + 74 * order.items.length + 'px;'">
+              <el-button type="primary" size="mini" style="width:80px" @click="goToDetail(index)"><i class="fa fa-search" aria-hidden="true"></i> 查看详情</el-button>
+              <!-- <p v-if="order.order.groupon_id">班级购编号：{{order.order.groupon_id}}</p> -->
+              <p v-if="order.order.seller_remark_type == 0" style="margin-top: 8px;">
+                <el-button size="mini" style="width:80px" @click="preAddRemark(index)"><i class="fa fa-flag" aria-hidden="true"></i> 商家标记</el-button>
+              </p>
+              <p v-else>
+                <el-tooltip class="item" effect="dark" :content="order.order.seller_remark ? order.order.seller_remark : '没有商家标记'" placement="top">
+                  <el-button type="text" @click="preAddRemark(index)">
+                    <!-- <i v-if="order.order.seller_remark_type == 0" class="fa fa-flag" aria-hidden="true"></i> -->
+                    <i v-if="order.order.seller_remark_type == 1" class="fa fa-flag" aria-hidden="true" style="color: #13CE66;"></i>
+                    <i v-if="order.order.seller_remark_type == 2" class="fa fa-flag" aria-hidden="true" style="color: #F7BA2A;"></i>
+                    <i v-if="order.order.seller_remark_type == 3" class="fa fa-flag" aria-hidden="true" style="color: #FF4949;"></i>
+                  </el-button>
+                </el-tooltip>
+              </p>
+            </div>
+          </div>
+          <div class="address_area">
+            <span style="margin-right:20px;">收货人信息：{{order.order.name}}，{{order.order.mobile}}，{{order.order.address}}</span>
+            <span v-if="order.order.remark" style="color:#FF4949;">订单备注：{{order.order.remark}}</span>
+          </div>
+        </div>
+      </div>
+      <el-pagination :current-page="page" :total="total_count" :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+      </el-pagination>
     </div>
-    <el-pagination :current-page="page" :total="total_count" :page-sizes="[10, 20, 50, 100]" :page-size="size" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange">
-    </el-pagination>
 
     <!-- 商家备注 -->
     <el-dialog title="商家标记" :visible.sync="remark_dialog.visible" size="tiny" :close-on-click-modal="false" :close-on-press-escape="false">
@@ -295,6 +297,7 @@ export default {
             mobile: '',
             name: '',
             isbn: '',
+            groupon_id: '',
 
             pickerOptions: {
                 shortcuts: [{
@@ -342,7 +345,9 @@ export default {
 
             remark_list: [],
             inputVisible: false,
-            inputValue: ''
+            inputValue: '',
+
+            loading: false
         }
     },
     mounted() {
@@ -749,6 +754,7 @@ export default {
             this.mobile = ''
             this.name = ''
             this.isbn = ''
+            this.groupon_id = ''
             if (this.search_value.trim() != '') {
                 this.inputSearchValue(0, type)
             }
@@ -772,6 +778,9 @@ export default {
                 case 'isbn':
                     this.isbn = this.search_value
                     break;
+                case 'class':
+                    this.groupon_id = this.search_value
+                    break;
             }
         },
         resetForm() {
@@ -786,6 +795,7 @@ export default {
             this.mobile = ''
             this.name = ''
             this.isbn = ''
+            this.groupon_id = ''
             this.getOrders()
         },
         getStoreData() {
@@ -800,6 +810,7 @@ export default {
             this.mobile = order_search.mobile ? order_search.mobile : ''
             this.name = order_search.name ? order_search.name : ''
             this.isbn = order_search.isbn ? order_search.isbn : ''
+            this.groupon_id = order_search.groupon_id ? order_search.groupon_id : ''
             this.page = order_search.page ? order_search.page : 1
             this.size = order_search.size ? order_search.size : 10
         },
@@ -809,12 +820,14 @@ export default {
                 this.$message.warning('请选择检索类型！')
                 return
             }
+            this.loading = true
             var self = this
             var data = {
                 "id": self.order_id,
                 "mobile": self.mobile,
                 "name": self.name,
                 "isbn": self.isbn,
+                "groupon_id": self.groupon_id,
                 "order_status": self.order_status,
                 "school_id": self.school_id.trim(),
                 "seller_remark_type": self.seller_remark_type ? self.seller_remark_type : 0,
@@ -845,6 +858,7 @@ export default {
                         return el
                     })
                 }
+                this.loading = false
             })
         },
         getSchools() {
@@ -1013,5 +1027,10 @@ export default {
 .row {
     margin-bottom: 15px;
     width: auto;
+}
+.el-tag--groupon {
+    background-color: rgba(158,128,91,.1);
+    border-color: rgba(158,128,91,.2);
+    color: #9e805b;
 }
 </style>

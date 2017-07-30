@@ -4,7 +4,7 @@
           <h2 class="title">话题推荐</h2>
       </div>
 
-      <div class="content_inner">
+      <div class="content_inner" v-loading.body="loading" element-loading-text="拼命加载中">
           <div class="add_topic">
             <el-button id="add_topic_btn" type="primary" size="small" icon="plus" :disabled="topics.length >= 20" @click="addTopic">添加话题</el-button>
             <label for="add_topic_btn" style="margin-left:10px;color:#888">最多添加 20 个话题</label>
@@ -46,7 +46,8 @@ import axios from "../../../scripts/http"
 export default {
     data() {
         return {
-            topics: []
+            topics: [],
+            loading: false
         }
     },
     mounted() {
@@ -55,10 +56,12 @@ export default {
     },
     methods: {
         getShopTopic() {
+            this.loading = true
             axios.post('/v1/topic/search', {}).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.topics = resp.data.data
                 }
+                this.loading = false
             })
         },
         updateTopicStatus(id, status) {
