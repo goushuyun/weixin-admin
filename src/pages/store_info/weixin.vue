@@ -162,7 +162,6 @@ export default {
                 url: '',
                 office_account: {},
                 has_authorized: false
-
             }
         },
         methods: {

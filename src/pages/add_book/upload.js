@@ -26,7 +26,8 @@ export default {
 		},
 		pre_check(file) {
 			// check file type
-			if (file.type.indexOf('sheet') < 0 || file.name.indexOf('xlsx') < 0) {
+			// if (file.type.indexOf('sheet') < 0 || file.name.indexOf('xlsx') < 0) {
+			if (file.name.indexOf('xlsx') < 0) {
 				this.$message({type: 'warning', message: '文件格式错误，必须为 .xlsx 格式的文件'})
 				return false
 			}
