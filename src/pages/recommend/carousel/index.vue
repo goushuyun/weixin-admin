@@ -14,7 +14,7 @@
             <el-col style="width:400px;">
               <div style="width:360px;" @click.stop="getIndex(index)">
                 <el-upload
-                action="http://upload.qiniu.com/"
+                action="https://upload.qbox.me/"
                 :data="imagesFormData"
                 :show-file-list="false"
                 :before-upload="beforeAvatarUpload"

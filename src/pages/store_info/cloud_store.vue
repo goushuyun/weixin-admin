@@ -40,7 +40,7 @@
         <el-form-item label="云店头像：">
           <div>
             <el-upload class="avatar-uploader"
-            action="http://upload.qiniu.com/"
+            action="https://upload.qbox.me/"
             :data="imagesFormData"
             :show-file-list="false"
             :before-upload="beforeAvatarUpload"

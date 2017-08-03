@@ -29,7 +29,7 @@
           <!-- :file-list="fileList" -->
           <el-form-item prop="images" label="实体店图片：">
             <el-upload
-              action="http://upload.qiniu.com/"
+              action="https://upload.qbox.me/"
               :data="imagesFormData"
               list-type="picture-card"
               :file-list="fileList"
