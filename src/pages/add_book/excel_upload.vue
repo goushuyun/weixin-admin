@@ -46,7 +46,7 @@
 
             <el-table-column label="导入结果">
                 <template scope="scope">
-                    <span class="upload_success" v-if="scope.row.error_reason == '' && scope.row.error_file == ''">{{scope.row.success_num}} 条数据全部上传成功</span>
+                    <span class="upload_success" v-if="scope.row.error_reason == '' && scope.row.error_file == ''">{{scope.row.success_num > 0 ? scope.row.success_num + '条数据全部上传成功' : ''}} </span>
 
                     <span v-else>
                         <el-button @click="download('http://images.goushuyun.cn/' + scope.row.error_file)" v-if="scope.row.error_file != ''" style="color: #F7BA2A;" size="small" type="text"><i class="fa fa-download" aria-hidden="true"></i> {{scope.row.failed_num}} 条导入失败</el-button>
