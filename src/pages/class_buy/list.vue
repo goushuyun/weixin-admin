@@ -626,6 +626,7 @@ export default {
       if (query == '') {
         return
       }
+      this.loading.select = true
       //isbn为空
       var is_isbn = isISBNFormat(query)
       var data = {}
@@ -678,8 +679,10 @@ export default {
             goods.label = goods.book.title + '-' + goods.book.isbn
             return goods
           })
+          this.loading.select = false
           this.search_list = goods_list
         } else {
+          this.loading.select = false
           this.search_index = ''
           this.search_list = []
           $('#isbn_input input').focus()
