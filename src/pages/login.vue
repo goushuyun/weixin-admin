@@ -67,10 +67,10 @@
                     <el-form :model="sign" :rules="rules" ref="sign">
                         <div v-if="activeName=='sign_up'">
                             <el-form-item prop="mobile">
-                                <el-input class="mobile" size="small" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
+                                <el-input class="mobile" size="small" placeholder="手机号码" v-model.trim="sign.mobile" @blur="checkSignUp"></el-input>
                             </el-form-item>
                             <el-form-item prop="message_code">
-                                <el-input placeholder="短信验证码" size="small" v-model="sign.message_code">
+                                <el-input placeholder="短信验证码" size="small" v-model.trim="sign.message_code">
                                     <el-button slot="append" style="width:100px" @click="getMessageCode('register')" :disabled="registe_timer_disabled">
                                         <span v-show="!registe_timer_disabled">获取验证码</span>
                                         <span v-show="registe_timer_disabled">（{{register_timer_second}}s）</span>
@@ -78,10 +78,10 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item prop="username">
-                                <el-input placeholder="姓名" size="small" v-model="sign.username"></el-input>
+                                <el-input placeholder="姓名" size="small" v-model.trim="sign.username"></el-input>
                             </el-form-item>
                             <el-form-item prop="password">
-                                <el-input placeholder="设置密码" size="small" type="password" v-model="sign.password" @keyup.enter.native="signUp('sign')"></el-input>
+                                <el-input placeholder="设置密码" size="small" type="password" v-model.trim="sign.password" @keyup.enter.native="signUp('sign')"></el-input>
                             </el-form-item>
                             <el-form-item>
                                 <el-button style="width: 100%;" size="small" type="primary" :loading="btn_loading" @click="signUp('sign')">立即注册</el-button>
@@ -90,10 +90,10 @@
 
                         <div v-if="activeName=='sign_in'">
                             <el-form-item prop="mobile">
-                                <el-input class="mobile" size="small" placeholder="手机号码" v-model="sign.mobile" @blur="checkSignUp"></el-input>
+                                <el-input class="mobile" size="small" placeholder="手机号码" v-model.trim="sign.mobile" @blur="checkSignUp"></el-input>
                             </el-form-item>
                             <el-form-item prop="password" v-show="!forgetPwd">
-                                <el-input placeholder="登录密码" size="small" type="password" v-model="sign.password" @keyup.enter.native="signIn('sign')"></el-input>
+                                <el-input placeholder="登录密码" size="small" type="password" v-model.trim="sign.password" @keyup.enter.native="signIn('sign')"></el-input>
                             </el-form-item>
                             <el-form-item prop="message_code" v-if="forgetPwd">
                                 <el-input placeholder="短信验证码" size="small" v-model="sign.message_code">
