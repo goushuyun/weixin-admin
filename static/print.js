@@ -138,23 +138,22 @@ function printDeliveryOrder(order, items, isLogo, layer, page) {
     console.log(112);
     //设定纸张规格
     LODOP.PRINT_INITA("0mm", "0mm", "98mm", "178 mm", "");
-    console.log("hahahah");
     //判断是否打印logo
-    if (isLogo) {
-        //headerd的logo
-        LODOP.ADD_PRINT_IMAGE(15, 16, 25, 25, "<img src='http://okxy9gsls.bkt.clouddn.com/logo.png'/>");
-        LODOP.ADD_PRINT_TEXT("4.76mm", "11.38mm", "24.61mm", "6.88mm", "购书云");
-        LODOP.SET_PRINT_STYLEA(0, "FontName", "楷体");
-        LODOP.SET_PRINT_STYLEA(0, "FontSize", 15);
-        LODOP.SET_PRINT_STYLEA(0, "Bold", 1);
-
-        //footer的logo
-        LODOP.ADD_PRINT_IMAGE("170.68mm", "3.97mm", "6.61mm", "6.61mm", "<img src='http://okxy9gsls.bkt.clouddn.com/logo.png'/>");
-        LODOP.ADD_PRINT_TEXT("170.95mm", "11.38mm", "22.01mm", "7.94mm", "购书云");
-        LODOP.SET_PRINT_STYLEA(0, "FontName", "aria");
-        LODOP.SET_PRINT_STYLEA(0, "FontSize", 15);
-        LODOP.SET_PRINT_STYLEA(0, "Bold", 1);
-    }
+    // if (isLogo) {
+    //     //headerd的logo
+    //     LODOP.ADD_PRINT_IMAGE(15, 16, 25, 25, "<img src='http://okxy9gsls.bkt.clouddn.com/logo.png'/>");
+    //     LODOP.ADD_PRINT_TEXT("4.76mm", "11.38mm", "24.61mm", "6.88mm", "购书云");
+    //     LODOP.SET_PRINT_STYLEA(0, "FontName", "楷体");
+    //     LODOP.SET_PRINT_STYLEA(0, "FontSize", 15);
+    //     LODOP.SET_PRINT_STYLEA(0, "Bold", 1);
+	//
+    //     //footer的logo
+    //     LODOP.ADD_PRINT_IMAGE("170.68mm", "3.97mm", "6.61mm", "6.61mm", "<img src='http://okxy9gsls.bkt.clouddn.com/logo.png'/>");
+    //     LODOP.ADD_PRINT_TEXT("170.95mm", "11.38mm", "22.01mm", "7.94mm", "购书云");
+    //     LODOP.SET_PRINT_STYLEA(0, "FontName", "aria");
+    //     LODOP.SET_PRINT_STYLEA(0, "FontSize", 15);
+    //     LODOP.SET_PRINT_STYLEA(0, "Bold", 1);
+    // }
 
     //根据layer的层数,如果layer等于0 ，则计算总共的页数，
     var lineSize = 0;
@@ -314,12 +313,12 @@ function printDeliveryOrder(order, items, isLogo, layer, page) {
                 clearTimeout(getJobId)
                 //结果计算
                 resolve(jobId)
-            } else if (count >= 15) {
+            } else if (count >= 30) {
                 clearTimeout(getJobId);
                 reject();
 
             }
-        }, 200);
+        }, 500);
     })
     var singleOrderPrintModel = JSON.parse(localStorage.singleOrderPrintModel);
     accessJobId.then(function(value) {
@@ -337,7 +336,7 @@ function printDeliveryOrder(order, items, isLogo, layer, page) {
                         console.log("start 1");
                         resolve(jobId)
 
-                    } else if (count > 10) {
+                    } else if (count > 30) {
                         console.log("start end 5");
                         clearTimeout(printOkTask);
                         reject();
