@@ -13,7 +13,9 @@
     bottom: 0;
     // background-color: #324057;
     background-color: rgba(0, 0, 0, .85);
-
+    .el-menu-item {
+      min-width: 180px;
+    }
     .left_top {
         padding: 8px 0 8px 20px;
         display: flex;

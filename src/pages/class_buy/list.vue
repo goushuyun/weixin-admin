@@ -83,7 +83,10 @@
             <el-table-column prop="profile" label="班级购说明" min-width="240"></el-table-column>
             <el-table-column label="操作" width="100" fixed="right">
               <template scope="scope">
-                <el-button type="primary" size="small" icon="search" @click="openDialog('view', scope.$index)">查看</el-button>
+                <el-button-group>
+                  <el-button type="primary" size="small" icon="edit" @click="openDialog('view', scope.$index)"></el-button>
+                  <el-button :disabled="scope.row.founder_type != 2" type="primary" size="small" icon="delete" @click="proDelete(scope.$index)"></el-button>
+                </el-button-group>
               </template>
             </el-table-column>
           </el-table>
@@ -430,6 +433,24 @@ export default {
     this.findGroupon()
   },
   methods: {
+    proDelete(index) {
+      this.$confirm('此操作将永久删除该班级购，是否继续？', '提示', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var groupon = this.groupons[index]
+        axios.post('/v1/groupon/update_groupon', {
+          "id": groupon.id,
+          "status": 2
+        }).then(resp => {
+          if (resp.data.message == 'ok') {
+            this.$message.success('班级购删除成功！')
+            this.findGroupon()
+          }
+        })
+      }).catch(() => {});
+    },
     getSchoolMajors() {
       axios.post('/v1/groupon/get_school_majors', {
         user_type: 2

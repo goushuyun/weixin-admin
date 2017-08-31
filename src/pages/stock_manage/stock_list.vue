@@ -45,8 +45,8 @@
       </el-form-item>
     </el-form>
     <div class="data_table" v-loading="loading" element-loading-text="拼命加载中">
-        <el-table :data="tableData" stripe style="width: 100%">
-            <el-table-column type="index" width="56" label=""></el-table-column>
+        <el-table :data="tableData" stripe border style="width: 100%">
+            <el-table-column type="index" width="60"></el-table-column>
             <el-table-column label="图片" width="100">
                 <template scope="scope" >
                   <div class="image_wrap">
@@ -92,7 +92,7 @@
                     <div v-if="scope.row.has_old_book && !scope.row.old_book.location.length" class="goods_item old_color ellipsis">无</div>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="160">
+            <el-table-column label="操作" fixed="right" width="140">
                 <template scope="scope">
                     <!-- <el-button type="text" size="small" @click="preEdit(scope.$index)" icon="edit"></el-button>
                     <el-button type="text" style="color:#FF4949" size="small" @click="proDelete(scope.$index)" icon="delete"></el-button> -->
