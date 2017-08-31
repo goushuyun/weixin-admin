@@ -112,6 +112,18 @@
                     <i class="fa fa-balance-scale" aria-hidden="true"></i>线下零售
                 </el-menu-item>
               </el-submenu>
+              <el-submenu index="3">
+                <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>库存管理</template>
+                <el-menu-item index="3-1" :route="{name:'by_isbn'}">
+                    <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
+                </el-menu-item>
+                <el-menu-item index="3-2" :route="{name:'by_excel'}">
+                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>Excel上架
+                </el-menu-item>
+                <el-menu-item index="3-3" :route="{name:'stock_list'}">
+                    <i class="fa fa-university" aria-hidden="true"></i>库存查看
+                </el-menu-item>
+              </el-submenu>
               <el-submenu index="2">
                 <template slot="title"><i class="fa fa-flag" aria-hidden="true"></i>推荐管理</template>
                 <el-menu-item index="2-1" :route="{name:'topic'}">
@@ -140,19 +152,6 @@
                     <i class="fa fa-podcast" aria-hidden="true"></i>我的求购
                 </el-menu-item>
               </el-submenu> -->
-
-              <el-submenu index="3">
-                <template slot="title"><i class="fa fa-book" aria-hidden="true"></i>库存管理</template>
-                <el-menu-item index="3-1" :route="{name:'by_isbn'}">
-                    <i class="fa fa-search" aria-hidden="true"></i>ISBN上架
-                </el-menu-item>
-                <el-menu-item index="3-2" :route="{name:'by_excel'}">
-                    <i class="fa fa-file-excel-o" aria-hidden="true"></i>Excel上架
-                </el-menu-item>
-                <el-menu-item index="3-3" :route="{name:'stock_list'}">
-                    <i class="fa fa-university" aria-hidden="true"></i>库存查看
-                </el-menu-item>
-              </el-submenu>
               <el-submenu index="4">
                 <template slot="title"><i class="fa fa-line-chart" aria-hidden="true"></i>资产统计</template>
                 <el-menu-item index="4-1" :route="{name:'online_account'}">
