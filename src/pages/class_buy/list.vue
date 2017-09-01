@@ -532,9 +532,13 @@ export default {
         return el.id == school_id
       })
       if (is_dialog == true) {
-        this.dialog_institutes = school.institutes
+        this.$nextTick(_ => {
+          this.dialog_institutes = school.institutes
+        })
       } else {
-        this.institutes = school.institutes
+        this.$nextTick(_ => {
+          this.institutes = school.institutes
+        })
       }
     },
     getMajors(is_dialog) {
@@ -544,13 +548,17 @@ export default {
         var dialog_institutes = this.dialog_institutes.find(el => {
           return el.id == institute_id
         })
-        this.dialog_majors = dialog_institutes.majors
+        this.$nextTick(_ => {
+          this.dialog_majors = dialog_institutes.majors
+        })
       } else {
         institute_id = this.institute_id
         var institute = this.institutes.find(el => {
           return el.id == institute_id
         })
-        this.majors = institute.majors
+        this.$nextTick(_ => {
+          this.majors = institute.majors
+        })
       }
     },
     resetForm() {
