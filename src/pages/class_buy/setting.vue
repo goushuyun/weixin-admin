@@ -11,7 +11,7 @@
           </div>
         </div>
         <div class="school" v-for="(school, s_index) in school_majors">
-          <el-collapse>
+          <el-collapse v-model="opens">
             <el-collapse-item :name="school.id">
               <template slot="title">
                 <span class="school_name">{{school.name}}</span>
@@ -84,7 +84,9 @@ export default {
       activeNames: ['1'], // 用于打开 collapse
       school_majors: [], // 本页面全部数据：学校 - 学院 - 专业
 
-      loading: false
+      loading: false,
+
+      opens: []
     }
   },
   mounted() {
@@ -128,6 +130,9 @@ export default {
       this.school_majors[s_index].add = true
       this.$nextTick(() => {
         $('#add_institution_' + s_index + ' input').focus()
+        if (this.opens.indexOf(this.school_majors[s_index].id) < 0) {
+          this.opens.push(this.school_majors[s_index].id)
+        }
       })
     },
     cancelAddInstitute(s_index) {
