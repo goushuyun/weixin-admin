@@ -81,11 +81,11 @@
             </el-table-column>
             <el-table-column prop="expire_at" label="截止日期" width="140"></el-table-column>
             <el-table-column prop="profile" label="班级购说明" min-width="240"></el-table-column>
-            <el-table-column label="操作" width="100" fixed="right">
+            <el-table-column label="操作" width="130" fixed="right">
               <template scope="scope">
                 <el-button-group>
-                  <el-button type="primary" size="small" icon="edit" @click="openDialog('view', scope.$index)"></el-button>
-                  <el-button :disabled="scope.row.founder_type != 2" type="primary" size="small" icon="delete" @click="proDelete(scope.$index)"></el-button>
+                  <el-button type="primary" size="small" @click="openDialog('view', scope.$index)">查看</el-button>
+                  <el-button :disabled="scope.row.founder_type != 2" type="primary" size="small" @click="proDelete(scope.$index)">删除</el-button>
                 </el-button-group>
               </template>
             </el-table-column>

@@ -397,7 +397,7 @@ export default {
         checkActualRefundFee() {
             var input = this.actual_refund_fee
             var input_num = priceInt(input)
-            var max_value = priceInt(this.after_sale_detail.total_fee)
+            var max_value = priceInt(this.order_detail.total_fee)
             var reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/
             if (!reg.test(input.toString()) || input == 0) {
                 this.actual_refund_fee = ''
