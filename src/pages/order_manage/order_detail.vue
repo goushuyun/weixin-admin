@@ -43,7 +43,9 @@
         <div style="width:640px">
           <el-row type="flex" align="middle" v-for="(item,index) in order_items" :style="index + 1 == order_items.length ? '' : 'border-bottom: 1px solid #EEF1F6;'">
             <el-col style="width:140px;">
-              <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
+              <div class="image_area">
+                <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
+              </div>
             </el-col>
             <el-col style="width:300px">
               <p>{{item.book_title}}</p>
@@ -685,10 +687,15 @@ export default {
             border-left: 1px solid #DFE6EC;
             text-align: center;
         }
-        img {
-            width: 48px;
-            height: 64px;
-            margin: 5px 40px;
+        .image_area {
+          height: 64px;
+          width: 64px;
+          text-align: center;
+          margin: 5px 40px;
+          img {
+            max-width: 48px;
+            max-height: 64px;
+          }
         }
         p {
             line-height: 24px;
@@ -719,10 +726,11 @@ export default {
     .refund_img {
         width: 80px;
         height: 80px;
+        text-align: center;
         margin: 12px 12px 12px 0;
         img {
-            width: 80px;
-            height: 80px;
+            max-width: 80px;
+            max-height: 80px;
         }
     }
 }
