@@ -240,7 +240,7 @@ export default {
           text-align: center;
           margin: 5px 40px;
           img {
-            max-width: 48px;
+            max-width: 64px;
             max-height: 64px;
           }
         }
