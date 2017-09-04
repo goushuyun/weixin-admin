@@ -6,13 +6,13 @@
   <div class="content_inner">
     <el-form :inline="true" label-width="80px" class="search_area">
       <el-form-item label="ISBN">
-        <el-input id="isbn" size="small" v-model.trim="isbn" @keyup.enter.native="getData"></el-input>
+        <el-input id="isbn" style="width: 203px;" size="small" v-model.trim="isbn" @keyup.enter.native="getData"></el-input>
       </el-form-item>
       <el-form-item label="书名">
-        <el-input size="small" v-model.trim="title" @keyup.enter.native="getData"></el-input>
+        <el-input style="width: 203px;" size="small" v-model.trim="title" @keyup.enter.native="getData"></el-input>
       </el-form-item>
       <el-form-item label="作者">
-        <el-input size="small" v-model.trim="author" @keyup.enter.native="getData"></el-input>
+        <el-input style="width: 203px;" size="small" v-model.trim="author" @keyup.enter.native="getData"></el-input>
       </el-form-item>
       <el-form-item class="btn_bottom">
         <el-button size="small" type="primary" @click="getData"><i class="fa fa-search" aria-hidden="true"></i> 查询</el-button>
@@ -47,7 +47,7 @@
     <div class="data_table" v-loading="loading" element-loading-text="拼命加载中">
         <el-table :data="tableData" stripe border style="width: 100%">
             <el-table-column type="index" width="60"></el-table-column>
-            <el-table-column label="图片" width="100">
+            <el-table-column label="图片" width="110">
                 <template scope="scope" >
                   <div class="image_wrap">
                       <img :src="scope.row.book.image == '' ? 'http://image.goushuyun.cn/book.png' : ('http://images.goushuyun.cn/' + scope.row.book.image)" class="image"></img>
