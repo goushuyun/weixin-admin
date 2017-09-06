@@ -23,7 +23,7 @@
         </el-form-item>
         <el-form-item>
             <el-input placeholder="搜索值" v-model.trim="search_value" style="width: 290px;" size="small" icon="search" @input="inputSearchValue" :on-icon-click="getOrders">
-                <el-select v-model="search_type" style="width: 125px;" clearable slot="prepend" placeholder="筛选条件" size="small" @change="handleSearchValue">
+                <el-select v-model="search_type" style="width: 125px;" slot="prepend" placeholder="筛选条件" size="small" @change="handleSearchValue">
                     <el-option label="订单编号" value="order"></el-option>
                     <el-option label="收货人手机号" value="mobile"></el-option>
                     <el-option label="收货人姓名" value="name"></el-option>
@@ -293,7 +293,7 @@ export default {
             school_id: '',
             seller_remark_type: '',
 
-            search_type: '',
+            search_type: 'order',
             search_value: '',
             order_id: '',
             mobile: '',
@@ -410,7 +410,6 @@ export default {
             })
         },
         setRemark(index) {
-          console.log(index);
             var remark = this.remark_list[index]
             var seller_remark = this.remark_dialog.seller_remark
             if (seller_remark) {
@@ -791,7 +790,7 @@ export default {
             this.school_id = ''
             this.seller_remark_type = ''
 
-            this.search_type = ''
+            this.search_type = 'order'
             this.search_value = ''
             this.order_id = ''
             this.mobile = ''
@@ -802,11 +801,10 @@ export default {
         },
         getStoreData() {
             var order_search = this.$store.state.order_search
-            console.log(order_search);
             this.order_time = order_search.order_time ? order_search.order_time : [null, null]
             this.order_status = order_search.order_status != undefined ? order_search.order_status : 1
             this.school_id = order_search.school_id ? order_search.school_id : ''
-            this.search_type = order_search.search_type ? order_search.search_type : ''
+            this.search_type = order_search.search_type ? order_search.search_type : 'order'
             this.search_value = order_search.search_value ? order_search.search_value : ''
             this.order_id = order_search.order_id ? order_search.order_id : ''
             this.mobile = order_search.mobile ? order_search.mobile : ''
