@@ -189,7 +189,7 @@
                 <div class="class_buy_info" style="width:auto; position: relative; top: 78px; left: 30px;">
                   <el-button v-if="!edit_main_info" type="primary" size="small" :disabled="dialog_groupon.founder_type != 2" @click="edit_main_info = true">修改信息</el-button>
                   <el-button v-if="edit_main_info" type="primary" size="small" @click="saveMainInfo('dialog_data')">保存</el-button>
-                  <el-button v-if="edit_main_info" type="default" size="small" @click="openDialog('view', null)">取消</el-button>
+                  <el-button v-if="edit_main_info" type="default" size="small" @click="reOpenDialog('view', null)">取消</el-button>
                 </div>
               </transition>
             </div>
@@ -510,16 +510,19 @@ export default {
         var school_id = this.dialog_data.dialog_school_id
         if (school_id != '') {
           this.getInstitutes(true)
-        } else {
-          this.dialog_data.dialog_institute_id = ''
           this.dialog_data.dialog_institute_major_id = ''
-          this.dialog_institutes = []
+          this.dialog_data.dialog_institute_id = ''
+        } else {
+          this.dialog_data.dialog_institute_major_id = ''
+          this.dialog_data.dialog_institute_id = ''
           this.dialog_majors = []
+          this.dialog_institutes = []
         }
       } else if (option === 'institute') {
         var institute_id = this.dialog_data.dialog_institute_id
         if (institute_id != '') {
           this.getMajors(true)
+          this.dialog_data.dialog_institute_major_id = ''
         } else {
           this.dialog_data.dialog_institute_major_id = ''
           this.dialog_majors = []
@@ -532,13 +535,9 @@ export default {
         return el.id == school_id
       })
       if (is_dialog == true) {
-        this.$nextTick(_ => {
-          this.dialog_institutes = school.institutes
-        })
+        this.dialog_institutes = school.institutes
       } else {
-        this.$nextTick(_ => {
-          this.institutes = school.institutes
-        })
+        this.institutes = school.institutes
       }
     },
     getMajors(is_dialog) {
@@ -548,17 +547,13 @@ export default {
         var dialog_institutes = this.dialog_institutes.find(el => {
           return el.id == institute_id
         })
-        this.$nextTick(_ => {
-          this.dialog_majors = dialog_institutes.majors
-        })
+        this.dialog_majors = dialog_institutes.majors
       } else {
         institute_id = this.institute_id
         var institute = this.institutes.find(el => {
           return el.id == institute_id
         })
-        this.$nextTick(_ => {
-          this.majors = institute.majors
-        })
+        this.majors = institute.majors
       }
     },
     resetForm() {
@@ -582,6 +577,12 @@ export default {
     handleCurrentChange(page) {
       this.page = page
       this.findGroupon()
+    },
+    reOpenDialog(operate_type, index) {
+      this.dialog_visible = false
+      this.$nextTick(_ => {
+        this.openDialog(operate_type, index)
+      })
     },
     openDialog(operate_type, index) {
       // 记录参数
