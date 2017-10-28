@@ -209,7 +209,7 @@ export default {
     mixins: [mix],
     data() {
         var checkCardNo = (rule, value, callback) => {
-            let cardNoReg = /\d{15}|\d{19}/
+            let cardNoReg = /^\d{1,20}$/
             if (!cardNoReg.test(value)) {
                 callback(new Error('银行账号格式不正确'));
             } else {

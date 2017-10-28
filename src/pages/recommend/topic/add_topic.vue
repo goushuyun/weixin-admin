@@ -8,13 +8,17 @@
         <el-form label-width="100px">
             <el-form-item label="话题名称" required>
                 <label v-if="!update && topic_id" class="margin_right20">{{update_title}}</label>
-                <el-input v-if="(update && topic_id) || (!topic_id)" class="margin_right20" id="title_input" v-model="title" size="small" :maxlength="10"></el-input>
+                <el-input v-if="(update && topic_id) || (!topic_id)" style="width: 460px;" class="margin_right20" id="title_input" v-model="title" size="small" :maxlength="10"></el-input>
                 <el-button v-if="!update && topic_id" type="text" @click="proUpdate">修改</el-button>
                 <el-button v-if="update && topic_id" type="text" @click="confirmUpdate">确定</el-button>
                 <el-button v-if="update && topic_id" type="text" style="color:#13CE66" @click="update = false">取消</el-button>
             </el-form-item>
             <el-form-item label="添加书籍" required>
-                <el-input id="isbn_input" v-model="isbn" size="small" placeholder="请输入isbn编码" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input>
+                <!-- <el-input id="isbn_input" v-model="isbn" size="small" placeholder="请输入ISBN或书名" :maxlength="13" icon="search" @keyup.enter.native="search" :on-icon-click="search"></el-input> -->
+                <el-select id="isbn_input" style="width: 460px;" size="small" filterable remote placeholder="通过搜索 ISBN 或这 书名 添加书籍" :loading="search_loading"
+                  v-model="search_index" :remote-method="search" @change="handleSelect">
+                  <el-option v-for="(item,index) in search_list" :key="index" :label="item.label" :value="index"></el-option>
+                </el-select>
                 <el-button style="float:right;margin:0 20px" size="small" @click="prePage">返回</el-button>
                 <el-button v-if="!topic_id" style="float:right" type="primary" size="small" @click="addTopic">提交发布</el-button>
             </el-form-item>
@@ -69,6 +73,10 @@ export default {
             goods: [],
 
             loading: false,
+
+            search_index: '', // 搜索isbn
+            search_list: [], //搜索出来的图书列表
+            search_loading: false,
 
             page: 1,
             size: 15,
@@ -134,7 +142,6 @@ export default {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data[0]
                     this.total_count = data.item_count
-                    console.log(data.items);
                     this.goods = data.items.map(el => {
                         el.price = priceFloat(el.book_price)
                         return el
@@ -221,78 +228,87 @@ export default {
                 }
             })
         },
-        search() {
-            //isbn为空
-            if (!isISBNFormat(this.isbn)) {
-                this.$message.warning('请填写正确的 ISBN 码')
+        search(query) {
+            query = query.trim()
+            if (query == '') {
                 return
             }
-            // 如果是添加话题，则每次添加话题项之前判断列表中又没有这本书
+            this.search_loading = true
+            var is_isbn = isISBNFormat(query)
+            var data = {
+                "search_amount": -100, //required -100 过滤这个线索 ;除了-100 的num 查找库存为num的数据
+                "search_type": -100, //required -100 过滤这个线索 ; 0 检索新书数据 1 检索二手书数据
+                "search_picture": -100, //required -100 过滤这个线索 0 查找图片不为空的商品 1查找图片为空的商品
+            }
+            if (is_isbn == true) {
+                data.isbn = query
+            } else {
+                data.title = query
+            }
+            // 检查仓库中又没有这本书
+            axios.post("/v1/goods/search", data).then(resp => {
+                if (resp.data.message == 'ok') {
+                    var data = resp.data.data.map(goods => {
+                      var goods_id = ''
+                      var amount = 0
+                      if (goods.new_book) {
+                          amount += goods.new_book.amount
+                          goods_id = goods.new_book.goods_id
+                      }
+                      if (goods.old_book) {
+                          amount += goods.old_book.amount
+                          if (goods_id =='') {
+                              goods_id = goods.old_book.goods_id
+                          }
+                      }
+                      goods.goods_id = goods_id
+                      goods.amount = amount
+                      goods.label = goods.book.title + '-' + goods.book.isbn
+                      return goods
+                    })
+                    this.search_loading = false
+                    this.search_list = data
+                } else {
+                    this.search_loading = false
+                    this.search_index = ''
+                    this.search_list = []
+                    $('#isbn_input input').focus()
+                }
+            })
+        },
+        handleSelect() {
+            var item = this.search_list[this.search_index]
+            if (item == undefined) {
+                return
+            }
             if (!this.topic_id && this.goods.length > 0) {
                 for (var i = 0; i < this.goods.length; i++) {
-                    if (this.goods[i].isbn == this.isbn) {
+                    if (this.goods[i].isbn == item.book.isbn) {
                         this.$message.warning('该商品已在推荐列表中')
-                        this.isbn = ''
+                        this.search_index = ''
+                        this.search_list = []
                         $('#isbn_input input').focus()
                         return
                     }
                 }
             }
-            // 检查仓库中又没有这本书
-            this.loading = true
-            axios.post("/v1/goods/search", {
-                "isbn": this.isbn, //not required 书本的isbn
-                "search_amount": -100, //required -100 过滤这个线索 ;除了-100 的num 查找库存为num的数据
-                "search_type": -100, //required -100 过滤这个线索 ; 0 检索新书数据 1 检索二手书数据
-                "search_picture": -100, //required -100 过滤这个线索 0 查找图片不为空的商品 1查找图片为空的商品
-            }).then(resp => {
-                if (resp.data.message == 'ok') {
-                    var data = resp.data.data
-                    console.log(data);
-                    // 如果没有找到，则直接返回
-                    if (data.length == 0) {
-                        this.$message.warning('没有在仓库找到这本书')
-                        this.loading = false
-                        return
-                    }
-                    // 否则继续进行如下操作
-                    let goods = data[0]
-                    //检查商品库存数量，小于0 则提示不能推荐
-                    var amount = 0
-                    var goods_id = ''
-                    if (goods.new_book) {
-                        amount += goods.new_book.amount
-                        goods_id = goods.new_book.goods_id
-                    }
-                    if (goods.old_book) {
-                        amount += goods.old_book.amount
-                        if (goods_id =='') {
-                            goods_id = goods.old_book.goods_id
-                        }
-                    }
-                    if (amount < 1) {
-                        this.$message.warning('该商品库存不足，请及时上架商品！')
-                        this.loading = false
-                        return
-                    }
-                    if (this.topic_id != '') {
-                        // 如果是修改话题，则直接添加话题项
-                        this.addTopicItem(goods_id)
-                    } else {
-                        // 如果是添加话题，则先加入到goods中，最后统一提交
-                        goods.book.price = priceFloat(goods.book.price)
-                        goods.book.stock = amount
-                        goods.book.goods_id = goods_id
-                        this.goods.unshift(goods.book)
-                    }
-                    this.loading = false
-                    this.isbn = ''
-                    $('#isbn_input input').focus()
-                } else {
-                    this.isbn = ''
-                    $('#isbn_input input').focus()
-                }
-            })
+            //检查商品库存数量，小于0 则提示不能推荐
+            if (item.amount < 1) {
+                this.$message.warning('该商品库存不足，请及时上架商品！')
+                return
+            }
+            if (this.topic_id != '') {
+                // 如果是修改话题，则直接添加话题项
+                this.addTopicItem(item.goods_id)
+            } else {
+                // 如果是添加话题，则先加入到goods中，最后统一提交
+                item.book.price = priceFloat(item.book.price)
+                item.book.goods_id = item.goods_id
+                this.goods.unshift(item.book)
+            }
+            this.search_index = ''
+            this.search_list = []
+            $('#isbn_input input').focus()
         },
         addTopicItem(goods_id) {
             axios.post('/v1/topic/add_item', {
@@ -310,9 +326,6 @@ export default {
 </script>
 
 <style lang="scss">
-.el-input {
-    width: 220px;
-}
 .pre_page {
     &:hover {
         color: #20A0FF;

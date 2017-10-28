@@ -230,9 +230,9 @@ export default {
             this.$router.push({name: 'offline_retail'})
         },
         goToAddBook() {
-            this.$store.commit('setMenuActive', '3-1')
-            localStorage.setItem('menu_active', '3-1')
-            this.$router.push({name: 'by_isbn'})
+            this.$store.commit('setMenuActive', '3-2')
+            localStorage.setItem('menu_active', '3-2')
+            this.$router.push({name: 'by_excel'})
         },
         goToStoreSetting() {
             this.$store.commit('setMenuActive', '5-2')
