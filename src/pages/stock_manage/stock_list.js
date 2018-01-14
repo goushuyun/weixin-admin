@@ -759,6 +759,37 @@ export default {
             }).catch(() => {
                 return false
             });
+        },
+        cleanStorage() {
+            this.$prompt('为了确保安全，请输入“新书”或者“旧书”后点击确认！', '清空数据库', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              inputPattern: /^新书$|^旧书$/,
+              inputErrorMessage: '输入的指令有误'
+            }).then(({ value }) => {
+                var new_or_old = ""
+                if (value === "新书") {
+                    new_or_old = 1
+                } else if (value === "旧书") {
+                    new_or_old = 2
+                } else {
+                    this.$message.error("您的输入有误，请输入“新书”或“旧书”后点击确认！")
+                    return
+                }
+                axios.post('/v1/goods/clean_storage', {
+                    "new_or_old": new_or_old
+                }).then(resp => {
+                    if (resp.data.message == 'ok') {
+                        this.$message.info('删除成功')
+                    } else {
+                        this.$message.error(resp.data.message)
+                    }
+                }).catch(resp => {
+                    this.$message.error(resp.data.message)
+                })
+            }).catch(() => {
+                this.$message.error("未知错误，请稍后再试！")
+            });
         }
     }
 }
