@@ -789,7 +789,6 @@ export default {
                     this.$message.error(resp.data.message)
                 })
             }).catch(() => {
-                this.$message.error("未知错误，请稍后再试！")
             });
         }
     }
