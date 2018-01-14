@@ -773,7 +773,7 @@ export default {
                 } else if (value === "旧书") {
                     new_or_old = 2
                 } else {
-                    this.$message.error("您的输入有误，请输入“新书”或“旧书”后点击确定！")
+                    this.$message.error("您的输入有误，请输入“新书”或者“旧书”后点击确定！")
                     return
                 }
                 axios.post('/v1/goods/clean_storage', {
@@ -781,6 +781,7 @@ export default {
                 }).then(resp => {
                     if (resp.data.message == 'ok') {
                         this.$message.info('删除成功')
+                        this.getData()
                     } else {
                         this.$message.error(resp.data.message)
                     }
