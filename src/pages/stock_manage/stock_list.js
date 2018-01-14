@@ -761,7 +761,7 @@ export default {
             });
         },
         cleanStorage() {
-            this.$prompt('为了确保安全，请输入“新书”或者“旧书”后点击确认！', '清空数据库', {
+            this.$prompt('为了确保安全，请输入“新书”或者“旧书”后点击确定！', '清空数据库', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               inputPattern: /^新书$|^旧书$/,
@@ -773,7 +773,7 @@ export default {
                 } else if (value === "旧书") {
                     new_or_old = 2
                 } else {
-                    this.$message.error("您的输入有误，请输入“新书”或“旧书”后点击确认！")
+                    this.$message.error("您的输入有误，请输入“新书”或“旧书”后点击确定！")
                     return
                 }
                 axios.post('/v1/goods/clean_storage', {
