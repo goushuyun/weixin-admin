@@ -761,26 +761,26 @@ export default {
             });
         },
         cleanStorage() {
-            this.$prompt('为了确保安全，请输入“新书”或者“旧书”后点击确定！', '清空数据库', {
+            this.$prompt('为了确保安全，请输入“新书”或者“二手书”后点击确定！', '库存清零', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
-              inputPattern: /^新书$|^旧书$/,
+              inputPattern: /^新书$|^二手书$/,
               inputErrorMessage: '输入的指令有误'
             }).then(({ value }) => {
-                var new_or_old = ""
+                var new_or_old
                 if (value === "新书") {
                     new_or_old = 1
-                } else if (value === "旧书") {
+                } else if (value === "二手书") {
                     new_or_old = 2
                 } else {
-                    this.$message.error("您的输入有误，请输入“新书”或者“旧书”后点击确定！")
+                    this.$message.error("您的输入有误，请输入“新书”或者“二手书”后点击确定！")
                     return
                 }
                 axios.post('/v1/goods/clean_storage', {
                     "new_or_old": new_or_old
                 }).then(resp => {
-                    if (resp.data.message == 'ok') {
-                        this.$message.info('删除成功')
+                    if (resp.data.message === 'ok') {
+                        this.$message.success((new_or_old === 1 ? "新书" : "二手书") + "库存清零成功！")
                         this.getData()
                     } else {
                         this.$message.error(resp.data.message)
