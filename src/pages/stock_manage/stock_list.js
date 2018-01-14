@@ -761,7 +761,7 @@ export default {
             });
         },
         cleanStorage() {
-            this.$prompt('为了确保安全，请输入“新书”或者“二手书”后点击确定！', '库存清零', {
+            this.$prompt('此操作会将书籍数量清零，输入“新书”会清零全部新书库存，输入“二手书”会清零全部二手书库存！', '库存清零', {
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               inputPattern: /^新书$|^二手书$/,
