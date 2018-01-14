@@ -44,7 +44,7 @@
         <el-button size="small" type="primary" @click="resetForm"><i class="fa fa-refresh" aria-hidden="true"></i> 重置</el-button>
       </el-form-item>
       <el-form-item class="btn_bottom">
-        <el-button size="small" type="danger" @click="cleanStorage"><i class="fa fa-recycle" aria-hidden="true"></i> 清库</el-button>
+        <el-button size="small" type="danger" @click="cleanStorage"><i class="fa fa-recycle" aria-hidden="true"></i> 库存清零</el-button>
       </el-form-item>
     </el-form>
     <div class="data_table" v-loading="loading" element-loading-text="拼命加载中">
