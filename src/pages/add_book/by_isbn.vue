@@ -359,7 +359,7 @@ export default {
                 "search_amount": "0",
                 "search_type": "-100",
                 "search_picture": "-100",
-                "is_location": true
+                "need_location": true
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     if (resp.data.data.length > 0) {

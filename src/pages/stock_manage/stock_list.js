@@ -563,7 +563,7 @@ export default {
                 "size": self.size, //not required 一页显示的数据条数，默认20
                 "author": self.author, //not required 作者搜索模糊搜索
                 "publisher": "",        //not required 出版社模糊搜索
-                "is_location": true
+                "need_location": true
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     var data = resp.data.data
