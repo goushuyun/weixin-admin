@@ -358,7 +358,8 @@ export default {
                 "isbn": this.book_info.isbn,
                 "search_amount": "0",
                 "search_type": "-100",
-                "search_picture": "-100"
+                "search_picture": "-100",
+                "need_location": true
             }).then(resp => {
                 if (resp.data.message == 'ok') {
                     if (resp.data.data.length > 0) {
