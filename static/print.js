@@ -162,7 +162,7 @@ function printDeliveryOrder(order, items, isLogo, layer, page) {
         //首先要计算需要打印几张纸
 
         for (var i = 0; i < items.length; i++) {
-            var line = getLine(items[i].title)
+            var line = getLine(items[i].title) + getLine(items[i].shelf)
             lineSize += 15 + (line - 1) * 3;
 
             if ((lineSize + 15) >= 115 && (items.length - i > 1)) {
