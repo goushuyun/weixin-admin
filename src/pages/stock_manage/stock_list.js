@@ -348,9 +348,9 @@ export default {
             var data = {
                 "id": this.goods_id, //required
                 "isbn": this.book_info.isbn, //not required
-                "new_book_price": this.new_book.price && parseInt(this.new_book.price) ? priceInt(this.new_book.price) : -100, //not required  -100 表示改成0
+                "new_book_price": this.new_book.price && priceInt(this.new_book.price) ? priceInt(this.new_book.price) : -100, //not required  -100 表示改成0
                 "new_book_amount": this.new_book.amount ? this.new_book.amount : -100, //not required  -100 表示改成0
-                "old_book_price": this.old_book.price && parseInt(this.old_book.price) ? priceInt(this.old_book.price) : -100, //not required  -100 表示改成0
+                "old_book_price": this.old_book.price && priceInt(this.old_book.price) ? priceInt(this.old_book.price) : -100, //not required  -100 表示改成0
                 "old_book_amount": this.old_book.amount ? this.old_book.amount : -100, //not required  -100 表示改成0
                 "sales_status": -100, //not required  -100 改成销售中 1 改成停止销售
                 "book_id": this.book_info.id

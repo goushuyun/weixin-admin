@@ -11,3 +11,8 @@ pids
 *.pid
 *.seed
 *.sh
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
