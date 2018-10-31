@@ -346,7 +346,7 @@ export default {
             this.form.imagesArray.forEach(i => {
                 var obj = {
                     key: i,
-                    url: 'http://onv8eua8j.bkt.clouddn.com/' + i
+                    url: 'http://images.goushuyun.cn/' + i
                 }
                 imagesArray.push(obj)
             })

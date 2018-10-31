@@ -95,7 +95,7 @@
               <el-row type="flex" align="middle" v-for="(item,index) in order.items" :style="index + 1 == order.items.length ? '' : 'border-bottom: 1px solid #EEF1F6;'">
                 <el-col style="width:140px;">
                   <div class="image_area">
-                    <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
+                    <img :src="'http://images.goushuyun.cn/' + item.book_image" class="image"></img>
                   </div>
                 </el-col>
                 <el-col style="width:300px">

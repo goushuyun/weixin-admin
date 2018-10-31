@@ -264,9 +264,9 @@ export default {
             let vuex_logo = this.$store.state.store_logo
             let local_logo = localStorage.getItem('store_logo')
             if (vuex_logo) {
-                return 'http://onv8eua8j.bkt.clouddn.com/' + vuex_logo
+                return 'http://images.goushuyun.cn/' + vuex_logo
             } else if (local_logo) {
-                return 'http://onv8eua8j.bkt.clouddn.com/' + local_logo
+                return 'http://images.goushuyun.cn/' + local_logo
             } else {
                 return 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png'
             }

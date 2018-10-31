@@ -294,7 +294,7 @@ export default {
         updateImage(logo_key) {
             var data = this.circulars[this.imagesFormData.index]
             var id = data.id
-            var image = 'http://onv8eua8j.bkt.clouddn.com/' + logo_key
+            var image = 'http://images.goushuyun.cn/' + logo_key
             axios.post('/v1/circular/update',{id,image}).then(resp => {
                 if (resp.data.message == 'ok') {
                     this.circulars[this.imagesFormData.index].image = image

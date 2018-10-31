@@ -46,7 +46,7 @@
             :before-upload="beforeAvatarUpload"
             :on-success="handleAvatarSuccess"
             :on-error="handleAvatarError">
-              <img v-if="form.logo" :src="'http://onv8eua8j.bkt.clouddn.com/' + form.logo" class="avatar">
+              <img v-if="form.logo" :src="'http://images.goushuyun.cn/' + form.logo" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </div>

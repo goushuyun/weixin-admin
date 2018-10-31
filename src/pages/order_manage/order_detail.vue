@@ -44,7 +44,7 @@
           <el-row type="flex" align="middle" v-for="(item,index) in order_items" :style="index + 1 == order_items.length ? '' : 'border-bottom: 1px solid #EEF1F6;'">
             <el-col style="width:140px;">
               <div class="image_area">
-                <img :src="'http://onv8eua8j.bkt.clouddn.com/' + item.book_image" class="image"></img>
+                <img :src="'http://images.goushuyun.cn/' + item.book_image" class="image"></img>
               </div>
             </el-col>
             <el-col style="width:300px">
@@ -101,13 +101,13 @@
                 <div class="info_info">
                     <label class="first-lable">查看图片：</label>
                     <el-card v-if="showPicture" :body-style="{ padding: '0px' }" class="refund_img" v-for="(img,index) in after_sale_detail.images">
-                      <img :src="'http://onv8eua8j.bkt.clouddn.com/' + img.url" @click="picturePreview(index)" style="cursor:pointer;">
+                      <img :src="'http://images.goushuyun.cn/' + img.url" @click="picturePreview(index)" style="cursor:pointer;">
                     </el-card>
                     <label v-else>买家没有上传图片</label>
                     <el-dialog v-model="dialog.visible" size="tiny">
                       <el-carousel v-if="dialog.visible" height="450px" :autoplay="false" arrow="hover" :initial-index="dialog.index">
                         <el-carousel-item style="text-align: center;" v-for="dialog_img in after_sale_detail.images" :key="dialog_img">
-                          <img height="100%" :src="'http://onv8eua8j.bkt.clouddn.com/' + dialog_img.url">
+                          <img height="100%" :src="'http://images.goushuyun.cn/' + dialog_img.url">
                         </el-carousel-item>
                       </el-carousel>
                     </el-dialog>
