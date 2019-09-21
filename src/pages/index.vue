@@ -178,7 +178,7 @@
         <transition name="el-zoom-in-center">
           <div v-show="show_btns" class="left_bottom" @mouseleave="show_btns = false">
             <div class="btn_area" @click="goToGoushuyun">
-              <img src="http://okxy9gsls.bkt.clouddn.com/gsy_btn.png">
+              <img src="https://admin.goushuyun.com/images/logo.png">
             </div>
             <div class="btn_area" @click="goToshops">
               <i class="fa fa-arrow-left icon" aria-hidden="true"></i>
@@ -268,7 +268,7 @@ export default {
             } else if (local_logo) {
                 return 'http://images.goushuyun.cn/' + local_logo
             } else {
-                return 'http://okxy9gsls.bkt.clouddn.com/cloudshoplogo1.png'
+                return 'https://admin.goushuyun.com/images/logo.png'
             }
         },
         store_name() {
