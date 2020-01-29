@@ -232,7 +232,7 @@ export default {
             },
             store_url() {
                 // url 中填入官方服务号的 appid, 商户的store_id
-                return 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx6d36779ce4dd3dfa&redirect_uri='+ conf.url_encode_domain +'%2fone%2ftwo%2findex.html%23%2findex%2fmain&response_type=code&scope=snsapi_base&state=' + this.office_account.store_id + '&component_appid='+ conf.component_appid +'#wechat_redirect'
+                return 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx13708acd96aad773&redirect_uri='+ conf.url_encode_domain +'%2fone%2ftwo%2findex.html%23%2findex%2fmain&response_type=code&scope=snsapi_base&state=' + this.office_account.store_id + '&component_appid='+ conf.component_appid +'#wechat_redirect'
             }
         },
         mounted(){

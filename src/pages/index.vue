@@ -178,7 +178,7 @@
         <transition name="el-zoom-in-center">
           <div v-show="show_btns" class="left_bottom" @mouseleave="show_btns = false">
             <div class="btn_area" @click="goToGoushuyun">
-              <img src="https://admin.goushuyun.com/images/logo.png">
+              <img src="http://image.goushuyun.cn/gsy_btn.png">
             </div>
             <div class="btn_area" @click="goToshops">
               <i class="fa fa-arrow-left icon" aria-hidden="true"></i>
