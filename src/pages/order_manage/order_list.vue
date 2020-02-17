@@ -493,7 +493,7 @@ export default {
                     cancelButtonText: '取消',
                     type: 'info'
                 }).then(() => {
-                    window.location.assign('http://okxy9gsls.bkt.clouddn.com/CLodop_Setup_for_Win32NT_https_2.130.exe')
+                    window.location.assign('http://images.goushuyun.cn/static/CLodop_Setup_for_Win32NT.exe')
                 }).catch(() => {
                     self.$message({
                         type: 'info',
